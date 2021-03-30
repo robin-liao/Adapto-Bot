@@ -138,6 +138,7 @@ export class TeamsBot extends TeamsActivityHandler {
         ? this.handleOnMessageBack(ctx, next)
         : this.handleOnMessage(ctx, next)
     );
+    this.registerOnTeamsEvents();
   }
 
   private handleOnMessage: BotHandler = async (ctx, next) => {
@@ -394,6 +395,103 @@ export class TeamsBot extends TeamsActivityHandler {
         await sendError(error);
       }
     });
+  }
+
+  private registerOnTeamsEvents() {
+    const sendJSON = async (
+      eventName: string,
+      obj: any,
+      ctx: TurnContext,
+      next: () => Promise<void>
+    ) => {
+      await ctx.sendActivity({
+        textFormat: "xml",
+        text: `<strong>${eventName}</strong><br/><pre>${JSON.stringify(
+          obj,
+          null,
+          2
+        )}</pre>`,
+      });
+      return next();
+    };
+
+    this.onTeamsChannelCreatedEvent((channelInfo, teamInfo, ctx, next) =>
+      sendJSON(
+        "onTeamsChannelCreatedEvent",
+        { channelInfo, teamInfo },
+        ctx,
+        next
+      )
+    );
+
+    this.onTeamsChannelDeletedEvent((channelInfo, teamInfo, ctx, next) =>
+      sendJSON(
+        "onTeamsChannelDeletedEvent",
+        { channelInfo, teamInfo },
+        ctx,
+        next
+      )
+    );
+
+    this.onTeamsChannelRenamedEvent((channelInfo, teamInfo, ctx, next) =>
+      sendJSON(
+        "onTeamsChannelRenamedEvent",
+        { channelInfo, teamInfo },
+        ctx,
+        next
+      )
+    );
+
+    this.onTeamsChannelRestoredEvent((channelInfo, teamInfo, ctx, next) =>
+      sendJSON(
+        "onTeamsChannelRestoredEvent",
+        { channelInfo, teamInfo },
+        ctx,
+        next
+      )
+    );
+
+    this.onTeamsMembersAddedEvent((membersAdded, teamInfo, ctx, next) =>
+      sendJSON(
+        "onTeamsMembersAddedEvent",
+        { membersAdded, teamInfo },
+        ctx,
+        next
+      )
+    );
+
+    this.onTeamsMembersRemovedEvent((membersRemoved, teamInfo, ctx, next) =>
+      sendJSON(
+        "onTeamsMembersRemovedEvent",
+        { membersRemoved, teamInfo },
+        ctx,
+        next
+      )
+    );
+
+    this.onTeamsTeamArchivedEvent((teamInfo, ctx, next) =>
+      sendJSON("onTeamsTeamArchivedEvent", { teamInfo }, ctx, next)
+    );
+
+    this.onTeamsTeamDeletedEvent((teamInfo, ctx, next) =>
+      sendJSON("onTeamsTeamDeletedEvent", { teamInfo }, ctx, next)
+    );
+
+    this.onTeamsTeamHardDeletedEvent((teamInfo, ctx, next) =>
+      sendJSON("onTeamsTeamHardDeletedEvent", { teamInfo }, ctx, next)
+    );
+
+    this.onTeamsTeamRenamedEvent((teamInfo, ctx, next) =>
+      sendJSON("onTeamsTeamRenamedEvent", { teamInfo }, ctx, next)
+    );
+
+    this.onTeamsTeamRestoredEvent((teamInfo, ctx, next) =>
+      sendJSON("onTeamsTeamRestoredEvent", { teamInfo }, ctx, next)
+    );
+
+    this.onTeamsTeamUnarchivedEvent((teamInfo, ctx, next) =>
+      sendJSON("onTeamsTeamUnarchivedEvent", { teamInfo }, ctx, next)
+    );
   }
 
   private async echo(ctx: TurnContext) {

@@ -7,8 +7,10 @@ import {
   TaskModuleTaskInfo,
   TeamsChannelAccount,
 } from "botbuilder";
+import _ = require("lodash");
 import { IMessagingExtensionAction } from ".";
 import { CardGenerator } from "../card-gen";
+import { respondTaskModuleError } from "./utils";
 
 export class TaskModuleCardMention implements IMessagingExtensionAction {
   constructor(private commandId: string) {}
@@ -17,7 +19,13 @@ export class TaskModuleCardMention implements IMessagingExtensionAction {
     ctx: TurnContext,
     request: MessagingExtensionAction
   ): Promise<MessagingExtensionActionResponse> {
-    const members = await TeamsInfo.getMembers(ctx);
+    const members: TeamsChannelAccount[] = [];
+    try {
+      members.push(...(await TeamsInfo.getMembers(ctx)));
+    } catch (e) {
+      return respondTaskModuleError(e.message, true, true);
+    }
+
     const choices = members.map((user, i) => ({
       type: "Input.Choice",
       title: user.name,
@@ -117,7 +125,16 @@ export class TaskModuleCardMention implements IMessagingExtensionAction {
     ctx: TurnContext,
     request: MessagingExtensionAction
   ): Promise<MessagingExtensionActionResponse> {
-    const { selectedUsers, returnAs, members } = request.data;
+    if (!request.data || _.isEmpty(request.data)) {
+      return;
+    }
+
+    const { selectedUsers, returnAs, members = [] } = request.data;
+
+    if (!selectedUsers) {
+      return;
+    }
+
     const selectedIdx = (selectedUsers as string)
       .split(",")
       .map((s) => parseInt(s));

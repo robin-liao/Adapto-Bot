@@ -1,0 +1,22 @@
+<html>
+  <head>
+    <script
+      src="https://statics.teams.cdn.office.net/sdk/v1.7.0/js/MicrosoftTeams.min.js"
+      integrity="sha384-00JbifySIlPvW32u9rSurgu8PujfL6XFdV9iNn4ZWyurJJ33MFvpwPqmCHDq9ADv"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body onload="onLoad()">
+    <script>
+      function onLoad() {
+        microsoftTeams.initialize();
+        microsoftTeams.getContext((context) => {
+          const div = document.getElementById("info");
+          div.innerHTML = `<pre>${JSON.stringify(context, null, 2)}</pre>`;
+        });
+      }
+    </script>
+    <h3>microsoftTeams.getContext()</h3>
+    <div id="info"></div>
+  </body>
+</html>

@@ -1,0 +1,61 @@
+{
+  "@type": "MessageCard",
+  "@context": "http://schema.org/extensions",
+  "title": "Incident Updated - INC0010010",
+  "summary": "Incident Updated - INC0010010",
+  "themeColor": "D1222B",
+  "sections": [
+    {
+      "title": "",
+      "text": "",
+      "activityTitle": "",
+      "activitySubtitle": "",
+      "activityText": "",
+      "facts": [
+        {
+          "name": "Category",
+          "value": "Software"
+        },
+        {
+          "name": "State",
+          "value": "New"
+        },
+        {
+          "name": "Priority",
+          "value": "5 - Planning"
+        },
+        {
+          "name": "Assignment group",
+          "value": "Software"
+        }
+      ]
+    },
+    {
+      "text": "Please check the details"
+    }
+  ],
+  "potentialAction": [
+    {
+      "@type": "OpenUri",
+      "name": "View Incident in ServiceNow",
+      "targets": [
+        {
+          "os": "default",
+          "uri": "https://dev62584.service-now.com/incident.do?sys_id=XXXXXXX&sysparm_stack=incident_list.do?sysparm_query=active=true"
+        },
+        {
+          "os": "iOS",
+          "uri": "https://dev62584.service-now.com/incident.do?sys_id=XXXXXXX&sysparm_stack=incident_list.do?sysparm_query=active=true"
+        },
+        {
+          "os": "android",
+          "uri": "https://dev62584.service-now.com/incident.do?sys_id=XXXXXXX&sysparm_stack=incident_list.do?sysparm_query=active=true"
+        },
+        {
+          "os": "windows",
+          "uri": "https://dev62584.service-now.com/incident.do?sys_id=XXXXXXX&sysparm_stack=incident_list.do?sysparm_query=active=true"
+        }
+      ]
+    }
+  ]
+}

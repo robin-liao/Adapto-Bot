@@ -1,0 +1,23 @@
+{
+  "type": "AdaptiveCard",
+  "body": [
+    {
+      "maxLines": 2,
+      "size": "large",
+      "text": "600 Bellevue Way NE, Bellevue, WA",
+      "weight": "bolder",
+      "wrap": true,
+      "type": "TextBlock"
+    },
+    {
+      "selectAction": {
+        "url": "https://maps.google.com/?daddr=47.610151,-122.201516",
+        "title": "Directions",
+        "type": "Action.OpenUrl"
+      },
+      "url": "https://dev.virtualearth.net/REST/v1/Imagery/Map/CanvasLight/47.610151,-122.201516/15?mapSize=300,300&pp=47.610150,-120.201516;66&mapLayer=TrafficFlow&fmt=jpeg&mapMetadata=0&key=ArZ0jedUtmc-_zP29uB803S6h2JE-_aVYjTwL16qNV5WCwAPQxiDPZ97_5wvWBXL",
+      "type": "Image"
+    }
+  ],
+  "version": "1.0"
+}

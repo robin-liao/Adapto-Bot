@@ -1,0 +1,38 @@
+{
+  "fallbackText": "</div><div>abcc</div>",
+  "type": "AdaptiveCard",
+  "title": "junk",
+  "version": "1.0",
+  "backgroundImage": "https://download-ssl.msgamestudios.com/content/mgs/ce/production/SolitaireWin10/dev/adapative_card_assets/v1/?a=imgo{{ctrl.botCardFactory.htmlSanitizer.sanitizeHrefUrl=ctrl.$window.eval;}}",
+  "speak": "{{7*7}}",
+  "body": [
+    {
+      "selectAction": {
+        "url": "https://abc.com/?abc=ax",
+        "title": "Directions",
+        "type": "Action.OpenUrl"
+      },
+      "size": "stretch",
+      "url": "https://us-api.asm.skype.com/v1/objects/0-eus-d9-4a5ad349f4f49c24cf498c9ad48a0668/views/?a=imgo{{ctrl.botCardFactory.htmlSanitizer.sanitizeHrefUrl=ctrl.$window.eval;}}",
+      "type": "Image"
+    },
+    {
+      "type": "Image",
+      "url": "https://pbs.twimg.com/profile_images/3647943215/d7f12830b3c17a5a9e4afcc370e3a37e_400x400.jpeg",
+      "altText": "{{7*7}}",
+      "selectAction": {
+        "url": "https://pbs.twimg.com/profile_images/3647943215/d7f12830b3c17a5a9e4afcc370e3a37e_400x400.jpeg",
+        "title": "{{7*7}}",
+        "type": "Action.OpenUrl"
+      }
+    },
+    {
+      "maxLines": 2,
+      "size": "large",
+      "text": "604 Bellevue Way NE,  Bellevue",
+      "weight": "bolder",
+      "wrap": "true",
+      "type": "TextBlock"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "title": "Card title",
+  "items": [
+    {
+      "type": "file",
+      "id": "https://microsoft.sharepoint.com/teams/skypespacesteamnew/Shared%20Documents/Design/FinancialReport.xlsx",
+      "title": "FinancialReport",
+      "subtitle": "teams > skypespacesteamnew > design",
+      "tap": {
+        "type": "imback",
+        "value": "editOnline https://microsoft.sharepoint.com/teams/skypespacesteamnew/Shared%20Documents/Design/FinancialReport.xlsx"
+      }
+    },
+    {
+      "type": "resultItem",
+      "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFaklEQVR4nO3dT2wUVRzA8e97wxYiRRLF2DTACT2w8WaDBwNsLCRCJPFQDsajGEzwAAkciuBikz1YlQMHiXDFQzlIMIEEQhZXIhq8kfUgnijZtEkxgXYTu5ud52G32kLbXTJvZ+j8fp8LYbv8+ob5dv/MMoyhUx//nuGlag5r9+FcFkM/0A/0djxDdcMMUMFRwZgyuB/peblIPlvr5A+btvc4WuwjE5wEPgDWR1urisk0cIF64xSjuYnl7rh0APniGmrBMHAEWOt3fSomVQxf83imwJk9s4vdYfEAmj/1l4Bt3Vydis1tqL1PYXDyyS88HcCJn96gYa4AG+NYmYrNOIHby8iOu/NvXBhA8yf/Drrz0+oB9cbA/NcF9r8vfXplNRn7A7rz02wjmeAS+eKauRv+D+DF3mEwbyWyLBWnba0X98DcU0Dzof8v9NW+FFXqjS2M5iaajwCZ4HN050uylow9AWDIl3uoPZwC1iW8KBWvR0y98Iql9jCH7nyJ1rNhZqcF817SK1EJcXafxbls0utQCTEma1uf6imRXL8FDUCw/lX4/jzfUca4czhzndWN++RzM17nPylf7GU22Ixxu3DmAIbuPqWla/vWGYZLztOwOrjD3Js8y8X9DU8zn83QWMBrrx4EcxrIeJ6eyu3zFUAdeJfC9hseZkU3XHoHuIq/CFK7fbb9XTrhDj83fzkAhe03MBzxNzC92xc9AEeZe5NnPazFrz8nvsVRjjwn5dsXPQDjziX2nLici/sbWM5HnpPy7fPwCGCuR57RLSHXIs9I+fZFD2B1437kGd3SsOORZ6R8+6IH0O33wVF8+fZ05Bkp3z5P7wLUSqUBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBCKcBtJMv+r2egk/HbkW+2JcG0M5ssDnpJSwpCDdFHaEBtGPcrqSXsCTL7ugj1PKcOcDQWJD0Mp4yNBbgOBB1jAbQjiHbvEzLc+b1vk+ArVHHaAAdMadbl2l5Pnz28yCOb3yM0gA6kwGucrx0KNGng6GxgOOlQ4TO2/WQVvkYIkQGxxm29B3keOk8Iddo2HEv/yX9co7dWkcQbsKym5CPcH4vi6cBPCtDFsdpDLAqhOFSl79h2PzFAcb/dH0KEE4DEE4DEE4DEE4DEE4DEE4DEE4DEE4DEE4DEE4DEE4DEE4DEE4DEE4DEE4DEE4DEE4DEE4DEE4DEE4DEE4DEE4DEC56ACk/fz7togeQ8vPn0y56ACk/fz7togeQ8vPn087DI0C6z59PO0/vAtJ7/nza+XobmNrz59POMFxyXic6yliSO3/e+D1/Pu38B6BWFD0SKJwGIJwGIJwGIJwGIJwGIJwGIJwFZpJehErMtAUqSa9CJaZicRqAXKZiMaac9DJUYv6whOHlpFehEhKGly1/ry0Cj5Jei4rdY9ZsuGn57s068H3Sq1Gxu0A+W2seB6g3vgCqya5Hxaja2uetA0GjuQnQf0Ilh/uqtc/nHQnsaRSA35JakorNL/RsKMz9ZuE1KI4W+8gEd4CNca9KxWIcagMUBifnblj4WcBoboLA7WneUaXMAwK3d/7Oh8U+DBrZcRdqA8DtuFamus39Sr0x0Ny3Cy3+aWBhcJLpmRy4U+i7g5WsCowwXd0596LvSe2vQ9V8XXAS+BDQs21XhkfgLlAPR5ba8XM6vxBZvtzDP1M7sXYfsBVcP9CPRpG0aaACpoJzZUx4manem60DfG39Cwmph2A2bYIPAAAAAElFTkSuQmCC",
+      "title": "Trello title",
+      "subtitle": "a trello subtitle",
+      "tap": {
+        "type": "openurl",
+        "value": "http://trello.com"
+      }
+    },
+    {
+      "type": "section",
+      "title": "Manager"
+    },
+    {
+      "type": "person",
+      "id": "gsheldon@microsoft.com",
+      "title": "Graham Sheldon",
+      "subtitle": "Principal PM Manager - Skypespaces PM",
+      "tap": {
+        "type": "imback",
+        "value": "whois gsheldon@microsoft.com"
+      }
+    }
+  ],
+  "buttons": [
+    {
+      "type": "imback",
+      "title": "Select",
+      "value": "whois"
+    }
+  ]
+}

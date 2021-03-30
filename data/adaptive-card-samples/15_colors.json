@@ -1,0 +1,173 @@
+{
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.0",
+  "body": [
+    {
+      "type": "Container",
+      "style": "default",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "color: default",
+          "color": "default"
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: default - subtle",
+          "color": "default",
+          "isSubtle": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: accent",
+          "color": "accent"
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: accent - subtle",
+          "color": "accent",
+          "isSubtle": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: good",
+          "color": "good"
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: good - subtle",
+          "color": "good",
+          "isSubtle": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: warning",
+          "color": "warning"
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: warning - subtle",
+          "color": "warning",
+          "isSubtle": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: attention",
+          "color": "attention"
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: attention - subtle",
+          "color": "attention",
+          "isSubtle": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: light",
+          "color": "light"
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: light - subtle",
+          "color": "light",
+          "isSubtle": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: dark",
+          "color": "dark"
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: dark - subtle",
+          "color": "dark",
+          "isSubtle": true
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "style": "emphasis",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "color: default",
+          "color": "default"
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: default - subtle",
+          "color": "default",
+          "isSubtle": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: accent",
+          "color": "accent"
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: accent - subtle",
+          "color": "accent",
+          "isSubtle": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: good",
+          "color": "good"
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: good - subtle",
+          "color": "good",
+          "isSubtle": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: warning",
+          "color": "warning"
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: warning - subtle",
+          "color": "warning",
+          "isSubtle": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: attention",
+          "color": "attention"
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: attention - subtle",
+          "color": "attention",
+          "isSubtle": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: light",
+          "color": "light"
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: light - subtle",
+          "color": "light",
+          "isSubtle": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: dark",
+          "color": "dark"
+        },
+        {
+          "type": "TextBlock",
+          "text": "color: dark - subtle",
+          "color": "dark",
+          "isSubtle": true
+        }
+      ]
+    }    
+  ]
+}

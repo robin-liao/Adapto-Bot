@@ -1,0 +1,23 @@
+{
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.0.0",
+  "body": [
+    {
+      "type": "Input.Date",
+      "id": "due-date-1",
+      "placeholder": "due Date 1"
+    },
+    {
+      "type": "Input.Date",
+      "id": "due-date-2",
+      "value": "2018-05-21",
+      "placeholder": "due Date 2"
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit"
+    }
+  ]
+}

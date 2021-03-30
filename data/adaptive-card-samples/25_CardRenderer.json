@@ -1,0 +1,192 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.3",
+  "body": [
+    {
+      "type": "TextBlock",
+      "size": "Large",
+      "text": "Bot Message Renderer",
+      "weight": "Bolder"
+    },
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "items": [
+            {
+              "type": "ColumnSet",
+              "columns": [
+                {
+                  "type": "Column",
+                  "width": "stretch",
+                  "items": [
+                    {
+                      "type": "TextBlock",
+                      "size": "large",
+                      "text": "Choose card type:"
+                    },
+                    {
+                      "type": "Input.ChoiceSet",
+                      "id": "cardType",
+                      "style": "expanded",
+                      "placeholder": "Choose card type",
+                      "choices": [
+                        {
+                          "type": "Input.Choice",
+                          "title": "Adaptive Card",
+                          "value": "application/vnd.microsoft.card.adaptive"
+                        },
+                        {
+                          "type": "Input.Choice",
+                          "title": "O365 Connector Card",
+                          "value": "application/vnd.microsoft.teams.card.o365connector"
+                        },
+                        {
+                          "type": "Input.Choice",
+                          "title": "Profile Card",
+                          "value": "application/vnd.microsoft.teams.card.profile"
+                        },
+                        {
+                          "type": "Input.Choice",
+                          "title": "List Card",
+                          "value": "application/vnd.microsoft.teams.card.list"
+                        },
+                        {
+                          "type": "Input.Choice",
+                          "title": "Hero Card",
+                          "value": "application/vnd.microsoft.card.hero"
+                        },
+                        {
+                          "type": "Input.Choice",
+                          "title": "Thumbnail Card",
+                          "value": "application/vnd.microsoft.card.thumbnail"
+                        },
+                        {
+                          "type": "Input.Choice",
+                          "title": "Signin Card",
+                          "value": "application/vnd.microsoft.card.signin"
+                        },
+                        {
+                          "type": "Input.Choice",
+                          "title": "Receipt Card",
+                          "value": "application/vnd.microsoft.card.receipt"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Column",
+                  "width": "stretch",
+                  "items": [
+                    {
+                      "type": "TextBlock",
+                      "text": "Return as",
+                      "size": "large"
+                    },
+                    {
+                      "type": "Input.ChoiceSet",
+                      "id": "returnAs",
+                      "isMultiSelect": true,
+                      "value": "asMECard",
+                      "choices": [
+                        {
+                          "title": "Card in Compose",
+                          "value": "asMECard"
+                        },
+                        {
+                          "title": "Send as Bot Message",
+                          "value": "asBotCard"
+                        }
+                      ],
+                      "placeholder": "Placeholder text",
+                      "style": "expanded"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Input.Text",
+              "id": "cardPayload",
+              "isMultiline": true,
+              "placeholder": "paste card payload here"
+            }
+          ],
+          "width": "stretch"
+        },
+        {
+          "type": "Column",
+          "items": [
+            {
+              "type": "TextBlock",
+              "size": "large",
+              "text": "Non-Card Content"
+            },
+            {
+              "type": "TextBlock",
+              "text": "Summary",
+              "weight": "Bolder"
+            },
+            {
+              "type": "Input.Text",
+              "placeholder": "summary",
+              "id": "summary"
+            },
+            {
+              "type": "TextBlock",
+              "text": "Text Format",
+              "weight": "Bolder"
+            },
+            {
+              "type": "Input.ChoiceSet",
+              "id": "textFormat",
+              "style": "expanded",
+              "placeholder": "Choose card type",
+              "choices": [
+                {
+                  "type": "Input.Choice",
+                  "title": "Plain",
+                  "value": "plain"
+                },
+                {
+                  "type": "Input.Choice",
+                  "title": "XML",
+                  "value": "xml"
+                },
+                {
+                  "type": "Input.Choice",
+                  "title": "Markdown",
+                  "value": "markdown"
+                }
+              ]
+            },
+            {
+              "type": "TextBlock",
+              "text": "Text",
+              "weight": "Bolder"
+            },
+            {
+              "type": "Input.Text",
+              "placeholder": "paste text content here",
+              "id": "textContent",
+              "isMultiline": true
+            }
+          ],
+          "width": "stretch"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Submit",
+      "data": {
+        "acAction": "render"
+      }
+    }
+  ]
+}

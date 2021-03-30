@@ -1,0 +1,41 @@
+{
+  "upn": "Sid.Uppal@microsoft.com",
+  "displayName": "Sid Uppal",
+  "jobTitle": "PRINCIPAL SOFTWARE ENG MANAGER",
+  "department": "MS Teams _Ecosystem PM 1010",
+  "officeLocation": "LINCOLN SQUARE/10005",
+  "phone": "+1 (425) 5386365",
+  "text": "WhoBot has found things Sid has shared recently like his availability, recent files, and who he is currently working with to help you get to know him better and get things done.",
+  "images": [
+    {
+      "url": "https://cdn2.iconfinder.com/data/icons/social-icons-33/128/Trello-128.png",
+      "alt": "Sid Uppal"
+    }
+  ],
+  "buttons": [
+    {
+      "type": "imback",
+      "title": "Availability",
+      "value": "availability lajin@microsoft.com"
+    },
+    {
+      "type": "imback",
+      "title": "Reports To",
+      "value": "reportsto lajin@microsoft.com"
+    },
+    {
+      "type": "imback",
+      "title": "Recent Files",
+      "value": "recentfiles lajin@microsoft.com"
+    },
+    {
+      "type": "imback",
+      "title": "Works With",
+      "value": "workswith lajin@microsoft.com"
+    }
+  ],
+  "tap": {
+    "type": "imback",
+    "value": "chat lajin@microsoft.com"
+  }
+}

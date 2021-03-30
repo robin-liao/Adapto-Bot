@@ -1,0 +1,56 @@
+{
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.0",
+  "body": [
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "Image",
+                  "url":
+                    "https://tfsprodwus22.visualstudio.com/_apis/wit/workItemIcons/icon_insect?color=CC293D&v=2",
+                  "size": "small",
+                  "style": "default"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text":
+                    "Bug 246396: Message selection in R0 and R1 does not follow the earlier behavior",
+                  "weight": "bolder",
+                  "wrap": true
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "Proposed | Mark Peterson",
+                  "isSubtle": true,
+                  "spacing": "none",
+                  "wrap": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "View work item"
+    }
+  ]
+}

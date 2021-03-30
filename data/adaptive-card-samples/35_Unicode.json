@@ -1,0 +1,187 @@
+{
+  "type": "AdaptiveCard",
+  "body": [
+    {
+      "type": "TextBlock",
+      "weight": "bolder",
+      "text": "All questions"
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "items": [
+                {
+                  "type": "Container",
+                  "items": [
+                    {
+                      "type": "TextBlock",
+                      "weight": "Bolder",
+                      "text": "Kavin Singh"
+                    },
+                    {
+                      "type": "TextBlock",
+                      "spacing": "None",
+                      "text": "new question lol",
+                      "wrap": true
+                    }
+                  ]
+                }
+              ],
+              "width": "stretch"
+            },
+            {
+              "type": "Column",
+              "verticalContentAlignment": "Center",
+              "items": [
+                {
+                  "type": "Container",
+                  "items": [
+                    {
+                      "type": "Container",
+                      "selectAction": {
+                        "type": "Action.Submit",
+                        "id": "upvote",
+                        "data": {
+                          "id": "upvote",
+                          "questionId": "5f19cc70c0884a16bcf61169",
+                          "qnaSessionId": "5f19cc55c0884a16bcf61168"
+                        }
+                      },
+                      "items": [
+                        {
+                          "type": "TextBlock",
+                          "size": "Large",
+                          "color": "Accent",
+                          "text": "↑"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "width": "auto"
+            },
+            {
+              "type": "Column",
+              "verticalContentAlignment": "Center",
+              "items": [
+                {
+                  "type": "Container",
+                  "items": [
+                    {
+                      "type": "TextBlock",
+                      "size": "Medium",
+                      "weight": "Bolder",
+                      "color": "Accent",
+                      "text": "1 "
+                    }
+                  ]
+                }
+              ],
+              "width": "auto"
+            }
+          ]
+        },
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "items": [
+                {
+                  "type": "Container",
+                  "items": [
+                    {
+                      "type": "TextBlock",
+                      "weight": "Bolder",
+                      "text": "Lily Du"
+                    },
+                    {
+                      "type": "TextBlock",
+                      "spacing": "None",
+                      "text": "hellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohello",
+                      "wrap": true
+                    }
+                  ]
+                }
+              ],
+              "width": "stretch"
+            },
+            {
+              "type": "Column",
+              "verticalContentAlignment": "Center",
+              "items": [
+                {
+                  "type": "Container",
+                  "items": [
+                    {
+                      "type": "Container",
+                      "selectAction": {
+                        "type": "Action.Submit",
+                        "id": "upvote",
+                        "data": {
+                          "id": "upvote",
+                          "questionId": "5f19cc72c0884a16bcf6116a",
+                          "qnaSessionId": "5f19cc55c0884a16bcf61168"
+                        }
+                      },
+                      "items": [
+                        {
+                          "type": "TextBlock",
+                          "size": "Large",
+                          "color": "Accent",
+                          "text": "↑"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "width": "auto"
+            },
+            {
+              "type": "Column",
+              "verticalContentAlignment": "Center",
+              "items": [
+                {
+                  "type": "Container",
+                  "items": [
+                    {
+                      "type": "TextBlock",
+                      "size": "Medium",
+                      "weight": "Bolder",
+                      "color": "Accent",
+                      "text": "2 "
+                    }
+                  ]
+                }
+              ],
+              "width": "auto"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ActionSet",
+      "actions": [
+        {
+          "type": "Action.Submit",
+          "id": "confirmEndQnA",
+          "title": "End session",
+          "data": {
+            "id": "confirmEndQnA",
+            "qnaSessionId": "5f19cc55c0884a16bcf61168"
+          }
+        }
+      ]
+    }
+  ],
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.2"
+}

@@ -1,0 +1,416 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.0",
+  "body": [
+    {
+      "type": "Container",
+      "height": "stretch",
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "size": "large",
+                  "weight": "bolder",
+                  "text": "cat",
+                  "textStyle": "display"
+                },
+                {
+                  "type": "TextBlock",
+                  "size": "small",
+                  "weight": "bolder",
+                  "isSubtle": true,
+                  "text": "NOUN"
+                },
+                {
+                  "type": "ColumnSet",
+                  "columns": [
+                    {
+                      "type": "Column",
+                      "width": "1",
+                      "items": [
+                        {
+                          "type": "TextBlock",
+                          "weight": "bolder",
+                          "text": "1\\.",
+                          "horizontalAlignment": "right",
+                          "maxLines": 1,
+                          "textStyle": "display"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Column",
+                      "width": "17",
+                      "items": [
+                        {
+                          "type": "TextBlock",
+                          "text":
+                            "a small domesticated carnivorous mammal with soft fur, a short snout, and retractable claws. It is widely kept as a pet or for catching mice, and many breeds have been developed.",
+                          "wrap": true
+                        },
+                        {
+                          "type": "TextBlock",
+                          "text": "*synonyms:* feline · tabby",
+                          "wrap": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "ColumnSet",
+                  "columns": [
+                    {
+                      "type": "Column",
+                      "width": "1",
+                      "items": [
+                        {
+                          "type": "TextBlock",
+                          "weight": "bolder",
+                          "text": "2\\.",
+                          "horizontalAlignment": "right",
+                          "maxLines": 1,
+                          "textStyle": "display"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Column",
+                      "width": "17",
+                      "items": [
+                        {
+                          "type": "TextBlock",
+                          "text":
+                            "(particularly among jazz enthusiasts) a person, especially a man.",
+                          "wrap": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "TextBlock",
+                  "size": "small",
+                  "weight": "bolder",
+                  "isSubtle": true,
+                  "text": "VERB"
+                },
+                {
+                  "type": "ColumnSet",
+                  "columns": [
+                    {
+                      "type": "Column",
+                      "width": "1",
+                      "items": []
+                    },
+                    {
+                      "type": "Column",
+                      "width": "17",
+                      "items": [
+                        {
+                          "type": "TextBlock",
+                          "text":
+                            "raise (an anchor) from the surface of the water to the cathead.",
+                          "wrap": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "size": "large",
+                  "weight": "bolder",
+                  "text": "cat",
+                  "textStyle": "display"
+                },
+                {
+                  "type": "TextBlock",
+                  "size": "small",
+                  "weight": "bolder",
+                  "isSubtle": true,
+                  "text": "NOUN"
+                },
+                {
+                  "type": "ColumnSet",
+                  "columns": [
+                    {
+                      "type": "Column",
+                      "width": "1",
+                      "items": []
+                    },
+                    {
+                      "type": "Column",
+                      "width": "17",
+                      "items": [
+                        {
+                          "type": "TextBlock",
+                          "text": "short for ",
+                          "wrap": true
+                        },
+                        {
+                          "type": "TextBlock",
+                          "text": "catalytic converter",
+                          "wrap": true
+                        },
+                        {
+                          "type": "TextBlock",
+                          "text": ".",
+                          "wrap": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "size": "large",
+                  "weight": "bolder",
+                  "text": "cat",
+                  "textStyle": "display"
+                },
+                {
+                  "type": "TextBlock",
+                  "size": "small",
+                  "weight": "bolder",
+                  "isSubtle": true,
+                  "text": "NOUN"
+                },
+                {
+                  "type": "ColumnSet",
+                  "columns": [
+                    {
+                      "type": "Column",
+                      "width": "1",
+                      "items": []
+                    },
+                    {
+                      "type": "Column",
+                      "width": "17",
+                      "items": [
+                        {
+                          "type": "TextBlock",
+                          "text": "short for ",
+                          "wrap": true
+                        },
+                        {
+                          "type": "TextBlock",
+                          "text": "catamaran",
+                          "wrap": true
+                        },
+                        {
+                          "type": "TextBlock",
+                          "text": ".",
+                          "wrap": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "size": "large",
+                  "weight": "bolder",
+                  "text": "CAT",
+                  "textStyle": "display"
+                },
+                {
+                  "type": "TextBlock",
+                  "size": "small",
+                  "weight": "bolder",
+                  "isSubtle": true,
+                  "text": "ABBREVIATION"
+                },
+                {
+                  "type": "ColumnSet",
+                  "columns": [
+                    {
+                      "type": "Column",
+                      "width": "1",
+                      "items": [
+                        {
+                          "type": "TextBlock",
+                          "weight": "bolder",
+                          "text": "1\\.",
+                          "horizontalAlignment": "right",
+                          "maxLines": 1,
+                          "textStyle": "display"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Column",
+                      "width": "17",
+                      "items": [
+                        {
+                          "type": "TextBlock",
+                          "text": "clear air turbulence.",
+                          "wrap": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "ColumnSet",
+                  "columns": [
+                    {
+                      "type": "Column",
+                      "width": "1",
+                      "items": [
+                        {
+                          "type": "TextBlock",
+                          "weight": "bolder",
+                          "text": "2\\.",
+                          "horizontalAlignment": "right",
+                          "maxLines": 1,
+                          "textStyle": "display"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Column",
+                      "width": "17",
+                      "items": [
+                        {
+                          "type": "TextBlock",
+                          "text": "computer-assisted (or -aided) testing.",
+                          "wrap": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "ColumnSet",
+                  "columns": [
+                    {
+                      "type": "Column",
+                      "width": "1",
+                      "items": [
+                        {
+                          "type": "TextBlock",
+                          "weight": "bolder",
+                          "text": "3\\.",
+                          "horizontalAlignment": "right",
+                          "maxLines": 1,
+                          "textStyle": "display"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Column",
+                      "width": "17",
+                      "items": [
+                        {
+                          "type": "TextBlock",
+                          "text": "computerized axial tomography.",
+                          "wrap": true
+                        },
+                        {
+                          "type": "TextBlock",
+                          "isSubtle": true,
+                          "text": "\"a CAT scan\"",
+                          "wrap": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "size": "large",
+                  "weight": "bolder",
+                  "text": "com·pu·ter·ized ax·i·al to·mog·ra·phy",
+                  "textStyle": "display"
+                },
+                {
+                  "type": "TextBlock",
+                  "size": "small",
+                  "weight": "bolder",
+                  "isSubtle": true,
+                  "text": "NOUN"
+                },
+                {
+                  "type": "ColumnSet",
+                  "columns": [
+                    {
+                      "type": "Column",
+                      "width": "1",
+                      "items": []
+                    },
+                    {
+                      "type": "Column",
+                      "width": "17",
+                      "items": [
+                        {
+                          "type": "TextBlock",
+                          "text":
+                            "a form of tomography in which a computer controls the motion of the X-ray source and detectors, processes the data, and produces the image.",
+                          "wrap": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "selectAction": {
+        "type": "Action.OpenUrl",
+        "url":
+          "https://www.bing.com/search?q=what's+a+cat&elv=AXXfrEiqqD9r3GuelwApulq2fLNnJBdJyvjvGgxG2JdptrMCkjGGlyIarHktoXq0SEJEqEPJWg95uxSWAWIPR2EXlHd3pHfMDGBtjsAqNyaB",
+        "title": "Open In Bing"
+      }
+    }
+  ],
+  "-ms-source": "Bing",
+  "-ms-height": "fixed"
+}

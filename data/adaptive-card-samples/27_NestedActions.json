@@ -1,0 +1,85 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.0",
+  "body": [],
+  "actions": [
+    {
+      "type": "Action.ShowCard",
+      "title": "Set due date",
+      "card": {
+        "type": "AdaptiveCard",
+        "body": [],
+        "actions": [
+          {
+            "type": "Action.ShowCard",
+            "title": "Set due date",
+            "card": {
+              "type": "AdaptiveCard",
+              "body": [],
+              "actions": [
+                {
+                  "type": "Action.OpenUrl",
+                  "title": "OK OK OK",
+                  "url": "http://adaptivecards.io"
+                },
+                {
+                  "type": "Action.OpenUrl",
+                  "title": "View",
+                  "url": "http://adaptivecards.io"
+                },
+                {
+                  "type": "Action.OpenUrl",
+                  "title": " ",
+                  "url": "http://adaptivecards.io",
+                  "iconUrl": "https://urlp.sfbassets.com/urlpcdn/sa1/contentapi1/40044db4-4716-46bb-86f3-73ff910f41c3"
+                },
+                {
+                  "type": "Action.OpenUrl",
+                  "title": "The spending trends and total",
+                  "url": "http://adaptivecards.io"
+                },
+                {
+                  "type": "Action.OpenUrl",
+                  "title": "The spending trends and total",
+                  "url": "http://adaptivecards.io",
+                  "iconUrl": "https://urlp.sfbassets.com/urlpcdn/sa1/contentapi1/40044db4-4716-46bb-86f3-73ff910f41c3"
+                }
+              ]
+            }
+          },
+          {
+            "type": "Action.OpenUrl",
+            "title": "View",
+            "url": "http://adaptivecards.io"
+          },
+          {
+            "type": "Action.OpenUrl",
+            "title": "View View View",
+            "url": "http://adaptivecards.io"
+          },
+          {
+            "type": "Action.OpenUrl",
+            "title": "View View View",
+            "url": "http://adaptivecards.io"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Action.OpenUrl",
+      "title": "View",
+      "url": "http://adaptivecards.io"
+    },
+    {
+      "type": "Action.OpenUrl",
+      "title": "View View View",
+      "url": "http://adaptivecards.io"
+    },
+    {
+      "type": "Action.OpenUrl",
+      "title": "View View View",
+      "url": "http://adaptivecards.io"
+    }
+  ]
+}

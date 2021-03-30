@@ -1,0 +1,81 @@
+{
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.0",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "adaptiveCardMarkdown"
+    },
+    {
+      "type": "TextBlock",
+      "text": "**bold**"
+    },
+    {
+      "type": "TextBlock",
+      "text": "_Italic_"
+    },
+    {
+      "type": "TextBlock",
+      "text": "[hyperlink](https://microsoft.com)"
+    },
+    {
+      "type": "TextBlock",
+      "text": "[unsafe link](javascript:alert(''))"
+    },
+    {
+      "type": "TextBlock",
+      "text": "![image](https://cdn2.iconfinder.com/data/icons/social-icons-33/128/Trello-128.png)"
+    },
+    {
+      "type": "TextBlock",
+      "text": "`code`"
+    },
+    {
+      "type": "TextBlock",
+      "text": "```code block```"
+    },
+    {
+      "type": "TextBlock",
+      "text": "- Item 1\r- Item 2\r- Item 3"
+    },
+    {
+      "type": "TextBlock",
+      "text": "1. Green\r2. Orange\r3. Blue"
+    },
+    {
+      "type": "TextBlock",
+      "text": "<a href='https://abc.com'>html should not allow</a>"
+    },
+    {
+      "type": "FactSet",
+      "facts": [
+        {
+          "title": "**bold**",
+          "value": "_Italic_"
+        }
+      ]
+    },
+    {
+      "type": "Input.ChoiceSet",
+      "id": "myColor2",
+      "style": "expanded",
+      "isMultiSelect": false,
+      "value": "1",
+      "choices": [
+        {
+          "title": "**bold**  _Italic_",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "type": "Input.Toggle",
+      "id": "acceptTerms",
+      "title": "**bold**  _Italic_",
+      "value": "true",
+      "valueOn": "true",
+      "valueOff": "false"
+    }
+  ]
+}

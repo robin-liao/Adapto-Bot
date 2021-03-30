@@ -1,0 +1,110 @@
+{
+  "$schema": "https://github.com/OfficeDev/microsoft-teams-app-schema/blob/preview/DevPreview/MicrosoftTeams.schema.json",
+  "manifestVersion": "devPreview",
+  "version": "1.0",
+  "id": "8f592681-9d05-4737-a43e-2395a1ee4f9a",
+  "packageName": "com.microsoft.teams.samples.v4bot",
+  "developer": {
+    "name": "Robin Liao",
+    "websiteUrl": "https://example.azurewebsites.net",
+    "privacyUrl": "https://example.azurewebsites.net/privacy",
+    "termsOfUseUrl": "https://example.azurewebsites.net/termsofuse"
+  },
+  "name": {
+    "short": "Adapto V4 Bot",
+    "full": "Microsoft Teams V4 Sample Bot"
+  },
+  "description": {
+    "short": "Sample bot using V4 SDK",
+    "full": "Sample bot using V4 Bot Builder V4 SDK"
+  },
+  "icons": {
+    "outline": "icon-outline.png",
+    "color": "icon-color.png"
+  },
+  "accentColor": "#B23F1C",
+  "bots": [
+    {
+      "botId": "e524fc50-3773-4dad-a19f-ebba5bffb381",
+      "scopes": ["groupchat", "personal", "team"]
+    }
+  ],
+  "composeExtensions": [
+    {
+      "botId": "e524fc50-3773-4dad-a19f-ebba5bffb381",
+      "commands": [
+        {
+          "id": "queryCards",
+          "description": "Test command to run query",
+          "title": "Query cards",
+          "parameters": [
+            {
+              "name": "queryText",
+              "title": "Query parameter",
+              "description": "Query parameter"
+            }
+          ]
+        },
+        {
+          "id": "createCard",
+          "type": "action",
+          "description": "Action to create a card",
+          "title": "Create cards",
+          "fetchTask": true,
+          "parameters": [
+            {
+              "name": "dummy",
+              "title": "Dummy parameter",
+              "description": "Dummy parameter"
+            }
+          ]
+        },
+        {
+          "id": "createWithPreview",
+          "type": "action",
+          "description": "Action to create a card with preview before sending",
+          "title": "Create cards with preview",
+          "fetchTask": true,
+          "parameters": [
+            {
+              "name": "dummy",
+              "title": "Dummy parameter",
+              "description": "Dummy parameter"
+            }
+          ]
+        },
+        {
+          "id": "shareMessage",
+          "type": "action",
+          "context": ["message"],
+          "description": "Test command to run action on message context (message sharing)",
+          "title": "Create cards",
+          "fetchTask": true,
+          "parameters": [
+            {
+              "name": "dummy",
+              "title": "Dummy parameter",
+              "description": "Dummy parameter"
+            }
+          ]
+        },
+        {
+          "id": "cardMention",
+          "type": "action",
+          "description": "Action to generate card with mentions",
+          "title": "Mention",
+          "fetchTask": true
+        }
+      ],
+      "messageHandlers": [
+        {
+          "type": "link",
+          "value": {
+            "domains": ["*.azurewebsites.net", "*.ngrok.io"]
+          }
+        }
+      ]
+    }
+  ],
+  "validDomains": ["*.azurewebsites.net", "*.ngrok.io"]
+}

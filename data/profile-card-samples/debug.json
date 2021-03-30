@@ -1,0 +1,47 @@
+{
+  "upn": "Harry.Duguid@icpnet.com",
+  "displayName": "Harry Duguid",
+  "jobTitle": "Data Steward",
+  "department": "COTY",
+  "buttons": [
+    {
+      "type": "messageBack",
+      "title": "Manager",
+      "displayText": "Who is the manager of Harry.Duguid@icpnet.com?",
+      "value": {
+        "intentName": "GetManager",
+        "employeeName": null,
+        "employeeEmail": "Harry.Duguid@icpnet.com",
+        "topic": null,
+        "startDate": null,
+        "endDate": null
+      }
+    },
+    {
+      "type": "messageBack",
+      "title": "Works with",
+      "displayText": "Who works with Harry.Duguid@icpnet.com?",
+      "value": {
+        "intentName": "WorkedWith",
+        "employeeName": null,
+        "employeeEmail": "Harry.Duguid@icpnet.com",
+        "topic": null,
+        "startDate": null,
+        "endDate": null
+      }
+    },
+    {
+      "type": "messageBack",
+      "title": "Peers",
+      "displayText": "Who are the peers of Harry.Duguid@icpnet.com?",
+      "value": {
+        "intentName": "Peers",
+        "employeeName": null,
+        "employeeEmail": "Harry.Duguid@icpnet.com",
+        "topic": null,
+        "startDate": null,
+        "endDate": null
+      }
+    }
+  ]
+}

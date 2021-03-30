@@ -1,0 +1,31 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.0",
+  "body": [
+    {
+      "type": "TextBlock",
+      "size": "large",
+      "weight": "bolder",
+      "text": "App JIT Test"
+    },
+    {
+      "type": "Input.Text",
+      "id": "card",
+      "isMultiline": true,
+      "placeholder": "Card payload to render if app is not installed in current context"
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Open Task Module",
+      "data": {
+        "msteams": {
+          "type": "task/fetch"
+        },
+        "commandId": "appJIT"
+      }
+    }
+  ]
+}

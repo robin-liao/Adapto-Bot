@@ -1,0 +1,123 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.0",
+  "body": [
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "<img src=/ onerror=javascript:alert('TextBlock')>",
+          "weight": "bolder",
+          "size": "medium"
+        }
+     ]
+    },
+    {
+      "type": "Input.ChoiceSet",
+      "id": "cardType1",
+      "style": "compact",
+      "placeholder": "Choose card type",
+      "choices": [
+        {
+          "type": "Input.Choice",
+          "title": "<img src=/ onerror=javascript:alert('compact choices.title')>",
+          "value": "choice1"
+        }
+      ]
+    },
+    {
+      "type": "Input.ChoiceSet",
+      "id": "cardType2",
+      "style": "expanded",
+      "placeholder": "Choose card type",
+      "choices": [
+        {
+          "type": "Input.Choice",
+          "title": "<img src=/ onerror=javascript:alert('expanded choices.title')>",
+          "value": "choice1"
+        }
+      ]
+    },
+    {
+      "type": "Input.Toggle",
+      "id": "Vegetarian",
+      "title": "<img src=/ onerror=javascript:alert('toggle')>",
+      "valueOn": "vegan",
+      "valueOff": "notVegan"
+    },
+    {
+      "type": "FactSet",
+      "facts": [
+        {
+          "title": "<img src=/ onerror=javascript:alert('fact title')>",
+          "value": "<img src=/ onerror=javascript:alert('fact value')>"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.ShowCard",
+      "title": "Card-ception",
+      "card": {
+        "body": [
+          {
+            "type": "Container",
+            "items": [
+              {
+                "type": "TextBlock",
+                "text": "<img src=/ onerror=javascript:alert('TextBlock')>",
+                "weight": "bolder",
+                "size": "medium"
+              }
+            ]
+          },
+          {
+            "type": "Input.ChoiceSet",
+            "id": "sub-cardType1",
+            "style": "compact",
+            "placeholder": "Choose card type",
+            "choices": [
+              {
+                "type": "Input.Choice",
+                "title": "<img src=/ onerror=javascript:alert('compact choices.title')>",
+                "value": "choice1"
+              }
+            ]
+          },
+          {
+            "type": "Input.ChoiceSet",
+            "id": "sub-cardType2",
+            "style": "expanded",
+            "placeholder": "Choose card type",
+            "choices": [
+              {
+                "type": "Input.Choice",
+                "title": "<img src=/ onerror=javascript:alert('expanded choices.title')>",
+                "value": "choice1"
+              }
+            ]
+          },
+          {
+            "type": "Input.Toggle",
+            "id": "sub-Vegetarian",
+            "title": "<img src=/ onerror=javascript:alert('toggle')>",
+            "valueOn": "vegan",
+            "valueOff": "notVegan"
+          },
+          {
+            "type": "FactSet",
+            "facts": [
+              {
+                "title": "<img src=/ onerror=javascript:alert('fact title')>",
+                "value": "<img src=/ onerror=javascript:alert('fact value')>"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

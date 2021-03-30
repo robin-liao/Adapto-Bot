@@ -1,0 +1,11 @@
+{
+  "title": "Test Card Deleting",
+  "text": "some text text text text text text....",
+  "buttons": [
+    {
+      "type": "invoke",
+      "title": "delete me",
+      "value": "{\"intent\": \"deleteCard\"}"
+    }
+  ]
+}

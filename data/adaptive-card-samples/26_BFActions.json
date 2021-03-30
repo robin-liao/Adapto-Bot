@@ -1,0 +1,85 @@
+{
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.0.0",
+  "fallbackText": "fallback text for sample 01",
+  "speak": "This is adaptive card sample 1",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "MS Teams actions",
+      "size": "large",
+      "weight": "bolder",
+      "horizontalAlignment": "center"
+    },
+    {
+      "type": "Input.Text",
+      "id": "userText",
+      "placeholder": "opt in any user inputs (id = userText)"
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "MessageBack",
+      "data": {
+        "msteams": {
+          "type": "messageBack",
+          "displayText": "I clicked a messageBack button",
+          "text": "text to bots",
+          "value": "{\"bfKey\": \"bfVal\", \"conflictKey\": \"teams action data\" }"
+        },
+        "acCardHiddenData": 1.23456,
+        "conflictKey": "adaptive card data"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Invoke",
+      "data": {
+        "msteams": {
+          "type": "invoke",
+          "value": "{\"bfKey\": \"bfVal\", \"conflictKey\": \"teams action data\" }"
+        },
+        "acCardHiddenData": 1.23456,
+        "conflictKey": "adaptive card data"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "imBack",
+      "data": {
+        "msteams": {
+          "type": "imback",
+          "value": "I clicked imBack button"
+        },
+        "acCardHiddenData": 1.23456,
+        "conflictKey": "adaptive card data"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Sign in",
+      "data": {
+        "msteams": {
+          "type": "signin",
+          "value": "https://chebyshev.azurewebsites.net/tabInitTaskModule"
+        },
+        "acCardHiddenData": 1.23456,
+        "conflictKey": "adaptive card data"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "openUrl",
+      "data": {
+        "msteams": {
+          "type": "openUrl",
+          "value": "https://microsoft.com"
+        },
+        "acCardHiddenData": 1.23456,
+        "conflictKey": "adaptive card data"
+      }
+    }    
+  ]
+}

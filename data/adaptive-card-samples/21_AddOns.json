@@ -1,0 +1,17 @@
+{
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.0",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "What color do you want? (expanded + single)"
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Toggle Copy Button"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "title": "Test Card Updating",
+  "buttons": [
+    {
+      "type": "invoke",
+      "title": "update me (long)",
+      "value": "{\"intent\": \"updateCard\", \"text\": \"Have you found yourself scratching your head trying to figure these questions out? Frustrated trying to access some of the goodies unique to the Microsoft Teams platform?  Well, fear not, Bot Builder SDK Extension for Teams in .NET and Node flavors is here!  Just head on over to Nuget or NPM to download our tasty helpers, sure to speed up your prep time so you can spend more time maximizing the flavor of the bots you're cooking up.Here’s a small sample of some recipes to whet your appetite. Have you found yourself scratching your head trying to figure these questions out? Frustrated trying to access some of the goodies unique to the Microsoft Teams platform?  Well, fear not, Bot Builder SDK Extension for Teams in .NET and Node flavors is here!  Just head on over to Nuget or NPM to download our tasty helpers, sure to speed up your prep time so you can spend more time maximizing the flavor of the bots you're cooking up.Here’s a small sample of some recipes to whet your appetite.\"}"
+    },
+    {
+      "type": "invoke",
+      "title": "update me (short)",
+      "value": "{\"intent\": \"updateCard\", \"text\": \"short text\"}"
+    },
+    {
+      "type": "invoke",
+      "title": "update to Text",
+      "value": "{\"intent\": \"updateCard\", \"update\": \"toText\", \"text\": \"short text\"}"
+    },
+    {
+      "type": "invoke",
+      "title": "update to Another Card",
+      "value": "{\"intent\": \"updateCard\", \"update\": \"toAdaptiveCard\"}"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "noImplicitAny": false,
+    "sourceMap": true,
+    "inlineSources": true,
+    "outDir": "./dist",
+    "sourceRoot": "./src",
+    "typeRoots": ["./src/@types"]
+  }
+}

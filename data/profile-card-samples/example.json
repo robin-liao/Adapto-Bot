@@ -1,0 +1,24 @@
+{
+  "upn": "sujeetm@microsoft.com",
+  "buttons": [
+    {
+      "type": "imback",
+      "title": "Availability",
+      "value": "availability lajin@microsoft.com"
+    },
+    {
+      "type": "imback",
+      "title": "Reports To",
+      "value": "reportsto lajin@microsoft.com"
+    },
+    {
+      "type": "imback",
+      "title": "Recent Files",
+      "value": "recentfiles lajin@microsoft.com"
+    }
+  ],
+  "tap": {
+    "type": "imback",
+    "value": "chat lajin@microsoft.com"
+  }
+}

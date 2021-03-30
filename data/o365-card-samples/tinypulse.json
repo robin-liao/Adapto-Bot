@@ -1,0 +1,96 @@
+{
+  "@context": "http://schema.org/extensions",
+  "@type": "MessageCard",
+  "themeColor": "F37121",
+  "sections": [
+    {
+      "heroImage": {
+        "image": "https://d1i5ulwvtra6uh.cloudfront.net/assets/engage-logo-2x.png"
+      }
+    },
+    {
+      "startGroup": true,
+      "activityImageStyle": "normal",
+      "activityImage": "https://d1i5ulwvtra6uh.cloudfront.net/assets/new_survey_email_icon_2.png",
+      "activityTitle": "**How valued do you feel at work?**",
+      "activitySubtitle": "1 being extremely unvalued (slightly more than the furniture), 10 being extremely valued (we can&#39;t live without you).",
+      "potentialAction": [
+        {
+          "@type": "ActionCard",
+          "@id": "Answer",
+          "name": "Answer",
+          "inputs": [
+            {
+              "@type": "MultichoiceInput",
+              "id": "question_response_integer",
+              "title": "Your score",
+              "isRequired": true,
+              "choices": [
+                {
+                  "display": "1 - Extremely unvalued",
+                  "value": 1
+                },
+                {
+                  "display": "2",
+                  "value": 2
+                },
+                {
+                  "display": "3",
+                  "value": 3
+                },
+                {
+                  "display": "4",
+                  "value": 4
+                },
+                {
+                  "display": "5",
+                  "value": 5
+                },
+                {
+                  "display": "6",
+                  "value": 6
+                },
+                {
+                  "display": "7",
+                  "value": 7
+                },
+                {
+                  "display": "8",
+                  "value": 8
+                },
+                {
+                  "display": "9",
+                  "value": 9
+                },
+                {
+                  "display": "10 - Extremely valued",
+                  "value": 10
+                }
+              ]
+            },
+            {
+              "@type": "TextInput",
+              "id": "question_response_more",
+              "title": "Please elaborate on your answer",
+              "isMultiline": true,
+              "isRequired": true
+            }
+          ],
+          "actions": [
+            {
+              "@type": "HttpPOST",
+              "@id": "Answer anonymously",
+              "name": "Answer anonymously",
+              "body": "{\"response_token\":\"1a51d21815fb98ac3cacfc\", \"question_response_integer\" : \"{{question_response_integer.value}}\",  \"question_response_more\" : \"{{question_response_more.value}}\"}",
+              "isPrimary": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "activityTitle": "**Streak: 3** surveys in a row",
+      "activitySubtitle": "Survey expires in -827 days on 05/22/2018"
+    }
+  ]
+}

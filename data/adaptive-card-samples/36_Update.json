@@ -1,0 +1,53 @@
+{
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.0.0",
+  "fallbackText": "fallback text for sample 01",
+  "speak": "This is adaptive card sample 1",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "What color do you want? (expanded + multi)"
+    },
+    {
+      "type": "Input.ChoiceSet",
+      "id": "ExpandedMultiSelectVal",
+      "style": "expanded",
+      "isMultiSelect": true,
+      "choices": [
+        {
+          "title": "Choice 1",
+          "value": "1"
+        },
+        {
+          "title": "Choice 2",
+          "value": "2"
+        },
+        {
+          "title": "Choice 3",
+          "value": "3"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Update",
+      "data": {
+        "intent": "updateCard",
+        "update": "toAdaptiveCard"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Task Module",
+      "data": {
+        "msteams": {
+          "type": "task/fetch"
+        },
+        "commandId": "oneStep"
+      }
+    }
+  ]
+}

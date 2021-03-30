@@ -1,0 +1,26 @@
+{
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.0.0",
+  "fallbackText": "fallback text for sample 01",
+  "speak": "This is adaptive card sample 1",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "Launch Task Module",
+      "size": "large"
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Task Module",
+      "data": {
+        "msteams": {
+          "type": "task/fetch"
+        },
+        "commandId": "launchTaskModule"
+      }
+    }
+  ]
+}

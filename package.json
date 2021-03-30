@@ -1,0 +1,36 @@
+{
+  "name": "adapto-bot",
+  "version": "1.0.0",
+  "description": "Robin's bot for Microsoft Teams platform",
+  "main": "dist/app.js",
+  "scripts": {
+    "start": "node dist/app.js",
+    "script": "nodemon --exec node --inspect=2266 -r ts-node/register",
+    "dev": "npm run script ./src/app.ts",
+    "build": "npm run clean & node node_modules/typescript/bin/tsc",
+    "clean": "rimraf dist"
+  },
+  "author": "Robin Liao",
+  "license": "ISC",
+  "dependencies": {
+    "adaptivecards": "^2.4.0",
+    "body-parser": "^1.19.0",
+    "botbuilder": "^4.12.0",
+    "botframework-config": "^4.11.1",
+    "cookie-parser": "^1.4.5",
+    "dotenv": "^6.2.0",
+    "express": "^5.0.0-alpha.8",
+    "lodash": "^4.17.19",
+    "nodemon": "^1.18.9",
+    "ts-node": "^7.0.1"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.2",
+    "@types/express": "^4.17.7",
+    "@types/lodash": "^4.14.157",
+    "@types/node": "^10.17.56",
+    "rimraf": "^3.0.2",
+    "tslint": "^6.1.0",
+    "typescript": "^3.9.7"
+  }
+}

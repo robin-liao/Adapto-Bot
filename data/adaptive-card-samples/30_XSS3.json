@@ -1,0 +1,124 @@
+{
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "type": "AdaptiveCard",
+    "version": "1.0",
+    "body": [{
+            "type": "FactSet",
+            "facts": [{
+                "title": "{{7*7}}",
+                "value": "{{7*7}}"
+            }]
+        },
+        {
+            "type": "Input.Text",
+            "placeholder": "{{7*7}}",
+            "style": "text",
+            "id": "Text1"
+        },
+        {
+            "type": "Input.Text",
+            "value": "{{7*7}}",
+            "style": "text",
+            "id": "Text2"
+        },
+        {
+            "type": "Input.Number",
+            "placeholder": "{{7*7}}",
+            "id": "Num1"
+        },
+        {
+            "type": "Input.Date",
+            "placeholder": "{{7*7}}",
+            "id": "Date1"
+        },
+        {
+            "type": "Input.Time",
+            "placeholder": "{{7*7}}",
+            "id": "Time1"
+        },
+        {
+            "type": "Input.Toggle",
+            "title": "{{7*7}}",
+            "id": "Toggle1"
+        },
+        {
+            "type": "Input.ChoiceSet",
+            "id": "Choice1",
+            "isMultiSelect": false,
+            "style": "expanded",
+            "choices": [{
+                "type": "Input.Choice",
+                "title": "{{7*7}}",
+                "value": "item1"
+            }]
+        },
+        {
+            "type": "Input.ChoiceSet",
+            "id": "Choice2",
+            "isMultiSelect": true,
+            "style": "expanded",
+            "choices": [{
+                "type": "Input.Choice",
+                "title": "{{7*7}}",
+                "value": "item1"
+            }]
+        },
+        {
+            "type": "Input.ChoiceSet",
+            "id": "Choice3",
+            "isMultiSelect": false,
+            "style": "compact",
+            "choices": [{
+                "type": "Input.Choice",
+                "title": "{{7*7}}",
+                "value": "item1"
+            }]
+        },
+        {
+            "type": "Input.ChoiceSet",
+            "id": "Choice4",
+            "isMultiSelect": true,
+            "style": "compact",
+            "choices": [{
+                "type": "Input.Choice",
+                "title": "{{7*7}}",
+                "value": "item1"
+            }]
+        }
+    ],
+    "actions": [{
+            "type": "Action.OpenUrl",
+            "title": "{{7*7}}",
+            "url": "javascript:alert(window.origin)"
+        },
+        {
+            "type": "Action.Submit",
+            "title": "{{7*7}}",
+            "data": { "key": "value" }
+        },
+        {
+            "type": "Action.ShowCard",
+            "title": "{{7*7}}",
+            "card": {
+                "type": "AdaptiveCard",
+                "body": [{
+                    "type": "Input.Text",
+                    "placeholder": "{{7*7}}",
+                    "style": "text",
+                    "id": "Text1"
+                }],
+                "actions": [{
+                        "type": "Action.OpenUrl",
+                        "title": "{{7*7}}",
+                        "url": "https://microsoft.com"
+                    },
+                    {
+                        "type": "Action.Submit",
+                        "title": "{{7*7}}",
+                        "data": { "key": "value" }
+                    }
+                ]
+            }
+        }
+    ]
+}

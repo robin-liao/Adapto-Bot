@@ -129,7 +129,7 @@ class AdaptiveCardGenerator extends JsonCardLoader<any> {
     });
   }
 
-  public settingCard(setting: Partial<ConvSetting>) {
+  public settingCard(setting: Partial<ConvSetting> = {}) {
     return CardFactory.adaptiveCard({
       $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
       version: "1.2",

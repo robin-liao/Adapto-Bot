@@ -10,6 +10,7 @@ import {
   ConversationReference,
   teamsGetChannelId,
   MessageFactory,
+  TeamsChannelData,
 } from "botbuilder";
 
 export const sleep = (ms: number) =>
@@ -129,3 +130,8 @@ export const isEmail = (email: string) => {
   );
   return regex.test(email);
 };
+
+export const getConversationId = (activity: Activity) =>
+  activity.conversation.conversationType === "channel"
+    ? (activity.channelData as TeamsChannelData).channel.id
+    : activity.conversation.id;

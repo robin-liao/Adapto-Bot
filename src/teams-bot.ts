@@ -37,6 +37,7 @@ import {
   printableJson,
   teamsSendProactiveMessage,
   isEmail,
+  getConversationId,
 } from "./utils";
 import * as _ from "lodash";
 import { Auth } from "./auth";
@@ -204,7 +205,7 @@ export class TeamsBot extends TeamsActivityHandler {
           return { status: StatusCodes.OK };
 
         case "setting":
-          const convId = ctx.activity.conversation.id;
+          const convId = getConversationId(ctx.activity);
           const tbl = new ConvSettingTable(convId);
           const {
             echoAllTeamsEvents,
@@ -317,9 +318,9 @@ export class TeamsBot extends TeamsActivityHandler {
     });
 
     this.textCmdHandler.register(/^setting/i, async (ctx) => {
-      const convId = ctx.activity.conversation.id;
+      const convId = getConversationId(ctx.activity);
       const setting = await new ConvSettingTable(convId).get();
-      const card = CardGenerator.adaptive.settingCard(setting ?? {});
+      const card = CardGenerator.adaptive.settingCard(setting);
       await ctx.sendActivity({
         attachments: [card],
       });
@@ -474,10 +475,10 @@ export class TeamsBot extends TeamsActivityHandler {
       settingKey?: keyof ConvSetting
     ) => {
       let enable = true;
-      const convId = ctx.activity.conversation.id;
+      const convId = getConversationId(ctx.activity);
       if (settingKey && convId) {
         const setting = await new ConvSettingTable(convId).get();
-        enable = !!setting[settingKey];
+        enable = !!setting?.[settingKey];
       }
 
       if (enable) {
@@ -635,10 +636,10 @@ export class TeamsBot extends TeamsActivityHandler {
   }
 
   private async echo(ctx: TurnContext) {
-    const convId = ctx.activity.conversation.id;
+    const convId = getConversationId(ctx.activity);
     if (convId) {
       const setting = await new ConvSettingTable(convId).get();
-      if (!setting.echoMessage) {
+      if (!setting?.echoMessage) {
         return;
       }
     }

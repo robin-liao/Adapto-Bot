@@ -7,4 +7,5 @@ export default {
   port: process.env.port || process.env.PORT || 5487,
   dataPrefix: "./data",
   host: process.env.HOST,
+  azureStorageConnectionString: process.env.AZURE_STORAGE_CONN,
 };

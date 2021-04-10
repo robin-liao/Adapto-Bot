@@ -173,6 +173,17 @@
               "placeholder": "paste text content here",
               "id": "textContent",
               "isMultiline": true
+            },
+            {
+              "type": "TextBlock",
+              "text": "(Optional) Additional Payload",
+              "weight": "Bolder"
+            },
+            {
+              "type": "Input.Text",
+              "placeholder": "paste additional payload here",
+              "id": "extraPayload",
+              "isMultiline": true
             }
           ],
           "width": "stretch"

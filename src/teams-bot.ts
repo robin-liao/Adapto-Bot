@@ -42,6 +42,7 @@ import * as _ from "lodash";
 import { Auth } from "./auth";
 import * as tm from "./task-modules";
 import { Router } from "express";
+import { ConvSetting, ConvSettingTable } from "./storage/setting-table";
 
 export class TeamsBot extends TeamsActivityHandler {
   private readonly msgExtHandler = new MessageExtensionHandler();
@@ -150,9 +151,11 @@ export class TeamsBot extends TeamsActivityHandler {
   };
 
   private handleOnMessageBack: BotHandler = async (ctx, next) => {
-    await this.handleInvoke(ctx);
-    await this.echo(ctx);
-    await sleep(1000);
+    const res = await this.handleInvoke(ctx);
+    if (res.status === StatusCodes.NOT_FOUND) {
+      await this.echo(ctx);
+      await sleep(1000);
+    }
     next();
   };
 
@@ -160,10 +163,10 @@ export class TeamsBot extends TeamsActivityHandler {
     if (ctx.activity.name) {
       switch (ctx.activity.name) {
         case "composeExtension/fetchCommands":
-          break;
+          return { status: StatusCodes.OK };
       }
     }
-    // await this.echo(ctx);
+
     const value = ctx.activity.value;
     if (value) {
       switch (value.intent) {
@@ -175,7 +178,7 @@ export class TeamsBot extends TeamsActivityHandler {
           switch (value.update) {
             case "toText":
               activity.text = value.text;
-              break;
+              return { status: StatusCodes.OK };
 
             case "toAdaptiveCard":
               const newCard = CardGenerator.adaptive.getJsonCardOfId(35);
@@ -190,18 +193,66 @@ export class TeamsBot extends TeamsActivityHandler {
               activity.attachments = [updateCard];
           }
           await ctx.updateActivity(activity);
-          break;
+          return { status: StatusCodes.OK };
 
         case "deleteCard":
           await ctx.deleteActivity(ctx.activity.replyToId);
-          break;
+          return { status: StatusCodes.OK };
 
         case "delay":
           await sleep(value.delay);
-          break;
+          return { status: StatusCodes.OK };
+
+        case "setting":
+          const convId = ctx.activity.conversation.id;
+          const tbl = new ConvSettingTable(convId);
+          const {
+            echoAllTeamsEvents,
+            echoMessage,
+            echoMessageReaction,
+          } = value;
+          await tbl.update({
+            ...(echoAllTeamsEvents && {
+              echoAllTeamsEvents: echoAllTeamsEvents === "true" ? true : false,
+            }),
+            ...(echoMessage && {
+              echoMessage: echoMessage === "true" ? true : false,
+            }),
+            ...(echoMessageReaction && {
+              echoMessageReaction:
+                echoMessageReaction === "true" ? true : false,
+            }),
+          });
+          const newSetting = await tbl.get();
+          const newSettingCard = CardGenerator.adaptive.settingCard(newSetting);
+          await ctx.updateActivity({
+            type: ActivityTypes.Message,
+            id: ctx.activity.replyToId,
+            attachments: [newSettingCard],
+          });
+          return { status: StatusCodes.OK };
+
+        case "scrum":
+          const doneUpdate = JSON.parse(value.hiddenData ?? {});
+          const updateText = value.updateText ?? "";
+          const userId = value.userId;
+          if (userId) {
+            doneUpdate[userId] = updateText;
+          }
+          const members = await TeamsInfo.getMembers(ctx);
+          const updateCard = CardGenerator.adaptive.scrumCard(
+            members,
+            doneUpdate
+          );
+          await ctx.updateActivity({
+            type: ActivityTypes.Message,
+            id: ctx.activity.replyToId,
+            attachments: [updateCard],
+          });
+          return { status: StatusCodes.OK };
       }
     }
-    return { status: StatusCodes.OK };
+    return { status: StatusCodes.NOT_FOUND };
   }
 
   private registerTaskModules() {
@@ -262,6 +313,23 @@ export class TeamsBot extends TeamsActivityHandler {
       await ctx.sendActivity({
         attachments: [card],
         summary: "a signin card",
+      });
+    });
+
+    this.textCmdHandler.register(/^setting/i, async (ctx) => {
+      const convId = ctx.activity.conversation.id;
+      const setting = await new ConvSettingTable(convId).get();
+      const card = CardGenerator.adaptive.settingCard(setting ?? {});
+      await ctx.sendActivity({
+        attachments: [card],
+      });
+    });
+
+    this.textCmdHandler.register(/^scrum/i, async (ctx) => {
+      const members = await TeamsInfo.getMembers(ctx);
+      const card = CardGenerator.adaptive.scrumCard(members);
+      await ctx.sendActivity({
+        attachments: [card],
       });
     });
 
@@ -402,16 +470,26 @@ export class TeamsBot extends TeamsActivityHandler {
       eventName: string,
       obj: any,
       ctx: TurnContext,
-      next: () => Promise<void>
+      next: () => Promise<void>,
+      settingKey?: keyof ConvSetting
     ) => {
-      await ctx.sendActivity({
-        textFormat: "xml",
-        text: `<strong>${eventName}</strong><br/><pre>${JSON.stringify(
-          obj,
-          null,
-          2
-        )}</pre>`,
-      });
+      let enable = true;
+      const convId = ctx.activity.conversation.id;
+      if (settingKey && convId) {
+        const setting = await new ConvSettingTable(convId).get();
+        enable = !!setting[settingKey];
+      }
+
+      if (enable) {
+        await ctx.sendActivity({
+          textFormat: "xml",
+          text: `<strong>${eventName}</strong><br/><pre>${JSON.stringify(
+            obj,
+            null,
+            2
+          )}</pre>`,
+        });
+      }
       return next();
     };
 
@@ -420,7 +498,8 @@ export class TeamsBot extends TeamsActivityHandler {
         "onTeamsChannelCreatedEvent",
         { channelInfo, teamInfo },
         ctx,
-        next
+        next,
+        "echoAllTeamsEvents"
       )
     );
 
@@ -429,7 +508,8 @@ export class TeamsBot extends TeamsActivityHandler {
         "onTeamsChannelDeletedEvent",
         { channelInfo, teamInfo },
         ctx,
-        next
+        next,
+        "echoAllTeamsEvents"
       )
     );
 
@@ -438,7 +518,8 @@ export class TeamsBot extends TeamsActivityHandler {
         "onTeamsChannelRenamedEvent",
         { channelInfo, teamInfo },
         ctx,
-        next
+        next,
+        "echoAllTeamsEvents"
       )
     );
 
@@ -447,7 +528,8 @@ export class TeamsBot extends TeamsActivityHandler {
         "onTeamsChannelRestoredEvent",
         { channelInfo, teamInfo },
         ctx,
-        next
+        next,
+        "echoAllTeamsEvents"
       )
     );
 
@@ -456,7 +538,8 @@ export class TeamsBot extends TeamsActivityHandler {
         "onTeamsMembersAddedEvent",
         { membersAdded, teamInfo },
         ctx,
-        next
+        next,
+        "echoAllTeamsEvents"
       )
     );
 
@@ -465,36 +548,100 @@ export class TeamsBot extends TeamsActivityHandler {
         "onTeamsMembersRemovedEvent",
         { membersRemoved, teamInfo },
         ctx,
-        next
+        next,
+        "echoAllTeamsEvents"
       )
     );
 
     this.onTeamsTeamArchivedEvent((teamInfo, ctx, next) =>
-      sendJSON("onTeamsTeamArchivedEvent", { teamInfo }, ctx, next)
+      sendJSON(
+        "onTeamsTeamArchivedEvent",
+        { teamInfo },
+        ctx,
+        next,
+        "echoAllTeamsEvents"
+      )
     );
 
     this.onTeamsTeamDeletedEvent((teamInfo, ctx, next) =>
-      sendJSON("onTeamsTeamDeletedEvent", { teamInfo }, ctx, next)
+      sendJSON(
+        "onTeamsTeamDeletedEvent",
+        { teamInfo },
+        ctx,
+        next,
+        "echoAllTeamsEvents"
+      )
     );
 
     this.onTeamsTeamHardDeletedEvent((teamInfo, ctx, next) =>
-      sendJSON("onTeamsTeamHardDeletedEvent", { teamInfo }, ctx, next)
+      sendJSON(
+        "onTeamsTeamHardDeletedEvent",
+        { teamInfo },
+        ctx,
+        next,
+        "echoAllTeamsEvents"
+      )
     );
 
     this.onTeamsTeamRenamedEvent((teamInfo, ctx, next) =>
-      sendJSON("onTeamsTeamRenamedEvent", { teamInfo }, ctx, next)
+      sendJSON(
+        "onTeamsTeamRenamedEvent",
+        { teamInfo },
+        ctx,
+        next,
+        "echoAllTeamsEvents"
+      )
     );
 
     this.onTeamsTeamRestoredEvent((teamInfo, ctx, next) =>
-      sendJSON("onTeamsTeamRestoredEvent", { teamInfo }, ctx, next)
+      sendJSON(
+        "onTeamsTeamRestoredEvent",
+        { teamInfo },
+        ctx,
+        next,
+        "echoAllTeamsEvents"
+      )
     );
 
     this.onTeamsTeamUnarchivedEvent((teamInfo, ctx, next) =>
-      sendJSON("onTeamsTeamUnarchivedEvent", { teamInfo }, ctx, next)
+      sendJSON(
+        "onTeamsTeamUnarchivedEvent",
+        { teamInfo },
+        ctx,
+        next,
+        "echoAllTeamsEvents"
+      )
+    );
+
+    this.onReactionsAdded((ctx, next) =>
+      sendJSON(
+        "onReactionsAdded",
+        { reactionsAdded: ctx.activity.reactionsAdded },
+        ctx,
+        next,
+        "echoMessageReaction"
+      )
+    );
+
+    this.onReactionsRemoved((ctx, next) =>
+      sendJSON(
+        "onReactionsRemoved",
+        { reactionsRemoved: ctx.activity.reactionsRemoved },
+        ctx,
+        next,
+        "echoMessageReaction"
+      )
     );
   }
 
   private async echo(ctx: TurnContext) {
+    const convId = ctx.activity.conversation.id;
+    if (convId) {
+      const setting = await new ConvSettingTable(convId).get();
+      if (!setting.echoMessage) {
+        return;
+      }
+    }
     const card = CardFactory.adaptiveCard({
       $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
       version: "1.2",
@@ -534,7 +681,10 @@ export class TeamsBot extends TeamsActivityHandler {
                   {
                     type: "TextRun",
                     fontType: "Monospace",
-                    text: printableJson(ctx.activity),
+                    text: printableJson(ctx.activity, {
+                      indentChar: "　",
+                      colorize: false,
+                    }),
                   },
                 ],
               },
@@ -546,8 +696,6 @@ export class TeamsBot extends TeamsActivityHandler {
         width: "full",
       },
     });
-
-    console.log(JSON.stringify(card.content, null, 2));
 
     await this.sendCard(ctx, card);
     // await ctx.sendActivity({
@@ -617,14 +765,10 @@ class MessageExtensionHandler {
   public async handleQueryCards(
     ctx: TurnContext
   ): Promise<MessagingExtensionResponse> {
-    const cards = CardGenerator.adaptive.allJsonCardsWithName;
-    const members = await TeamsInfo.getMembers(ctx);
-    const mentionCard: MessagingExtensionAttachment = {
-      preview: CardFactory.heroCard("mention card"),
-      ...CardGenerator.adaptive.mention(...members),
-    };
-    const invokeCard = CardGenerator.hero.invoke();
+    const attachments: MessagingExtensionAttachment[] = [];
 
+    // cards from JSON
+    const cards = CardGenerator.adaptive.allJsonCardsWithName;
     const jsonCards: MessagingExtensionAttachment[] = _.map(
       cards,
       ([name, card]): MessagingExtensionAttachment => ({
@@ -639,12 +783,29 @@ class MessageExtensionHandler {
         },
       })
     );
+    attachments.push(...jsonCards);
+
+    // cards generated dynamically
+    const invokeCard = CardGenerator.hero.invoke();
+    attachments.push(invokeCard);
+
+    // mention card
+    try {
+      const members = await TeamsInfo.getMembers(ctx);
+      const mentionCard: MessagingExtensionAttachment = {
+        preview: CardFactory.heroCard("mention card"),
+        ...CardGenerator.adaptive.mention(...members),
+      };
+      attachments.push(mentionCard);
+    } catch {
+      console.log("skip inserting mention card");
+    }
 
     return {
       composeExtension: {
         type: "result",
         attachmentLayout: "list",
-        attachments: [...jsonCards, invokeCard, mentionCard],
+        attachments,
       },
     };
   }

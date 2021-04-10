@@ -1,8 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import * as express from "express";
+import express from "express";
 import * as bodyParser from "body-parser";
+import * as _ from "lodash";
 
 import { Auth } from "./auth";
 
@@ -18,6 +19,7 @@ import { BotConfiguration, IEndpointService } from "botframework-config";
 
 import { TeamsBot } from "./teams-bot";
 import config from "./config";
+import { printableJson } from "./utils";
 
 // Read botFilePath and botFileSecret from .env file
 // Note: Ensure you have a .env file and include botFilePath and botFileSecret.
@@ -96,8 +98,26 @@ conversationState = new ConversationState(memoryStorage);
 const app = express();
 app.use(bodyParser.json());
 app.use(Auth.rootPath, Auth.router);
+let realSend;
 app.use((req, res, next) => {
-  console.log(res);
+  const { hostname, url, method, headers, body } = req;
+  console.log();
+  console.log("[INCOMING REQUEST]");
+  console.log(printableJson({ hostname, url, method, headers, body }));
+  console.log();
+
+  if (!realSend) {
+    realSend = res.send;
+    res.send = (...args: any[]) => {
+      if (_.isObject(args[0])) {
+        console.log();
+        console.log("[OUTGOING RESPONSE]");
+        console.log(printableJson(args[0]));
+        console.log();
+      }
+      return realSend.apply(res, args);
+    };
+  }
   next();
 });
 
@@ -107,8 +127,22 @@ const bot = new TeamsBot(conversationState);
 // Listen for incoming activities and route them to your bot for processing.
 
 app.post("/api/messages", (req, res) => {
-  console.log(`[INCOMING REQUEST] ${JSON.stringify(req.body, null, 2)}`);
   adapter.processActivity(req, res as any, async (turnContext) => {
+    turnContext.onSendActivities(async (ctx, activities, next) => {
+      console.log();
+      console.log("[SEND-ACTIVITIES REQUEST]");
+      console.log(printableJson(activities));
+      console.log();
+
+      const result = await next();
+
+      console.log();
+      console.log("[SEND-ACTIVITIES RESPONSE]");
+      console.log(printableJson(result));
+      console.log();
+
+      return result;
+    });
     await bot.run(turnContext);
   });
 });

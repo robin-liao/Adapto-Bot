@@ -31,17 +31,30 @@ export class TaskModuleCardCreate implements IMessagingExtensionAction {
     ctx: TurnContext,
     request: MessagingExtensionAction
   ): Promise<MessagingExtensionActionResponse> {
-    const { cardType, cardPayload, returnAs, summary, textFormat, textContent: text } = request.data;
-    const attachments = cardPayload ? [{
-      contentType: cardType,
-      content: JSON.parse(cardPayload),
-    }] : [];
+    const {
+      cardType,
+      cardPayload,
+      returnAs,
+      summary,
+      textFormat,
+      textContent: text,
+      extraPayload,
+    } = request.data;
+    const attachments = cardPayload
+      ? [
+          {
+            contentType: cardType,
+            content: JSON.parse(cardPayload),
+          },
+        ]
+      : [];
     if ((returnAs as string).includes("asBotCard")) {
       await ctx.sendActivity({
         attachments,
-        ...(summary && {summary}),
-        ...(text && {text}),
-        ...(textFormat && {textFormat}),
+        ...(summary && { summary }),
+        ...(text && { text }),
+        ...(textFormat && { textFormat }),
+        ...(extraPayload && JSON.parse(extraPayload)),
       });
     }
     if ((returnAs as string).includes("asMECard")) {
@@ -49,7 +62,7 @@ export class TaskModuleCardCreate implements IMessagingExtensionAction {
         composeExtension: {
           type: "result",
           attachmentLayout: "list",
-          attachments
+          attachments,
         },
       };
     }

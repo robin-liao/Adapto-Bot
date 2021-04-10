@@ -13,6 +13,7 @@ import { JsonFile } from "./utils";
 import config from "./config";
 import * as _ from "lodash";
 import * as fs from "fs";
+import { ConvSetting } from "./storage/setting-table";
 
 interface ITypedAttachment<T = any> extends Attachment {
   content?: T;
@@ -126,6 +127,253 @@ class AdaptiveCardGenerator extends JsonCardLoader<any> {
         entities,
       },
     });
+  }
+
+  public settingCard(setting: Partial<ConvSetting>) {
+    return CardFactory.adaptiveCard({
+      $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
+      version: "1.2",
+      type: "AdaptiveCard",
+      body: [
+        {
+          type: "TextBlock",
+          size: "large",
+          weight: "bolder",
+          text: "Settings",
+        },
+        {
+          type: "Input.Toggle",
+          id: "echoAllTeamsEvents",
+          title: "Echo all teams / channel events",
+          value: setting.echoAllTeamsEvents ? "true" : "false",
+          valueOn: "true",
+          valueOff: "false",
+        },
+        {
+          type: "Input.Toggle",
+          id: "echoMessage",
+          title: "Echo incoming messages",
+          value: setting.echoMessage ? "true" : "false",
+          valueOn: "true",
+          valueOff: "false",
+        },
+        {
+          type: "Input.Toggle",
+          id: "echoMessageReaction",
+          title: "Echo message reactions",
+          value: setting.echoMessageReaction ? "true" : "false",
+          valueOn: "true",
+          valueOff: "false",
+        },
+      ],
+      actions: [
+        {
+          type: "Action.Submit",
+          title: "Update",
+          data: {
+            intent: "setting",
+          },
+        },
+      ],
+    });
+  }
+
+  public scrumCard(
+    users: TeamsChannelAccount[],
+    doneUpdate: { [userId: string]: string } = {}
+  ): ITypedAttachment {
+    const doneUserId = _.keys(doneUpdate);
+    const usersNotDone = _.filter(
+      users,
+      (user) => !doneUserId.includes(user.id)
+    );
+    const allDone = usersNotDone.length === 0 ? "✅ " : "";
+    const entities: Mention[] = usersNotDone.map((user) => ({
+      type: "mention",
+      text: `<at>${user.name}</at>`,
+      mentioned: {
+        id: user.id,
+        name: user.name,
+      },
+    }));
+
+    return CardFactory.adaptiveCard({
+      $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
+      version: "1.2",
+      type: "AdaptiveCard",
+      body: [
+        {
+          type: "TextBlock",
+          size: "Large",
+          weight: "Bolder",
+          text: `${allDone}Scrum on ${new Date()
+            .toJSON()
+            .slice(0, 10)
+            .replace(/-/g, "/")}`,
+        },
+        ...users.map((user, id) =>
+          doneUserId.includes(user.id)
+            ? this.scrumItem(
+                user.id,
+                user.name,
+                id,
+                doneUpdate,
+                true,
+                doneUpdate[user.id]
+              )
+            : this.scrumItem(user.id, `<at>${user.name}</at>`, id, doneUpdate)
+        ),
+      ],
+      msTeams: {
+        entities,
+      },
+    });
+  }
+
+  private scrumItem(
+    userId: string,
+    name: string,
+    id: number,
+    data: any = {},
+    done = false,
+    updatedText?: string
+  ) {
+    return {
+      type: "Container",
+      separator: true,
+      spacing: "Large",
+      items: [
+        {
+          type: "ColumnSet",
+          columns: [
+            {
+              type: "Column",
+              width: "stretch",
+              verticalContentAlignment: "Center",
+              items: [
+                {
+                  type: "TextBlock",
+                  text: `${done ? "👍 " : ""}${name}`,
+                  wrap: true,
+                },
+              ],
+            },
+            {
+              type: "Column",
+              width: "auto",
+              horizontalAlignment: "Right",
+              items: [
+                ...(done
+                  ? []
+                  : [
+                      {
+                        type: "ActionSet",
+                        id: `actionset-${id}`,
+                        actions: [
+                          {
+                            type: "Action.ToggleVisibility",
+                            title: "Write Update",
+                            targetElements: [
+                              `actionset-${id}`,
+                              `inputpane-${id}`,
+                            ],
+                          },
+                          {
+                            type: "Action.Submit",
+                            title: "Mark as Done",
+                            data: {
+                              intent: "scrum",
+                              userId,
+                            },
+                          },
+                        ],
+                      },
+                    ]),
+                ...(done && !!updatedText
+                  ? [
+                      {
+                        type: "ActionSet",
+                        id: `actionset-${id}`,
+                        actions: [
+                          {
+                            type: "Action.ToggleVisibility",
+                            title: "Show Update",
+                            targetElements: [
+                              `actionset-${id}`,
+                              `inputpane-${id}`,
+                            ],
+                          },
+                        ],
+                      },
+                    ]
+                  : []),
+              ],
+            },
+          ],
+        },
+        {
+          type: "Container",
+          style: "emphasis",
+          bleed: true,
+          id: `inputpane-${id}`,
+          isVisible: false,
+          items: [
+            ...(done && !!updatedText
+              ? [
+                  {
+                    type: "TextBlock",
+                    text: updatedText ?? "",
+                  },
+                  {
+                    type: "ActionSet",
+                    actions: [
+                      {
+                        type: "Action.ToggleVisibility",
+                        title: "Close",
+                        targetElements: [`inputpane-${id}`, `actionset-${id}`],
+                      },
+                    ],
+                  },
+                ]
+              : []),
+            ...(done
+              ? []
+              : [
+                  {
+                    type: "Input.Text",
+                    id: "updateText",
+                    placeholder: "Post update here...",
+                    isMultiline: true,
+                  },
+                  {
+                    type: "ActionSet",
+                    actions: [
+                      {
+                        type: "Action.Submit",
+                        title: "Submit",
+                        data: {
+                          intent: "scrum",
+                          userId,
+                        },
+                      },
+                      {
+                        type: "Action.ToggleVisibility",
+                        title: "Cancel",
+                        targetElements: [`inputpane-${id}`, `actionset-${id}`],
+                      },
+                    ],
+                  },
+                ]),
+          ],
+        },
+        {
+          type: "Input.Text",
+          id: "hiddenData",
+          isVisible: false,
+          value: JSON.stringify(data),
+        },
+      ],
+    };
   }
 }
 

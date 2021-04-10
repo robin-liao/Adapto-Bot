@@ -1,5 +1,6 @@
 import * as jfs from "jsonfile";
 import * as fs from "fs";
+import colorizeJson from "json-colorizer";
 import {
   TurnContext,
   ChannelAccount,
@@ -46,14 +47,27 @@ export class JsonFile<T = any> {
   }
 }
 
-export const printableJson = (obj: any) => {
-  const str = JSON.stringify(obj, null, 2).split("\n");
-  const lines = [];
-  for (const line of str) {
-    const indent = line.length - line.trimLeft().length;
-    lines.push("　".repeat(indent) + line.substring(indent));
+export interface IPrintableJson {
+  indentChar?: string;
+  indentRepeat?: number;
+  colorize?: boolean;
+}
+
+export const printableJson = (
+  obj: any,
+  { indentChar = " ", indentRepeat = 2, colorize = true }: IPrintableJson = {}
+) => {
+  let str = JSON.stringify(obj, null, indentChar.repeat(indentRepeat));
+  if (colorize) {
+    str = colorizeJson(str, {
+      colors: {
+        STRING_KEY: "green",
+        STRING_LITERAL: "reset",
+        NUMBER_LITERAL: "yellow",
+      },
+    });
   }
-  return lines.join("\n");
+  return str;
 };
 
 export const teamsSendProactiveMessage = async (

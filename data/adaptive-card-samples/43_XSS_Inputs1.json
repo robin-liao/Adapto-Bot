@@ -1,0 +1,69 @@
+{
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.2",
+  "body": [
+    {
+      "type": "Input.Text",
+      "id": "id {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "isMultiline": true,
+      "maxLength": 100,
+      "placeholder": "placeholder {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "style": "text",
+      "value": "value {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "height": "stretch",
+      "separator": true,
+      "spacing": "large",
+      "isVisible": true
+    },
+    {
+      "type": "Input.Text",
+      "id": "id {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "isMultiline": false,
+      "maxLength": 100,
+      "placeholder": "placeholder {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "style": "text",
+      "value": "value {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "height": "stretch",
+      "separator": true,
+      "spacing": "large",
+      "isVisible": true
+    },
+    {
+      "type": "Input.Number",
+      "id": "id {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "placeholder": "placeholder {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "value": 0,
+      "min": 100,
+      "max": 500,
+      "height": "stretch",
+      "separator": true,
+      "spacing": "large",
+      "isVisible": true
+    },
+    {
+      "type": "Input.Date",
+      "id": "id {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "placeholder": "placeholder {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "value": "2019-08-27T12:30:07Z",
+      "min": "min {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "max": "max id {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "height": "stretch",
+      "separator": true,
+      "spacing": "large",
+      "isVisible": true
+    },
+    {
+      "type": "Input.Time",
+      "id": "id {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "placeholder": "placeholder {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "value": "placeholder {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "min": "min {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "max": "max id {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "height": "stretch",
+      "separator": true,
+      "spacing": "large",
+      "isVisible": true
+    }
+  ]
+}

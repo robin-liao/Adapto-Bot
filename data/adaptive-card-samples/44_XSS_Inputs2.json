@@ -1,0 +1,96 @@
+{
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.2",
+  "body": [
+    {
+      "type": "Input.Toggle",
+      "id": "id {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "title": "title {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "value": "value {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "valueOn": "valueOn {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "valueOff": "valueOff {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "wrap": true,
+      "height": "stretch",
+      "separator": true,
+      "spacing": "large",
+      "isVisible": true
+    },
+    {
+      "type": "Input.ChoiceSet",
+      "isMultiSelect": true,
+      "style": "compact",
+      "id": "id {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "value": "value {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "placeholder": "placeholder {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "wrap": true,
+      "height": "stretch",
+      "separator": true,
+      "spacing": "large",
+      "isVisible": true,
+      "choices": [
+        {
+          "title": "choice.title {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+          "value": "choice.value {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}"
+        }
+      ]
+    },
+    {
+      "type": "Input.ChoiceSet",
+      "isMultiSelect": false,
+      "style": "compact",
+      "id": "id {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "value": "value {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "placeholder": "placeholder {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "wrap": true,
+      "height": "stretch",
+      "separator": true,
+      "spacing": "large",
+      "isVisible": true,
+      "choices": [
+        {
+          "title": "choice.title {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+          "value": "choice.value {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}"
+        }
+      ]
+    },
+    {
+      "type": "Input.ChoiceSet",
+      "isMultiSelect": true,
+      "style": "expanded",
+      "id": "id {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "value": "value {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "placeholder": "placeholder {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "wrap": true,
+      "height": "stretch",
+      "separator": true,
+      "spacing": "large",
+      "isVisible": true,
+      "choices": [
+        {
+          "title": "choice.title {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+          "value": "choice.value {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}"
+        }
+      ]
+    },
+    {
+      "type": "Input.ChoiceSet",
+      "isMultiSelect": false,
+      "style": "expanded",
+      "id": "id {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "value": "value {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "placeholder": "placeholder {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "wrap": true,
+      "height": "stretch",
+      "separator": true,
+      "spacing": "large",
+      "isVisible": true,
+      "choices": [
+        {
+          "title": "choice.title {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+          "value": "choice.value {{7*7}} <img src=/ onerror=javascript:alert('xss-html-speak')> {{['if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}'].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}"
+        }
+      ]
+    }
+  ]
+}

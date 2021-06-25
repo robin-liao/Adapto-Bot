@@ -23,6 +23,14 @@
     "color": "icon-color.png"
   },
   "accentColor": "#880002",
+  "staticTabs": [
+    {
+      "entityId": "tab-adaptivecard-settings",
+      "name": "Mushroom Bot Settings",
+      "contentBotId": "159e1c0f-15ef-4597-a8c6-44ba1fd89b78",
+      "scopes": ["personal"]
+    }
+  ],
   "bots": [
     {
       "botId": "159e1c0f-15ef-4597-a8c6-44ba1fd89b78",
@@ -37,6 +45,7 @@
           "id": "queryCards",
           "description": "Test command to run query",
           "title": "Query cards",
+          "initialRun": true,
           "parameters": [
             {
               "name": "queryText",

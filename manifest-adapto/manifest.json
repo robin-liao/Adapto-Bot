@@ -37,6 +37,7 @@
           "id": "queryCards",
           "description": "Test command to run query",
           "title": "Query cards",
+          "initialRun": true,
           "parameters": [
             {
               "name": "queryText",

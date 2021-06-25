@@ -13,7 +13,7 @@
   "author": "Robin Liao",
   "license": "ISC",
   "dependencies": {
-    "adaptivecards": "^2.4.0",
+    "adaptivecards": "^2.10.0-beta1",
     "azure-storage": "^2.10.3",
     "body-parser": "^1.19.0",
     "botbuilder": "^4.12.0",

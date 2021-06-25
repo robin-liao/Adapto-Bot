@@ -30,6 +30,9 @@ import {
   TaskModuleTaskInfo,
   TeamsInfo,
   TeamsChannelAccount,
+  TabRequest,
+  TabResponse,
+  AppBasedLinkQuery,
 } from "botbuilder";
 import { CardGenerator, JsonCardLoader } from "./card-gen";
 import {
@@ -42,6 +45,7 @@ import {
 import * as _ from "lodash";
 import { Auth } from "./auth";
 import * as tm from "./task-modules";
+import * as teamsTab from "./tabs";
 import { Router } from "express";
 import { ConvSetting, ConvSettingTable } from "./storage/setting-table";
 
@@ -49,6 +53,7 @@ export class TeamsBot extends TeamsActivityHandler {
   private readonly msgExtHandler = new MessageExtensionHandler();
   private readonly textCmdHandler = new TextCommandHandler();
   private readonly tmHandler = new TaskModuleHandler();
+  private readonly tabHandler = new TabHandler();
 
   constructor(conversationState: ConversationState) {
     super();
@@ -62,7 +67,7 @@ export class TeamsBot extends TeamsActivityHandler {
   protected async onInvokeActivity(ctx: TurnContext): Promise<InvokeResponse> {
     const result = await super.onInvokeActivity(ctx);
     return result.status === StatusCodes.NOT_IMPLEMENTED
-      ? this.handleInvoke(ctx)
+      ? TeamsBot.handleInvoke(ctx)
       : result;
   }
 
@@ -72,17 +77,56 @@ export class TeamsBot extends TeamsActivityHandler {
   ): Promise<MessagingExtensionResponse> {
     switch (query.commandId) {
       case "queryCards":
-        return this.msgExtHandler.handleQueryCards(ctx);
+        return this.msgExtHandler.handleQueryCards(ctx, query);
       default:
         return {};
     }
+  }
+
+  protected async handleTeamsAppBasedLinkQuery(
+    ctx: TurnContext,
+    query: AppBasedLinkQuery
+  ): Promise<MessagingExtensionResponse> {
+    return Promise.resolve<MessagingExtensionResponse>({
+      composeExtension: {
+        type: "result",
+        attachmentLayout: "list",
+        attachments: [
+          {
+            ...CardGenerator.adaptive.appBasedLinkCard(query.url),
+            preview: {
+              contentType: CardFactory.contentTypes.heroCard,
+              content: {
+                title: "App-Based Link Preview Card",
+                subtitle: query.url,
+                text: JSON.stringify(query),
+              },
+            },
+          },
+        ],
+        suggestedActions: {
+          actions: [
+            {
+              type: "setDefaultUrlPreviewType",
+              value: "Card",
+              title: "",
+            },
+            {
+              type: "setCachePolicy",
+              value: `{\"type\":\"no-cache\"}`,
+              title: "",
+            },
+          ],
+        },
+      },
+    });
   }
 
   protected async handleTeamsMessagingExtensionCardButtonClicked(
     ctx: TurnContext,
     cardData: any
   ): Promise<void> {
-    await this.handleInvoke(ctx);
+    await TeamsBot.handleInvoke(ctx);
   }
 
   protected async handleTeamsSigninVerifyState(
@@ -132,9 +176,30 @@ export class TeamsBot extends TeamsActivityHandler {
     );
   }
 
+  protected handleTeamsTabFetch(
+    ctx: TurnContext,
+    request: TabRequest
+  ): Promise<TabResponse> {
+    const {
+      tabContext: { tabEntityId },
+    } = request;
+    return this.tabHandler.handleTeamsTabFetch(tabEntityId, ctx, request);
+  }
+
+  protected handleTeamsTabSubmit(
+    ctx: TurnContext,
+    request: TabRequest
+  ): Promise<TabResponse> {
+    const {
+      tabContext: { tabEntityId },
+    } = request;
+    return this.tabHandler.handleTeamsTabSubmit(tabEntityId, ctx, request);
+  }
+
   private setupHandlers() {
     this.registerTextCommands();
     this.registerTaskModules();
+    this.registerTabs();
     this.onMessage((ctx, next) =>
       ctx.activity.value
         ? this.handleOnMessageBack(ctx, next)
@@ -152,7 +217,7 @@ export class TeamsBot extends TeamsActivityHandler {
   };
 
   private handleOnMessageBack: BotHandler = async (ctx, next) => {
-    const res = await this.handleInvoke(ctx);
+    const res = await TeamsBot.handleInvoke(ctx);
     if (res.status === StatusCodes.NOT_FOUND) {
       await this.echo(ctx);
       await sleep(1000);
@@ -160,7 +225,7 @@ export class TeamsBot extends TeamsActivityHandler {
     next();
   };
 
-  private async handleInvoke(ctx: TurnContext): Promise<InvokeResponse> {
+  public static async handleInvoke(ctx: TurnContext): Promise<InvokeResponse> {
     if (ctx.activity.name) {
       switch (ctx.activity.name) {
         case "composeExtension/fetchCommands":
@@ -269,6 +334,13 @@ export class TeamsBot extends TeamsActivityHandler {
     this.tmHandler.register(
       "launchTaskModule",
       new tm.TaskModuleLaunch("launchTaskModule")
+    );
+  }
+
+  private registerTabs() {
+    this.tabHandler.register(
+      "tab-adaptivecard-settings",
+      new teamsTab.SettingTab()
     );
   }
 
@@ -764,26 +836,31 @@ export class TeamsBot extends TeamsActivityHandler {
 
 class MessageExtensionHandler {
   public async handleQueryCards(
-    ctx: TurnContext
+    ctx: TurnContext,
+    query: MessagingExtensionQuery
   ): Promise<MessagingExtensionResponse> {
     const attachments: MessagingExtensionAttachment[] = [];
+    const queryTxt = (query.parameters?.[0].value as string) || undefined;
 
     // cards from JSON
     const cards = CardGenerator.adaptive.allJsonCardsWithName;
-    const jsonCards: MessagingExtensionAttachment[] = _.map(
-      cards,
-      ([name, card]): MessagingExtensionAttachment => ({
-        ...card,
-        preview: {
-          contentType: CardFactory.contentTypes.thumbnailCard,
-          content: {
-            title: name,
-            subtitle: name,
-            text: name,
-          } as ThumbnailCard,
-        },
-      })
-    );
+    const jsonCards: MessagingExtensionAttachment[] = cards
+      .filter(([name, _card]) =>
+        queryTxt ? name.toLowerCase().includes(queryTxt.toLowerCase()) : true
+      )
+      .map(
+        ([name, card]): MessagingExtensionAttachment => ({
+          ...card,
+          preview: {
+            contentType: CardFactory.contentTypes.thumbnailCard,
+            content: {
+              title: name,
+              subtitle: name,
+              text: name,
+            } as ThumbnailCard,
+          },
+        })
+      );
     attachments.push(...jsonCards);
 
     // cards generated dynamically
@@ -901,5 +978,31 @@ class TaskModuleHandler {
   ): Promise<MessagingExtensionActionResponse> {
     const tm = this.lookup[commandId];
     return tm ? tm.submit(ctx, request) : Promise.resolve({});
+  }
+}
+
+class TabHandler {
+  private lookup: { [tabEntityId: string]: teamsTab.IAdaptiveCardTab } = {};
+
+  public register(tabEntityId: string, tab: teamsTab.IAdaptiveCardTab) {
+    this.lookup[tabEntityId] = tab;
+  }
+
+  public handleTeamsTabFetch(
+    tabEntityId: string,
+    ctx: TurnContext,
+    request: TabRequest
+  ): Promise<TabResponse> {
+    const tab = this.lookup[tabEntityId];
+    return tab ? tab.fetch(ctx, request) : Promise.resolve({ tab: {} });
+  }
+
+  public handleTeamsTabSubmit(
+    tabEntityId: string,
+    ctx: TurnContext,
+    request: TabRequest
+  ): Promise<TabResponse> {
+    const tab = this.lookup[tabEntityId];
+    return tab ? tab.submit(ctx, request) : Promise.resolve({ tab: {} });
   }
 }

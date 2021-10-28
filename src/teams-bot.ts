@@ -252,9 +252,8 @@ export class TeamsBot extends TeamsActivityHandler {
               break;
 
             default:
-              const updateCard = CardGenerator.hero.getJsonCardIncludingName(
-                "update"
-              );
+              const updateCard =
+                CardGenerator.hero.getJsonCardIncludingName("update");
               updateCard.content.text = value.text;
               activity.attachments = [updateCard];
           }
@@ -272,11 +271,8 @@ export class TeamsBot extends TeamsActivityHandler {
         case "setting":
           const convId = getConversationId(ctx.activity);
           const tbl = new ConvSettingTable(convId);
-          const {
-            echoAllTeamsEvents,
-            echoMessage,
-            echoMessageReaction,
-          } = value;
+          const { echoAllTeamsEvents, echoMessage, echoMessageReaction } =
+            value;
           await tbl.update({
             ...(echoAllTeamsEvents && {
               echoAllTeamsEvents: echoAllTeamsEvents === "true" ? true : false,
@@ -341,6 +337,10 @@ export class TeamsBot extends TeamsActivityHandler {
     this.tabHandler.register(
       "tab-adaptivecard-settings",
       new teamsTab.SettingTab()
+    );
+    this.tabHandler.register(
+      "tab-adaptivecard-sandbox",
+      new teamsTab.SandboxTab()
     );
   }
 

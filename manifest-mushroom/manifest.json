@@ -26,9 +26,15 @@
   "staticTabs": [
     {
       "entityId": "tab-adaptivecard-settings",
-      "name": "Mushroom Bot Settings",
+      "name": "Bot Settings",
       "contentBotId": "159e1c0f-15ef-4597-a8c6-44ba1fd89b78",
-      "scopes": ["personal"]
+      "scopes": ["personal", "team"]
+    },
+    {
+      "entityId": "tab-adaptivecard-sandbox",
+      "name": "Sandbox",
+      "contentBotId": "159e1c0f-15ef-4597-a8c6-44ba1fd89b78",
+      "scopes": ["personal", "team"]
     }
   ],
   "bots": [

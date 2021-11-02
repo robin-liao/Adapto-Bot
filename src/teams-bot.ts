@@ -25,6 +25,7 @@ import {
 import { Router } from "express";
 import { Auth } from "./auth";
 import { CardGenerator } from "./card-gen";
+import { CardUpdate } from "./scenarios/card-update";
 import { DefaultBot } from "./scenarios/default-bot";
 import { ConvSetting, ConvSettingTable } from "./storage/setting-table";
 import { IAdaptiveCardTab } from "./tabs";
@@ -50,7 +51,7 @@ export interface IScenarioBuilder {
     card: Attachment,
     alert?: boolean,
     repeat?: number
-  ): Promise<void>;
+  ): Promise<string[]>;
 }
 
 export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
@@ -63,6 +64,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
   constructor(conversationState: ConversationState) {
     super();
     this.setupHandlers();
+    this.setupScenarios();
   }
 
   public getTaskModuleRouter() {
@@ -225,13 +227,17 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
   }
 
   private setupHandlers() {
-    new DefaultBot().accept(this);
     this.onMessage((ctx, next) =>
       ctx.activity.value
         ? this.handleOnMessageBack(ctx, next)
         : this.handleOnMessage(ctx, next)
     );
     this.registerOnTeamsEvents();
+  }
+
+  private setupScenarios() {
+    new DefaultBot().accept(this);
+    new CardUpdate().accept(this);
   }
 
   private handleOnMessage: BotHandler = async (ctx, next) => {
@@ -519,7 +525,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
       mri: "97b1ec61-45bf-453c-9059-6e8984e0cef4",
       displayName: "Robin Liao",
     }
-  ) {
+  ): Promise<string[]> {
     const send = () =>
       ctx.sendActivity({
         attachments: [card],
@@ -541,6 +547,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     if (repeat <= 1) {
       const res = await send();
       console.log(`MESSAGE_SENT_ID = ${res.id}`);
+      return [res.id];
     } else {
       const idToDel: string[] = [];
       for (let i = 0; i < repeat; ++i) {
@@ -555,6 +562,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
       for (const id of idToDel) {
         await ctx.deleteActivity(id);
       }
+      return idToDel;
     }
   }
 }
@@ -614,6 +622,9 @@ class InvokeHandler {
   private lookup: { [intent: string]: InvokeCallback } = {};
 
   public register(intent: string, handler: InvokeCallback) {
+    if (this.lookup[intent]) {
+      throw new Error(`Invoke handler for intent "${intent}" already exists`);
+    }
     this.lookup[intent] = handler;
   }
 

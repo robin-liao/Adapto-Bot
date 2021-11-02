@@ -22,10 +22,6 @@ export class SettingTab implements IAdaptiveCardTab {
   }
 
   async submit(ctx: TurnContext, request: TabRequest): Promise<TabResponse> {
-    ctx.activity.value = ctx.activity.value.data;
-    try {
-      await TeamsBot.handleInvoke(ctx);
-    } catch {}
     return { tab: {} };
   }
 }

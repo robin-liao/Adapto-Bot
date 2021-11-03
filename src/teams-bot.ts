@@ -243,7 +243,13 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
   private handleOnMessage: BotHandler = async (ctx, next) => {
     const dispatched = await this.textCmdHandler.dispatch(ctx);
     if (!dispatched) {
-      await this.echo(ctx);
+      try {
+        const json = JSON.parse(ctx.activity.text.trim());
+        const card = CardFactory.adaptiveCard(json);
+        await this.sendCard(ctx, card);
+      } catch {
+        await this.echo(ctx);
+      }
     }
     next();
   };

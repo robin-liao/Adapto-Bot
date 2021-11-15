@@ -245,8 +245,15 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     if (!dispatched) {
       try {
         const json = JSON.parse(ctx.activity.text.trim());
-        const card = CardFactory.adaptiveCard(json);
-        await this.sendCard(ctx, card);
+        if (json.contentType && json.content) {
+          await this.sendCard(ctx, {
+            contentType: json.contentType,
+            content: json.content,
+          });
+        } else {
+          const card = CardFactory.adaptiveCard(json);
+          await this.sendCard(ctx, card);
+        }
       } catch {
         await this.echo(ctx);
       }

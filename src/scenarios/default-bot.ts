@@ -90,6 +90,21 @@ export class DefaultBot implements ITeamsScenario {
       });
     });
 
+    teamsBot.registerTextCommand(/^carousel/i, async (ctx) => {
+      const card1 = CardFactory.adaptiveCard({
+        body: [{ type: "TextBlock", text: "[url text](https://google.com)" }],
+      });
+      const card2 = CardFactory.heroCard(
+        "no title",
+        "[url text](https://google.com)"
+      );
+      await ctx.sendActivity({
+        textFormat: "markdown",
+        attachments: [card1, card2],
+        attachmentLayout: "carousel",
+      });
+    });
+
     teamsBot.registerTextCommand(/^card/i, async (ctx, _command, args) => {
       const [cardType, name, ...subCommands] = args;
 

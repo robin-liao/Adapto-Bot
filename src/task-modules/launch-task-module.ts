@@ -7,6 +7,7 @@ import {
 import { ITaskModule } from "./task-module.interface";
 import { Router } from "express";
 import * as fs from "fs";
+import config from "../config";
 
 export class TaskModuleLaunch implements ITaskModule {
   private router = Router();
@@ -39,7 +40,7 @@ export class TaskModuleLaunch implements ITaskModule {
       task: {
         type: "continue",
         value: {
-          url: `https://0b5edfbac203.ngrok.io/task/${this.commandId}?groupId={groupId}&teamId={teamId}&entityId={entityId}&channelId={channelId}&tid={tid}&userObjectId={userObjectId}&sessionId={sessionId}&theme={theme}&locale={locale}&ringId={ringId}&platform={hostClientType}&parentMessageId={parentMessageId}`,
+          url: `${config.host}/task/${this.commandId}?groupId={groupId}&teamId={teamId}&entityId={entityId}&channelId={channelId}&tid={tid}&userObjectId={userObjectId}&sessionId={sessionId}&theme={theme}&locale={locale}&ringId={ringId}&platform={hostClientType}&parentMessageId={parentMessageId}`,
         },
       } as any,
     });

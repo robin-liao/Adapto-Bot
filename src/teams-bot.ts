@@ -7,6 +7,10 @@ import {
   BotHandler,
   CardFactory,
   ConversationState,
+  FileConsentCard,
+  FileConsentCardResponse,
+  FileDownloadInfo,
+  FileDownloadInfoAttachment,
   InvokeResponse,
   MessagingExtensionAction,
   MessagingExtensionActionResponse,
@@ -24,9 +28,11 @@ import {
 } from "botbuilder";
 import { Router } from "express";
 import { Auth } from "./auth";
+import { DOWNLOAD_INFO_CONTENT_TYPE, IBotFileHandler } from "./bot-file-helper";
 import { CardGenerator } from "./card-gen";
 import { CardUpdate } from "./scenarios/card-update";
 import { DefaultBot } from "./scenarios/default-bot";
+import { FileBot } from "./scenarios/file-bot";
 import { ConvSetting, ConvSettingTable } from "./storage/setting-table";
 import { IAdaptiveCardTab } from "./tabs";
 import { ITaskModule } from "./task-modules";
@@ -45,6 +51,7 @@ export interface IScenarioBuilder {
     commandId: string,
     handler: MessageExtensionQueryCallback
   );
+  registerFileHandler(handler: IBotFileHandler);
 
   sendCard(
     ctx: TurnContext,
@@ -60,6 +67,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
   private readonly tmHandler = new TaskModuleHandler();
   private readonly tabHandler = new TabHandler();
   private readonly invokeHandler = new InvokeHandler();
+  private readonly fileHandlers: IBotFileHandler[] = [];
 
   constructor(conversationState: ConversationState) {
     super();
@@ -92,6 +100,12 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     handler: MessageExtensionQueryCallback
   ) {
     this.msgExtHandler.register(commandId, handler);
+  }
+
+  public registerFileHandler(handler: IBotFileHandler) {
+    if (!this.fileHandlers.includes(handler)) {
+      this.fileHandlers.push(handler);
+    }
   }
 
   protected async onInvokeActivity(ctx: TurnContext): Promise<InvokeResponse> {
@@ -226,10 +240,34 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     return this.tabHandler.handleTeamsTabSubmit(tabEntityId, ctx, request);
   }
 
+  protected async handleTeamsFileConsentAccept(
+    ctx: TurnContext,
+    fileConsentCardResponse: FileConsentCardResponse
+  ): Promise<void> {
+    const proms = this.fileHandlers.map((h) =>
+      h.handleTeamsFileConsentAccept?.(ctx, fileConsentCardResponse)
+    );
+    await Promise.all(proms);
+  }
+
+  protected async handleTeamsFileConsentDecline(
+    ctx: TurnContext,
+    fileConsentCardResponse: FileConsentCardResponse
+  ): Promise<void> {
+    const proms = this.fileHandlers.map((h) =>
+      h.handleTeamsFileConsentDecline?.(ctx, fileConsentCardResponse)
+    );
+    await Promise.all(proms);
+  }
+
   private setupHandlers() {
     this.onMessage((ctx, next) =>
       ctx.activity.value
         ? this.handleOnMessageBack(ctx, next)
+        : ctx.activity.attachments?.some(
+            (x) => x.contentType === DOWNLOAD_INFO_CONTENT_TYPE
+          )
+        ? this.handleOnMessageWithFileDownload(ctx, next)
         : this.handleOnMessage(ctx, next)
     );
     this.registerOnTeamsEvents();
@@ -238,9 +276,10 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
   private setupScenarios() {
     new DefaultBot().accept(this);
     new CardUpdate().accept(this);
+    new FileBot().accept(this);
   }
 
-  private handleOnMessage: BotHandler = async (ctx, next) => {
+  private async handleOnMessage(ctx: TurnContext, next: () => Promise<void>) {
     const dispatched = await this.textCmdHandler.dispatch(ctx);
     if (!dispatched) {
       try {
@@ -259,16 +298,34 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
       }
     }
     next();
-  };
+  }
 
-  private handleOnMessageBack: BotHandler = async (ctx, next) => {
+  private async handleOnMessageBack(
+    ctx: TurnContext,
+    next: () => Promise<void>
+  ) {
     const res = await this.handleInvoke(ctx);
     if (res.status === StatusCodes.NOT_FOUND) {
       await this.echo(ctx);
       await sleep(1000);
     }
     next();
-  };
+  }
+
+  private async handleOnMessageWithFileDownload(
+    ctx: TurnContext,
+    next: () => Promise<void>
+  ) {
+    const attachments = ctx.activity.attachments?.filter(
+      (x) => x.contentType === DOWNLOAD_INFO_CONTENT_TYPE
+    ) as FileDownloadInfoAttachment[];
+    const files = attachments.map((x) => x.content);
+    const proms = this.fileHandlers.map((h) =>
+      h.onMessageWithFileDownloadInfo?.(ctx, files)
+    );
+    await Promise.all(proms);
+    next();
+  }
 
   public async handleInvoke(ctx: TurnContext): Promise<InvokeResponse> {
     if (ctx.activity.name) {

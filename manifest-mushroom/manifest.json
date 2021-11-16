@@ -40,7 +40,8 @@
   "bots": [
     {
       "botId": "159e1c0f-15ef-4597-a8c6-44ba1fd89b78",
-      "scopes": ["groupchat", "personal", "team"]
+      "scopes": ["groupchat", "personal", "team"],
+      "supportsFiles": true
     }
   ],
   "composeExtensions": [

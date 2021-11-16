@@ -8,6 +8,8 @@ import {
   O365ConnectorCardOpenUri,
   TeamsChannelAccount,
   Mention,
+  FileConsentCard,
+  FileInfoCard,
 } from "botbuilder";
 import { JsonFile } from "./utils";
 import config from "./config";
@@ -96,8 +98,7 @@ class AdaptiveCardGenerator extends JsonCardLoader<any> {
         },
         {
           type: "TextBlock",
-          text:
-            "[#329 \\\\h ](https://github.com/apurva1112/LicenseAPITestModuleABC/issues/329)",
+          text: "[#329 \\\\h ](https://github.com/apurva1112/LicenseAPITestModuleABC/issues/329)",
         },
       ],
     });
@@ -509,6 +510,39 @@ class ListCardGenerator extends JsonCardLoader<any> {
   }
 }
 
+class FileCardGenerator {
+  public readonly contentTypeOfConsentCard =
+    "application/vnd.microsoft.teams.card.file.consent";
+  public readonly contentTypeOfInfoCard =
+    "application/vnd.microsoft.teams.card.file.info";
+
+  public createConsentCard(
+    fileCard: FileConsentCard,
+    filename?: string
+  ): Attachment {
+    const card: Attachment = {
+      contentType: this.contentTypeOfConsentCard,
+      content: fileCard,
+      ...(filename && { name: filename }),
+    };
+    return card;
+  }
+
+  public createInfoCard(
+    fileCard: FileInfoCard,
+    filename?: string,
+    contentUrl?: string
+  ): Attachment {
+    const card: Attachment = {
+      contentType: this.contentTypeOfInfoCard,
+      content: fileCard,
+      ...(filename && { name: filename }),
+      ...(contentUrl && { contentUrl }),
+    };
+    return card;
+  }
+}
+
 export const CardGenerator = {
   hero: new HeroCardGenerator(),
   thumbnail: new ThumbnailCardGenerator(),
@@ -516,4 +550,5 @@ export const CardGenerator = {
   o365: new O365CardGenerator(),
   profile: new ProfileCardGenerator(),
   list: new ListCardGenerator(),
+  file: new FileCardGenerator(),
 };

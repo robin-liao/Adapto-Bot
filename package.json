@@ -2,13 +2,17 @@
   "name": "adapto-bot",
   "version": "1.0.0",
   "description": "Robin's bot for Microsoft Teams platform",
-  "main": "dist/app.js",
+  "main": "dist/server.js",
   "scripts": {
-    "start": "node dist/app.js",
+    "prettier": "prettier \"./src/**/*.ts\" \"./src/**/*.tsx\" --write",
+    "start": "npm run server",
     "script": "nodemon --exec node --inspect=2266 -r ts-node/register",
-    "dev": "npm run script ./src/app.ts",
-    "build": "npm run clean & node node_modules/typescript/bin/tsc",
-    "clean": "rimraf dist"
+    "dev": "npm run build:dev",
+    "build": "npm run clean & webpack --config ./build-scripts/webpack.prod.js",
+    "clean": "rimraf dist & rimraf public/js",
+    "build:dev": "npm run clean & NODE_ENV=development webpack --config ./build-scripts/webpack.dev.js --watch",
+    "server": "NODE_ENV=production node dist/server.js",
+    "server:dev": "npm run exec dist/server.js"
   },
   "author": "Robin Liao",
   "license": "ISC",
@@ -24,6 +28,7 @@
     "lodash": "^4.17.19",
     "nodemon": "^1.18.9",
     "redis": "^3.1.2",
+    "request": "^2.88.2",
     "ts-node": "^7.0.1"
   },
   "devDependencies": {
@@ -32,9 +37,22 @@
     "@types/lodash": "^4.14.157",
     "@types/node": "^10.17.56",
     "@types/redis": "^2.8.32",
+    "@types/request": "^2.48.7",
+    "compression-webpack-plugin": "^6.1.1",
+    "copy-webpack-plugin": "^6.4.1",
+    "css-loader": "^3.6.0",
+    "file-loader": "^6.2.0",
     "json-colorizer": "^2.2.2",
+    "nodemon-webpack-plugin": "^4.5.2",
     "rimraf": "^3.0.2",
+    "source-map-loader": "2.0.1",
+    "style-loader": "^1.3.0",
+    "svg-inline-loader": "^0.8.2",
+    "ts-loader": "^8.3.0",
     "tslint": "^6.1.0",
-    "typescript": "^3.9.7"
+    "typescript": "^3.9.7",
+    "webpack": "5",
+    "webpack-cli": "^3.3.12",
+    "webpack-node-externals": "^3.0.0"
   }
 }

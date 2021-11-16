@@ -4,10 +4,9 @@
     "target": "es6",
     "esModuleInterop": true,
     "noImplicitAny": false,
-    "sourceMap": true,
-    "inlineSources": true,
+    "sourceMap": false,
+    "inlineSources": false,
     "outDir": "./dist",
-    "sourceRoot": "./src",
     "typeRoots": ["./src/@types"],
     "types": ["node"]
   },

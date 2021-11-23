@@ -33,6 +33,22 @@ class RedisClient {
       );
     });
   }
+
+  public hashSet(key: string, hashKey: string, value: string) {
+    return new Promise<void>((resolve, reject) => {
+      this.client.hset(key, hashKey, value, (err, reply) =>
+        err ? reject(err) : resolve()
+      );
+    });
+  }
+
+  public hashGet(key: string, hashKey: string) {
+    return new Promise<string>((resolve, reject) => {
+      this.client.hget(key, hashKey, (err, reply) =>
+        err ? reject(err) : resolve(reply)
+      );
+    });
+  }
 }
 
 export const redisClient = new RedisClient();

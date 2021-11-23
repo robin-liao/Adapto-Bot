@@ -18,6 +18,7 @@ import { IScenarioBuilder, ITeamsScenario } from "../teams-bot";
 import { getConversationId, isEmail, sleep } from "../utils";
 import * as tm from "../task-modules";
 import * as teamsTab from "../tabs";
+import { attachments as carouselCards } from "./carousel-attachments";
 
 export class DefaultBot implements ITeamsScenario {
   public accept(teamsBot: IScenarioBuilder) {
@@ -99,8 +100,9 @@ export class DefaultBot implements ITeamsScenario {
         "[url text](https://google.com)"
       );
       await ctx.sendActivity({
+        text: "[url text](https://google.com)",
         textFormat: "markdown",
-        attachments: [card1, card2],
+        attachments: [card1, card1],
         attachmentLayout: "carousel",
       });
     });

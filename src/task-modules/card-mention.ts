@@ -58,10 +58,14 @@ export class TaskModuleCardMention implements IMessagingExtensionAction {
                 {
                   type: "Input.ChoiceSet",
                   id: "selectedUsers",
-                  style: "expanded",
+                  style: "people",
+                  choices: [],
+                  "choices.data": {
+                    type: "Data.Query",
+                    dataset: "graph.microsoft.com/users?scope=currentContext",
+                  },
                   isMultiSelect: true,
                   placeholder: "Choose user(s)",
-                  choices,
                 },
               ],
             },
@@ -135,10 +139,10 @@ export class TaskModuleCardMention implements IMessagingExtensionAction {
       return;
     }
 
-    const selectedIdx = (selectedUsers as string)
-      .split(",")
-      .map((s) => parseInt(s));
-    const users: TeamsChannelAccount[] = selectedIdx.map((i) => members[i]);
+    const selectedMriList = (selectedUsers as string).split(",");
+    const users: TeamsChannelAccount[] = selectedMriList.map((mri) =>
+      members.find((m) => m.aadObjectId === mri)
+    );
     const card = CardGenerator.adaptive.mention(...users);
 
     if ((returnAs as string).includes("asBotCard")) {

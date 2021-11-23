@@ -33,10 +33,22 @@ import { CardGenerator } from "./card-gen";
 import { CardUpdate } from "./scenarios/card-update";
 import { DefaultBot } from "./scenarios/default-bot";
 import { FileBot } from "./scenarios/file-bot";
+import { MessageExtensionBot } from "./scenarios/message-extension-bot";
+import { SearchBot } from "./scenarios/search-bot";
+import { WorkBot } from "./scenarios/work-bot";
+import {
+  UniversalSearchRequest,
+  UniversalSearchResponse,
+} from "./search.interface";
 import { ConvSetting, ConvSettingTable } from "./storage/setting-table";
 import { IAdaptiveCardTab } from "./tabs";
 import { ITaskModule } from "./task-modules";
-import { getConversationId, printableJson, sleep } from "./utils";
+import {
+  getConversationId,
+  OneOnOneHelper,
+  printableJson,
+  sleep,
+} from "./utils";
 
 export interface ITeamsScenario {
   accept(teamsBot: IScenarioBuilder);
@@ -45,6 +57,7 @@ export interface ITeamsScenario {
 export interface IScenarioBuilder {
   registerTextCommand(pattern: RegExp, handler: TextCommandCallback);
   registerInvoke(intent: string, handler: InvokeCallback);
+  registerUniversalSearch(dataset: string, handler: InvokeSearchCallback);
   registerTaskModule(commandId: string, task: ITaskModule);
   registerTab(tabEntityId: string, tab: IAdaptiveCardTab);
   registerMessageExtensionQuery(
@@ -85,6 +98,13 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
 
   public registerInvoke(intent: string, handler: InvokeCallback) {
     this.invokeHandler.register(intent, handler);
+  }
+
+  public registerUniversalSearch(
+    dataset: string,
+    handler: InvokeSearchCallback
+  ) {
+    this.invokeHandler.registerUniversalSearch(dataset, handler);
   }
 
   public registerTaskModule(cmdID: string, task: ITaskModule) {
@@ -261,15 +281,16 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
   }
 
   private setupHandlers() {
-    this.onMessage((ctx, next) =>
-      ctx.activity.value
+    this.onMessage((ctx, next) => {
+      OneOnOneHelper.saveOneOnOneConvRef(ctx);
+      return ctx.activity.value
         ? this.handleOnMessageBack(ctx, next)
         : ctx.activity.attachments?.some(
             (x) => x.contentType === DOWNLOAD_INFO_CONTENT_TYPE
           )
         ? this.handleOnMessageWithFileDownload(ctx, next)
-        : this.handleOnMessage(ctx, next)
-    );
+        : this.handleOnMessage(ctx, next);
+    });
     this.registerOnTeamsEvents();
   }
 
@@ -277,6 +298,9 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     new DefaultBot().accept(this);
     new CardUpdate().accept(this);
     new FileBot().accept(this);
+    new WorkBot().accept(this);
+    new MessageExtensionBot().accept(this);
+    new SearchBot().accept(this);
   }
 
   private async handleOnMessage(ctx: TurnContext, next: () => Promise<void>) {
@@ -337,6 +361,13 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
 
     const res = await this.invokeHandler.dispatch(ctx);
     return res ?? { status: StatusCodes.NOT_FOUND };
+  }
+
+  protected async dispatchConversationUpdateActivity(
+    ctx: TurnContext
+  ): Promise<void> {
+    OneOnOneHelper.saveOneOnOneConvRef(ctx);
+    return super.dispatchConversationUpdateActivity(ctx);
   }
 
   private registerOnTeamsEvents() {
@@ -687,9 +718,14 @@ class TextCommandHandler {
 }
 
 type InvokeCallback = (ctx: TurnContext) => Promise<InvokeResponse>;
+type InvokeSearchCallback = (
+  request: UniversalSearchRequest,
+  ctx: TurnContext
+) => Promise<InvokeResponse<UniversalSearchResponse>>;
 
 class InvokeHandler {
   private lookup: { [intent: string]: InvokeCallback } = {};
+  private lookupSearch: { [dataset: string]: InvokeSearchCallback } = {};
 
   public register(intent: string, handler: InvokeCallback) {
     if (this.lookup[intent]) {
@@ -698,9 +734,29 @@ class InvokeHandler {
     this.lookup[intent] = handler;
   }
 
+  public registerUniversalSearch(
+    dataset: string,
+    handler: InvokeSearchCallback
+  ) {
+    if (this.lookupSearch[dataset]) {
+      throw new Error(
+        `Invoke search handler for intent "${dataset}" already exists`
+      );
+    }
+    this.lookupSearch[dataset] = handler;
+  }
+
   public async dispatch(ctx: TurnContext): Promise<InvokeResponse | undefined> {
     const intentQry: string = ctx.activity.value?.intent;
-    return this.lookup[intentQry]?.(ctx);
+    if (this.lookup[intentQry]) {
+      return this.lookup[intentQry]?.(ctx);
+    } else {
+      const datasetQry = (ctx.activity.value as UniversalSearchRequest)
+        ?.dataset;
+      if (this.lookupSearch[datasetQry]) {
+        return this.lookupSearch[datasetQry]?.(ctx.activity.value, ctx);
+      }
+    }
   }
 }
 
@@ -782,7 +838,7 @@ class TabHandler {
     request: TabRequest
   ): Promise<TabResponse> {
     const tab = this.lookup[tabEntityId];
-    return tab ? tab.fetch(ctx, request) : Promise.resolve({ tab: {} });
+    return tab ? tab.tabFetch(ctx, request) : Promise.resolve({ tab: {} });
   }
 
   public handleTeamsTabSubmit(
@@ -791,6 +847,6 @@ class TabHandler {
     request: TabRequest
   ): Promise<TabResponse> {
     const tab = this.lookup[tabEntityId];
-    return tab ? tab.submit(ctx, request) : Promise.resolve({ tab: {} });
+    return tab ? tab.tabSubmit(ctx, request) : Promise.resolve({ tab: {} });
   }
 }

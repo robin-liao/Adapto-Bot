@@ -9,7 +9,7 @@ import * as _ from "lodash";
 
 const entGen = TableUtilities.entityGenerator;
 
-type ValueType = string | number | boolean | Date;
+export type ValueType = string | number | boolean | Date;
 
 export interface AzureTableEntity {
   PartitionKey: string;
@@ -20,6 +20,32 @@ export interface AzureTableEntity {
 export type AzureTableEntityRaw<E extends AzureTableEntity> = {
   [K in keyof E]: TableUtilities.entityGenerator.EntityProperty<E[K]>;
 };
+
+export type Flatten<T extends Record<string, any>> = {
+  [K in keyof T]: T[K] extends ValueType ? T[K] : string;
+};
+
+export type TableEntity<T extends Record<string, any>> = Flatten<T> &
+  AzureTableEntity;
+
+export const flattenObj = <T extends Record<string, any>>(obj: T): Flatten<T> =>
+  _.transform(obj, (res: any, v, k) => {
+    res[k] =
+      _.isString(v) || _.isNumber(v) || _.isBoolean(v) || _.isDate(v)
+        ? v
+        : JSON.stringify(v);
+  });
+
+export const deflattenObj = <T extends Record<string, any>>(
+  obj: TableEntity<T>
+): T =>
+  _.transform(obj, (res: any, v, k) => {
+    try {
+      res[k] = JSON.parse(v);
+    } catch {
+      res[k] = v;
+    }
+  });
 
 class AzureTableService {
   private service = createTableService(config.azureStorageConnectionString);
@@ -88,7 +114,7 @@ class AzureTableService {
             const arr = _.map(result.entries, (entry) =>
               _.mapValues(entry, (v) =>
                 v.$ === "Edm.DateTime"
-                  ? new Date((v._ as unknown) as string)
+                  ? new Date(v._ as unknown as string)
                   : v._
               )
             ) as E[];
@@ -97,6 +123,17 @@ class AzureTableService {
             reject(err);
           }
         }
+      );
+    });
+  }
+
+  public deleteEntity(
+    tblName: string,
+    entity: AzureTableEntity
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.service.deleteEntity(tblName, entity, (error, response) =>
+        error ? reject(error) : resolve()
       );
     });
   }
@@ -133,6 +170,11 @@ export class AzureTable<
   protected async query(obj: Partial<E>, proj?: (keyof E)[]) {
     await this.init;
     return AzureStorage.queryEntities(this.tableName, obj as any, proj);
+  }
+
+  protected async del(obj: AzureTableEntity) {
+    await this.init;
+    return AzureStorage.deleteEntity(this.tableName, obj);
   }
 }
 

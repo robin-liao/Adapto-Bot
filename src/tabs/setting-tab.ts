@@ -7,7 +7,7 @@ import { getConversationId } from "../utils";
 import { IAdaptiveCardTab } from "./tab.interface";
 
 export class SettingTab implements IAdaptiveCardTab {
-  async fetch(ctx: TurnContext, request: TabRequest): Promise<TabResponse> {
+  async tabFetch(ctx: TurnContext, request: TabRequest): Promise<TabResponse> {
     const convId = getConversationId(ctx.activity);
     const setting = await new ConvSettingTable(convId).get();
     const card = CardGenerator.adaptive.settingCard(setting);
@@ -21,7 +21,7 @@ export class SettingTab implements IAdaptiveCardTab {
     };
   }
 
-  async submit(ctx: TurnContext, request: TabRequest): Promise<TabResponse> {
+  async tabSubmit(ctx: TurnContext, request: TabRequest): Promise<TabResponse> {
     return { tab: {} };
   }
 }

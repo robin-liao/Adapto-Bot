@@ -1,0 +1,23 @@
+{
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.2",
+  "body": [
+    {
+      "id": "selectedUsers",
+      "type": "Input.ChoiceSet",
+      "style": "people",
+      "isMultiSelect": true,
+      "choices": [],
+      "choices.data": {
+        "type": "Data.Query",
+        "dataset": "graph.microsoft.com/users"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit"
+    }
+  ]
+}

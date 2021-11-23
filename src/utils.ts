@@ -12,6 +12,7 @@ import {
   MessageFactory,
   TeamsChannelData,
 } from "botbuilder";
+import { UserDataTable } from "./storage/user-table";
 
 export const sleep = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
@@ -114,9 +115,10 @@ export const teamsCreateConversation = async (
   const connectorClient = botAdapter.createConnectorClient(
     context.activity.serviceUrl
   );
-  const conversationResourceResponse = await connectorClient.conversations.createConversation(
-    conversationParameters
-  );
+  const conversationResourceResponse =
+    await connectorClient.conversations.createConversation(
+      conversationParameters
+    );
   const conversationReference = TurnContext.getConversationReference(
     context.activity
   ) as ConversationReference;
@@ -135,3 +137,35 @@ export const getConversationId = (activity: Activity) =>
   activity.conversation.conversationType === "channel"
     ? (activity.channelData as TeamsChannelData).channel.id
     : activity.conversation.id;
+
+export class OneOnOneHelper {
+  public static async saveOneOnOneConvRef(ctx: TurnContext) {
+    if (ctx.activity.conversation.conversationType === "personal") {
+      const convRefOneOnOne = TurnContext.getConversationReference(
+        ctx.activity
+      );
+      const userId = ctx.activity.from.id;
+      const tbl = new UserDataTable(userId);
+      await tbl.update({ convRefOneOnOne });
+    }
+  }
+
+  public static async getOneOnOneCovRef(ctx: TurnContext) {
+    const userId = ctx.activity.from.id;
+    const tbl = new UserDataTable(userId);
+    const userData = await tbl.get("convRefOneOnOne");
+    return userData?.convRefOneOnOne;
+  }
+
+  public static async sendOneOnOneMessage(
+    ctx: TurnContext,
+    message: Partial<Activity>
+  ) {
+    const convRef = await OneOnOneHelper.getOneOnOneCovRef(ctx);
+    if (convRef) {
+      await ctx.adapter.continueConversation(convRef, async (turnCtx) => {
+        await turnCtx.sendActivity(message);
+      });
+    }
+  }
+}

@@ -65,7 +65,7 @@ const cardError = (json: any) =>
   });
 
 export class SandboxTab implements IAdaptiveCardTab {
-  async fetch(ctx: TurnContext, request: TabRequest): Promise<TabResponse> {
+  async tabFetch(ctx: TurnContext, request: TabRequest): Promise<TabResponse> {
     return {
       tab: {
         type: "continue",
@@ -76,7 +76,7 @@ export class SandboxTab implements IAdaptiveCardTab {
     };
   }
 
-  async submit(ctx: TurnContext, request: TabRequest): Promise<TabResponse> {
+  async tabSubmit(ctx: TurnContext, request: TabRequest): Promise<TabResponse> {
     const input = ctx.activity.value.data;
     const cards: TabResponseCard[] = [{ card: { ...cardInput.content } }];
 

@@ -32,8 +32,14 @@
     },
     {
       "entityId": "tab-adaptivecard-sandbox",
-      "name": "Sandbox",
-      "contentBotId": "e524fc50-3773-4dad-a19f-ebba5bffb381",
+      "name": "AC Tab Sandbox",
+      "contentBotId": "159e1c0f-15ef-4597-a8c6-44ba1fd89b78",
+      "scopes": ["personal", "team"]
+    },
+    {
+      "entityId": "tab-tag-work",
+      "name": "My Tag Work",
+      "contentBotId": "159e1c0f-15ef-4597-a8c6-44ba1fd89b78",
       "scopes": ["personal", "team"]
     }
   ],
@@ -94,7 +100,7 @@
           "type": "action",
           "context": ["message"],
           "description": "Test command to run action on message context (message sharing)",
-          "title": "Create cards",
+          "title": "Test ME Action",
           "fetchTask": true,
           "parameters": [
             {
@@ -109,6 +115,14 @@
           "type": "action",
           "description": "Action to generate card with mentions",
           "title": "Mention",
+          "fetchTask": true
+        },
+        {
+          "id": "tagWork",
+          "type": "action",
+          "context": ["message", "compose"],
+          "description": "Tag work content",
+          "title": "Tag Work",
           "fetchTask": true
         }
       ],

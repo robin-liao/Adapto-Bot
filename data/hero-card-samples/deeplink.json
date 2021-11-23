@@ -1,0 +1,11 @@
+{
+  "title": "Deeplink Text",
+  "text": "check out <a href=\"https://teams.microsoft.com/l/message/19:skypespaces_7a22628e03004b86b5735b7bb72c0fd3@thread.skype/1636582278943?tenantId=72f988bf-86f1-41af-91ab-2d7cd011db47&groupId=af55e84c-dc67-4e48-9005-86e0b07272f9&parentMessageId=1636582278943&teamName=Microsoft%20Teams&channelName=Bots&createdTime=1636582278943\">deeplink</a>",
+  "buttons": [
+    {
+      "type": "openurl",
+      "title": "Deeplink",
+      "value": "https://teams.microsoft.com/l/message/19:skypespaces_7a22628e03004b86b5735b7bb72c0fd3@thread.skype/1636582278943?tenantId=72f988bf-86f1-41af-91ab-2d7cd011db47&groupId=af55e84c-dc67-4e48-9005-86e0b07272f9&parentMessageId=1636582278943&teamName=Microsoft%20Teams&channelName=Bots&createdTime=1636582278943"
+    }
+  ]
+}

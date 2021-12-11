@@ -1,4 +1,7 @@
-import { ConversationReference } from "botframework-schema";
+import {
+  ConversationReference,
+  MessagingExtensionResult,
+} from "botframework-schema";
 import {
   AzureTable,
   deflattenObj,
@@ -8,6 +11,7 @@ import {
 
 export interface UserData {
   convRefOneOnOne?: Partial<ConversationReference>;
+  meQueryOverwrite?: MessagingExtensionResult;
   tags?: string[];
 }
 

@@ -3,6 +3,8 @@ import {
   MessagingExtensionAction,
   MessagingExtensionActionResponse,
   TaskModuleTaskInfo,
+  MessageFactory,
+  Activity,
 } from "botbuilder";
 import { IMessagingExtensionAction } from ".";
 import { CardGenerator } from "../card-gen";
@@ -39,6 +41,7 @@ export class TaskModuleCardCreate implements IMessagingExtensionAction {
       textFormat,
       textContent: text,
       extraPayload,
+      botMessagePreviewResponse,
     } = request.data;
     const attachments = cardPayload
       ? [
@@ -48,6 +51,24 @@ export class TaskModuleCardCreate implements IMessagingExtensionAction {
           },
         ]
       : [];
+
+    if (
+      this.commandId === "createWithPreview" &&
+      attachments[0] &&
+      !botMessagePreviewResponse
+    ) {
+      const activityPreview = MessageFactory.attachment(
+        attachments[0]
+      ) as Activity;
+      activityPreview.summary = JSON.stringify(request.data);
+      return {
+        composeExtension: {
+          type: "botMessagePreview",
+          activityPreview,
+        },
+      };
+    }
+
     if ((returnAs as string).includes("asBotCard")) {
       await ctx.sendActivity({
         attachments,
@@ -57,6 +78,7 @@ export class TaskModuleCardCreate implements IMessagingExtensionAction {
         ...(extraPayload && JSON.parse(extraPayload)),
       });
     }
+
     if ((returnAs as string).includes("asMECard")) {
       return {
         composeExtension: {
@@ -65,6 +87,22 @@ export class TaskModuleCardCreate implements IMessagingExtensionAction {
           attachments,
         },
       };
+    }
+  }
+
+  public async onBotMessagePreviewResponse(
+    ctx: TurnContext,
+    request: MessagingExtensionAction,
+    userResponse: "edit" | "send"
+  ): Promise<MessagingExtensionActionResponse> {
+    if (userResponse === "send") {
+      request.data = {
+        ...JSON.parse(request.botActivityPreview[0].summary),
+        botMessagePreviewResponse: userResponse,
+      };
+      return this.submit(ctx, request);
+    } else if (userResponse === "edit") {
+      return this.fetch(ctx, request);
     }
   }
 }

@@ -11,6 +11,62 @@
     {
       "type": "TextBlock",
       "text": "test at-mention: <at>User One</at>"
+    },
+    {
+      "type": "ImageSet",
+      "imageSize": "medium",
+      "images": [
+        {
+          "type": "Image",
+          "url": "data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7"
+        },
+        {
+          "type": "Image",
+          "url": "https://picsum.photos/300/200?image=200",
+          "selectAction": {
+            "type": "Action.OpenUrl",
+            "url": "https://google.com"
+          }
+        },
+        {
+          "type": "Image",
+          "url": "https://picsum.photos/300/200?image=200",
+          "selectAction": {
+            "type": "Action.OpenUrl",
+            "url": "https://google.com"
+          },
+          "msTeams": {
+            "allowExpand": true
+          }
+        },
+        {
+          "type": "Image",
+          "url": "https://picsum.photos/200/200?image=400",
+          "msTeams": {
+            "allowExpand": true
+          }
+        },
+        {
+          "type": "Image",
+          "url": "https://picsum.photos/300/200?image=500"
+        },
+        {
+          "type": "Image",
+          "url": "https://picsum.photos/200/200?image=600"
+        },
+        {
+          "type": "Image",
+          "url": "https://picsum.photos/300/200?image=700"
+        },
+        {
+          "type": "Image",
+          "url": "https://picsum.photos/300/200?image=800"
+        },
+        {
+          "type": "Image",
+          "url": "https://picsum.photos/300/200?image=900"
+        }
+      ]
     }
   ],
   "actions": [

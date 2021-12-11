@@ -33,14 +33,20 @@
     {
       "entityId": "tab-adaptivecard-sandbox",
       "name": "AC Tab Sandbox",
-      "contentBotId": "159e1c0f-15ef-4597-a8c6-44ba1fd89b78",
+      "contentBotId": "e524fc50-3773-4dad-a19f-ebba5bffb381",
       "scopes": ["personal", "team"]
     },
     {
       "entityId": "tab-tag-work",
       "name": "My Tag Work",
-      "contentBotId": "159e1c0f-15ef-4597-a8c6-44ba1fd89b78",
+      "contentBotId": "e524fc50-3773-4dad-a19f-ebba5bffb381",
       "scopes": ["personal", "team"]
+    },
+    {
+      "entityId": "tab-message-ext",
+      "name": "ME Config",
+      "contentBotId": "e524fc50-3773-4dad-a19f-ebba5bffb381",
+      "scopes": ["personal"]
     }
   ],
   "bots": [
@@ -56,8 +62,22 @@
       "commands": [
         {
           "id": "queryCards",
+          "context": ["message", "compose"],
           "description": "Test command to run query",
           "title": "Query cards",
+          "initialRun": true,
+          "parameters": [
+            {
+              "name": "queryText",
+              "title": "Query parameter",
+              "description": "Query parameter"
+            }
+          ]
+        },
+        {
+          "id": "userDefinedMEQuery",
+          "description": "Query command to return the results specified in ME Config tab",
+          "title": "Defined Query",
           "initialRun": true,
           "parameters": [
             {

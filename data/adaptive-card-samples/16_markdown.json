@@ -21,6 +21,10 @@
     },
     {
       "type": "TextBlock",
+      "text": "[**hyperlink strong**](https://microsoft.com)"
+    },
+    {
+      "type": "TextBlock",
       "text": "[unsafe link](javascript:alert(''))"
     },
     {

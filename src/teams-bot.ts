@@ -42,7 +42,7 @@ import {
 } from "./search.interface";
 import { ConvSetting, ConvSettingTable } from "./storage/setting-table";
 import { IAdaptiveCardTab } from "./tabs";
-import { ITaskModule } from "./task-modules";
+import { IMessagingExtensionAction, ITaskModule } from "./task-modules";
 import {
   getConversationId,
   OneOnOneHelper,
@@ -228,15 +228,41 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     );
   }
 
-  protected handleTeamsMessagingExtensionSubmitActionDispatch(
+  protected handleTeamsMessagingExtensionSubmitAction(
     ctx: TurnContext,
     request: MessagingExtensionAction
   ): Promise<MessagingExtensionActionResponse> {
     const { commandId } = request;
-    return this.tmHandler.handleTeamsMessagingExtensionSubmitActionDispatch(
+    return this.tmHandler.handleTeamsMessagingExtensionSubmitAction(
       commandId,
       ctx,
       request
+    );
+  }
+
+  protected async handleTeamsMessagingExtensionBotMessagePreviewEdit(
+    ctx: TurnContext,
+    request: MessagingExtensionAction
+  ): Promise<MessagingExtensionActionResponse> {
+    const { commandId } = request;
+    return this.tmHandler.handleTeamsMessagingExtensionSubmitAction(
+      commandId,
+      ctx,
+      request,
+      "edit"
+    );
+  }
+
+  protected async handleTeamsMessagingExtensionBotMessagePreviewSend(
+    ctx: TurnContext,
+    request: MessagingExtensionAction
+  ): Promise<MessagingExtensionActionResponse> {
+    const { commandId } = request;
+    return this.tmHandler.handleTeamsMessagingExtensionSubmitAction(
+      commandId,
+      ctx,
+      request,
+      "send"
     );
   }
 
@@ -815,13 +841,18 @@ class TaskModuleHandler {
     return tm ? tm.fetch(ctx, request) : Promise.resolve({});
   }
 
-  public handleTeamsMessagingExtensionSubmitActionDispatch(
+  public handleTeamsMessagingExtensionSubmitAction(
     commandId: string,
     ctx: TurnContext,
-    request: MessagingExtensionAction
+    request: MessagingExtensionAction,
+    userPreviewResponse?: "edit" | "send"
   ): Promise<MessagingExtensionActionResponse> {
-    const tm = this.lookup[commandId];
-    return tm ? tm.submit(ctx, request) : Promise.resolve({});
+    const tm = this.lookup[commandId] as IMessagingExtensionAction;
+    return tm
+      ? userPreviewResponse
+        ? tm.onBotMessagePreviewResponse?.(ctx, request, userPreviewResponse)
+        : tm.submit(ctx, request)
+      : Promise.resolve({});
   }
 }
 

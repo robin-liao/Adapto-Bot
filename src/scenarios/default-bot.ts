@@ -382,6 +382,10 @@ export class DefaultBot implements ITeamsScenario {
       new tm.TaskModuleCardCreate("createCard")
     );
     teamsBot.registerTaskModule(
+      "createWithPreview",
+      new tm.TaskModuleCardCreate("createWithPreview")
+    );
+    teamsBot.registerTaskModule(
       "cardMention",
       new tm.TaskModuleCardMention("cardMention")
     );

@@ -1,0 +1,53 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.2",
+  "backgroundImage": "https://coxautocommsdev-analytics.azurewebsites.net/Content/colors/e6f3f9-employee-update.png",
+  "body": [
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "auto",
+          "items": [
+            {
+              "type": "Image",
+              "size": "small",
+              "url": "https://coxautocommsdev-analytics.azurewebsites.net/Content/accouncement-2.png"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "items": [
+            {
+              "type": "TextBlock",
+              "size": "medium",
+              "weight": "bolder",
+              "color": "dark",
+              "isSubtle": true,
+              "text": "News Update",
+              "wrap": true,
+              "spacing": "small"
+            }
+          ],
+          "verticalContentAlignment": "center"
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "size": "extraLarge",
+      "weight": "bolder",
+      "color": "dark",
+      "text": "New lines",
+      "wrap": true
+    },
+    {
+      "type": "TextBlock",
+      "color": "dark",
+      "text": "Hello!  \n\ndsdsds\n\ndsdsds\n\ndsds\n\n65789",
+      "wrap": true
+    }
+  ]
+}

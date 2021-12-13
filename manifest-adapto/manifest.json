@@ -47,6 +47,13 @@
       "name": "ME Config",
       "contentBotId": "e524fc50-3773-4dad-a19f-ebba5bffb381",
       "scopes": ["personal"]
+    },
+    {
+      "entityId": "tab-task-module",
+      "name": "Tasks Module",
+      "contentUrl": "https://adapto-bot.azurewebsites.net/task/launchTaskModule/initTab",
+      "websiteUrl": "https://adapto-bot.azurewebsites.net/task/launchTaskModule/initTab",
+      "scopes": ["personal", "team"]
     }
   ],
   "bots": [
@@ -78,6 +85,19 @@
           "id": "userDefinedMEQuery",
           "description": "Query command to return the results specified in ME Config tab",
           "title": "Defined Query",
+          "initialRun": true,
+          "parameters": [
+            {
+              "name": "queryText",
+              "title": "Query parameter",
+              "description": "Query parameter"
+            }
+          ]
+        },
+        {
+          "id": "taskModuleCardQuery",
+          "description": "Query cards for task module launch",
+          "title": "Task Module",
           "initialRun": true,
           "parameters": [
             {
@@ -129,6 +149,20 @@
               "description": "Dummy parameter"
             }
           ]
+        },
+        {
+          "id": "launchTaskModule",
+          "type": "action",
+          "context": ["message", "compose"],
+          "description": "Launch Task Module",
+          "title": "Launch Task Module",
+          "fetchTask": false,
+          "taskInfo": {
+            "width": "800",
+            "height": "600",
+            "title": "First page",
+            "url": "https://adapto-bot.azurewebsites.net/task/launchTaskModule/dialogContent?groupId={groupId}&teamId={teamId}&entityId={entityId}&channelId={channelId}&tid={tid}&userObjectId={userObjectId}&sessionId={sessionId}&theme={theme}&locale={locale}&ringId={ringId}&platform={hostClientType}&parentMessageId={parentMessageId}"
+          }
         },
         {
           "id": "cardMention",

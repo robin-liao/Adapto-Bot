@@ -29,6 +29,7 @@
     "nodemon": "^1.18.9",
     "redis": "^3.1.2",
     "request": "^2.88.2",
+    "string-template": "^1.0.0",
     "ts-node": "^7.0.1",
     "uuid": "^8.3.2"
   },
@@ -39,6 +40,7 @@
     "@types/node": "^10.17.56",
     "@types/redis": "^2.8.32",
     "@types/request": "^2.48.7",
+    "@types/string-template": "^1.0.2",
     "@types/uuid": "^8.3.3",
     "compression-webpack-plugin": "^6.1.1",
     "copy-webpack-plugin": "^6.4.1",

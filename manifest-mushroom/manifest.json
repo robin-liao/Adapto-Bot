@@ -47,6 +47,13 @@
       "name": "ME Config",
       "contentBotId": "159e1c0f-15ef-4597-a8c6-44ba1fd89b78",
       "scopes": ["personal"]
+    },
+    {
+      "entityId": "tab-task-module",
+      "name": "Tasks Module",
+      "contentUrl": "https://ypliao.ngrok.io/task/launchTaskModule/initTab",
+      "websiteUrl": "https://ypliao.ngrok.io/task/launchTaskModule/initTab",
+      "scopes": ["personal", "team"]
     }
   ],
   "bots": [
@@ -78,6 +85,19 @@
           "id": "userDefinedMEQuery",
           "description": "Query command to return the results specified in ME Config tab",
           "title": "Defined Query",
+          "initialRun": true,
+          "parameters": [
+            {
+              "name": "queryText",
+              "title": "Query parameter",
+              "description": "Query parameter"
+            }
+          ]
+        },
+        {
+          "id": "taskModuleCardQuery",
+          "description": "Query cards for task module launch",
+          "title": "Task Module",
           "initialRun": true,
           "parameters": [
             {
@@ -138,7 +158,10 @@
           "title": "Launch Task Module",
           "fetchTask": false,
           "taskInfo": {
-            "url": "https://faa523b62135.ngrok.io/task/launchTaskModule?groupId={groupId}&teamId={teamId}&entityId={entityId}&channelId={channelId}&tid={tid}&userObjectId={userObjectId}&sessionId={sessionId}&theme={theme}&locale={locale}&ringId={ringId}&platform={hostClientType}&parentMessageId={parentMessageId}"
+            "width": "800",
+            "height": "600",
+            "title": "First page",
+            "url": "https://ypliao.ngrok.io/task/launchTaskModule/dialogContent?groupId={groupId}&teamId={teamId}&entityId={entityId}&channelId={channelId}&tid={tid}&userObjectId={userObjectId}&sessionId={sessionId}&theme={theme}&locale={locale}&ringId={ringId}&platform={hostClientType}&parentMessageId={parentMessageId}"
           }
         },
         {

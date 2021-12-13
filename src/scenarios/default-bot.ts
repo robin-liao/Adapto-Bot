@@ -389,10 +389,6 @@ export class DefaultBot implements ITeamsScenario {
       "cardMention",
       new tm.TaskModuleCardMention("cardMention")
     );
-    teamsBot.registerTaskModule(
-      "launchTaskModule",
-      new tm.TaskModuleLaunch("launchTaskModule")
-    );
   }
 
   private registerTabs(teamsBot: IScenarioBuilder) {

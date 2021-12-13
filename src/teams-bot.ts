@@ -35,6 +35,7 @@ import { DefaultBot } from "./scenarios/default-bot";
 import { FileBot } from "./scenarios/file-bot";
 import { MessageExtensionBot } from "./scenarios/message-extension-bot";
 import { SearchBot } from "./scenarios/search-bot";
+import { TaskModuleFullTest } from "./scenarios/task-module-full-test";
 import { WorkBot } from "./scenarios/work-bot";
 import {
   UniversalSearchRequest,
@@ -327,6 +328,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     new WorkBot().accept(this);
     new MessageExtensionBot().accept(this);
     new SearchBot().accept(this);
+    new TaskModuleFullTest().accept(this);
   }
 
   private async handleOnMessage(ctx: TurnContext, next: () => Promise<void>) {

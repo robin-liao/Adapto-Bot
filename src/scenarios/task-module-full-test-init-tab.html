@@ -1,0 +1,375 @@
+<html>
+  <head>
+    <script
+      src="https://statics.teams.cdn.office.net/sdk/v1.7.0/js/MicrosoftTeams.min.js"
+      integrity="sha384-00JbifySIlPvW32u9rSurgu8PujfL6XFdV9iNn4ZWyurJJ33MFvpwPqmCHDq9ADv"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+
+  <body onload="onLoad()">
+    <script>
+      let webviewUrl = `https://${window.location.hostname}/task/launchTaskModule/dialogContent`;
+      let queryParams = {};
+
+      function createUrlWithQsp(url, params) {
+        let qsp = [];
+        for (var k in params) {
+          if (params.hasOwnProperty(k)) {
+            let v = params[k];
+            qsp.push(k + "=" + v);
+          }
+        }
+        let qspStr = qsp.length === 0 ? "" : `?${qsp.join("&")}`;
+        return url + qspStr;
+      }
+
+      function onLoad() {
+        microsoftTeams.initialize();
+        microsoftTeams.getContext((context) => {
+          let theme = (context && context.theme) || undefined;
+          let darkTheme = theme && (theme === "dark" || theme === "contrast");
+          document.styleSheets[0].insertRule(
+            `html * { color: ${darkTheme ? "#ffffff" : "#252424"}; }`,
+            1
+          );
+
+          theme && (queryParams["theme"] = theme);
+
+          let form = document.getElementById("taskInfoForm");
+          form.url.value = createUrlWithQsp(webviewUrl, queryParams);
+          form.title.value = "First Page";
+          onChange();
+        });
+      }
+
+      function onSubmit() {
+        let form = document.getElementById("taskInfoForm");
+        let taskInfo = form.taskInfo;
+
+        if (!!taskInfo.url === !!taskInfo.card) {
+          setErrorMessage(
+            "You need to specify Webview URL or Card (can't be both)."
+          );
+          return false;
+        }
+
+        microsoftTeams.initialize();
+        microsoftTeams.tasks.startTask(taskInfo, (err, result) => {
+          setMessage(`
+          Error:<br/>
+          <pre>${JSON.stringify(err, null, 2)}</pre>
+          <br/>
+          Result:<br/>
+          <pre>${JSON.stringify(result, null, 2)}</pre>
+        `);
+        });
+        return true;
+      }
+
+      function onChange() {
+        let form = document.getElementById("taskInfoForm");
+        form.taskInfo = {
+          title: form.title.value || undefined,
+          url: form.url.value || undefined,
+          card: undefined,
+          width: form.widthCustom.value || form.width.value || undefined,
+          height: form.heightCustom.value || form.height.value || undefined,
+          fallbackUrl: form.fallbackUrl.value || undefined,
+          completionBotId: form.completionBotId.value || undefined,
+        };
+
+        if (form.card.value) {
+          try {
+            form.taskInfo.card = JSON.parse(form.card.value);
+          } catch (e) {}
+        }
+
+        setMessage(
+          `TaskInfo to Tab SDK startTask():<br/> <pre>${JSON.stringify(
+            form.taskInfo,
+            null,
+            2
+          )}</pre>`
+        );
+        setErrorMessage(null);
+      }
+
+      function onOptInDataChange() {
+        let form = document.getElementById("taskInfoForm");
+        let optInData = form.optInData.value || undefined;
+        if (optInData) {
+          queryParams["data"] = encodeURIComponent(optInData);
+        }
+        form.url.value = createUrlWithQsp(webviewUrl, queryParams);
+        onChange();
+      }
+
+      function setErrorMessage(text) {
+        let errTag = document.getElementById("error");
+        errTag.innerText = text;
+      }
+
+      function setMessage(html) {
+        let div = document.getElementById("message");
+        div.innerHTML = html;
+      }
+
+      function populateDefaultCard(event) {
+        let form = document.getElementById("taskInfoForm");
+        let optInData = form.optInData.value || "";
+        form.card.value = `{DEFAULT_CARD}`.replace(
+          "{OPT_IN_DATA}",
+          escapeJsonString(optInData)
+        );
+        onChange();
+        event.preventDefault();
+      }
+
+      function escapeJsonString(str) {
+        return str
+          .replace(/[\\]/g, "\\\\")
+          .replace(/[\"]/g, '\\"')
+          .replace(/[\/]/g, "\\/")
+          .replace(/[\b]/g, "\\b")
+          .replace(/[\f]/g, "\\f")
+          .replace(/[\n]/g, "\\n")
+          .replace(/[\r]/g, "\\r")
+          .replace(/[\t]/g, "\\t");
+      }
+    </script>
+
+    <style>
+      html * {
+        font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        margin: 0;
+        color: #333333;
+      }
+
+      pre {
+        background: wheat;
+        min-width: 300px;
+        max-width: 50vw;
+        overflow: scroll;
+        border-radius: 3px;
+        margin-right: 50px;
+        font-family: monospace;
+        padding: 10px;
+        color: #252424;
+      }
+
+      h1,
+      h2,
+      h3 {
+        font-weight: 500;
+      }
+
+      .container {
+        display: flex;
+      }
+
+      .left-half {
+        width: 50%;
+        min-width: 50%;
+      }
+
+      .right-half {
+        width: 50%;
+        margin: 0 30px;
+      }
+
+      textarea {
+        width: 100%;
+        border: 1px solid #cccccc;
+        resize: vertical;
+        color: #252424;
+      }
+
+      .spacer-large {
+        height: 24px;
+      }
+
+      .spacer-small {
+        height: 8px;
+      }
+
+      .btn {
+        font-size: 14px;
+        height: 32px;
+        cursor: pointer;
+        background: white;
+        border: 1px solid #666666;
+        color: #252424;
+      }
+
+      .btn:hover {
+        background: #666666;
+        color: white;
+      }
+
+      .btn:focus {
+        outline: none;
+      }
+
+      input[type="text"],
+      input[type="number"] {
+        outline: none;
+        border-radius: 3px;
+        border: 1px solid #cccccc;
+        width: 400px;
+        height: 30px;
+        font-size: 14px;
+        max-width: 100%;
+        color: #252424;
+      }
+
+      input[type="radio"] {
+        margin: 4px;
+      }
+
+      input[type="submit"] {
+        display: none;
+      }
+
+      .round-corner {
+        border-radius: 3px;
+      }
+    </style>
+
+    <h1>Welcome! Please fill out Task Info to launch</h1>
+    <div class="spacer-large"></div>
+
+    <section class="container">
+      <div class="left-half">
+        <form id="taskInfoForm" action="" onchange="onChange()">
+          <!-- Dialog Title -->
+          <h3>Dialog Title</h3>
+          <div class="spacer-small"></div>
+          <input type="text" name="title" id="title" onkeyup="onChange()" />
+          <br />
+          <div class="spacer-large"></div>
+
+          <!-- Completion Bot Id -->
+          <h3
+            title="If set then results will send back to bot via invoke. Otherwise they will send back to Tab SDK caller (here)"
+          >
+            Completion Bot Id (optional)
+          </h3>
+          <div class="spacer-small"></div>
+          <input
+            type="text"
+            name="completionBotId"
+            id="completionBotId"
+            value="{BOT_ID}"
+            onkeyup="onChange()"
+            placeholder="required only for fetching more Webviews or Cards from bots"
+          />
+          <br />
+          <div class="spacer-large"></div>
+
+          <!-- Webview URL -->
+          <h3>Webview URL</h3>
+          <div class="spacer-small"></div>
+          <input type="text" name="url" id="url" onkeyup="onChange()" />
+          <br />
+          <div class="spacer-large"></div>
+
+          <!-- Card -->
+          <h3>Card payload</h3>
+          <div class="spacer-small"></div>
+          <button class="btn round-corner" onclick="populateDefaultCard(event)">
+            Populate Default Card
+          </button>
+          <div class="spacer-small"></div>
+          <textarea
+            class="round-corner"
+            style="outline: none"
+            rows="15"
+            cols="63"
+            name="card"
+            form="taskInfoForm"
+            onkeyup="onChange()"
+            placeholder='card attachment JSON, i.e., {"contentType": "application/vnd.microsoft.card.adaptive", "content": {...adaptive card payload...} }'
+          ></textarea>
+          <br />
+          <div class="spacer-large"></div>
+
+          <!-- Width -->
+          <h3>Initial wdith</h3>
+          <div class="spacer-small"></div>
+          <input type="radio" name="width" value="small" /> Small
+          <br />
+          <input type="radio" name="width" value="medium" /> Medium
+          <br />
+          <input type="radio" name="width" value="large" /> Large <br />
+          Custom:
+          <input
+            type="number"
+            name="widthCustom"
+            placeholder="units in 'vh'"
+            onkeyup="onChange()"
+          />
+          <br />
+          <div class="spacer-large"></div>
+
+          <!-- Height -->
+          <h3>Initial height</h3>
+          <div class="spacer-small"></div>
+          <input type="radio" name="height" value="small" /> Small
+          <br />
+          <input type="radio" name="height" value="medium" /> Medium
+          <br />
+          <input type="radio" name="height" value="large" /> Large <br />
+          Custom:
+          <input
+            type="number"
+            name="heightCustom"
+            placeholder="units in 'vw'"
+            onkeyup="onChange()"
+          />
+          <br />
+          <div class="spacer-large"></div>
+
+          <!-- Fallback URL -->
+          <h3>Fallback URL</h3>
+          <div class="spacer-small"></div>
+          <input
+            type="text"
+            name="fallbackUrl"
+            id="fallbackUrl"
+            onkeyup="onChange()"
+          />
+          <br />
+          <div class="spacer-large"></div>
+
+          <br />
+        </form>
+      </div>
+      <div class="right-half">
+        <button class="btn round-corner" onclick="onSubmit()">
+          Launch Task Module
+        </button>
+        <div id="error" style="color: red"></div>
+        <div class="spacer-large"></div>
+        <div id="message"></div>
+        <div class="spacer-large"></div>
+
+        <!-- Opt-In data -->
+        <h3>Opt-In data</h3>
+        <div class="spacer-small"></div>
+        <textarea
+          class="round-corner"
+          style="outline: none"
+          rows="20"
+          cols="63"
+          name="optInData"
+          id="optInData"
+          form="taskInfoForm"
+          onkeyup="onOptInDataChange()"
+          placeholder="No data. You may put some here in JSON format"
+        ></textarea>
+        <br />
+      </div>
+    </section>
+  </body>
+</html>

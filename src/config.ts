@@ -2,6 +2,7 @@ import env = require("dotenv");
 env.config();
 
 export default {
+  teamsAppId: process.env.TEAMS_APP_ID,
   microsoftAppID: process.env.MICROSOFT_APP_ID,
   microsoftAppPassword: process.env.MICROSOFT_APP_PASSWORD,
   port: process.env.port || process.env.PORT || 5487,

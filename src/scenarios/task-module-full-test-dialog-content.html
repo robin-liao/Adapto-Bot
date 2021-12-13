@@ -1,0 +1,364 @@
+<html>
+  <head>
+    <script
+      src="https://statics.teams.cdn.office.net/sdk/v1.7.0/js/MicrosoftTeams.min.js"
+      integrity="sha384-00JbifySIlPvW32u9rSurgu8PujfL6XFdV9iNn4ZWyurJJ33MFvpwPqmCHDq9ADv"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      window.onload = function () {
+        let qsp = window.location.search;
+        let darkTheme =
+          qsp.includes("theme=dark") || qsp.includes("theme=contrast");
+        document.styleSheets[0].insertRule(
+          `html * { color: ${darkTheme ? "#ffffff" : "#252424"}; }`,
+          1
+        );
+
+        let optInData = JSON.parse(`{OPT_IN_DATA}`);
+        let form = document.getElementById("nextTaskForm");
+        form.optInData.value = JSON.stringify(optInData, null, 2);
+        onChange();
+      };
+    </script>
+  </head>
+
+  <body>
+    <script>
+      function onSubmit() {
+        let form = document.getElementById("nextTaskForm");
+
+        var nextStep = form.taskInfo.nextStep;
+        if (!!!nextStep) {
+          setErrorMessage("Please choose one option to continue");
+          return false;
+        }
+
+        microsoftTeams.initialize();
+        microsoftTeams.tasks.submitTask(form.taskInfo, ["{TEAMS_APP_ID}"]);
+        return true;
+      }
+
+      function onChange() {
+        let form = document.getElementById("nextTaskForm");
+        form.taskInfo = {
+          commandId: "launchTaskModule",
+          title: form.title.value || undefined,
+          url: form.url.value || undefined,
+          card: undefined,
+          width: form.widthCustom.value || form.width.value || undefined,
+          height: form.heightCustom.value || form.height.value || undefined,
+          fallbackUrl: form.fallbackUrl.value || undefined,
+          nextStep: form.nextStep.value || undefined,
+          optInData: form.optInData.value || undefined,
+          doneMessage: form.doneMessage.value || undefined,
+          doneCard: form.doneCard.value || undefined,
+        };
+
+        if (form.card.value) {
+          try {
+            form.taskInfo.card = JSON.parse(form.card.value);
+          } catch (e) {}
+        }
+
+        let div = document.getElementById("message");
+        div.innerHTML = `Payload send to bot:<br/> <pre>${JSON.stringify(
+          form.taskInfo,
+          null,
+          2
+        )}</pre>`;
+        setErrorMessage(null);
+      }
+
+      function setErrorMessage(text) {
+        let errTag = document.getElementById("error");
+        errTag.innerText = text;
+      }
+    </script>
+
+    <style>
+      html * {
+        font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        margin: 0;
+      }
+
+      pre {
+        background: wheat;
+        min-width: 300px;
+        max-width: 50vw;
+        overflow: scroll;
+        border-radius: 3px;
+        margin-right: 50px;
+        font-family: monospace;
+        padding: 10px;
+        color: #252424;
+      }
+
+      h1,
+      h2,
+      h3 {
+        font-weight: 500;
+      }
+
+      .container {
+        display: flex;
+      }
+
+      .left-half {
+        width: 50%;
+        min-width: 50%;
+      }
+
+      .right-half {
+        width: 50%;
+        margin: 0 30px;
+      }
+
+      textarea {
+        width: 100%;
+        border: 1px solid #cccccc;
+        resize: vertical;
+        color: #252424;
+      }
+
+      .spacer-large {
+        height: 24px;
+      }
+
+      .spacer-small {
+        height: 8px;
+      }
+
+      .btn {
+        font-size: 14px;
+        height: 32px;
+        cursor: pointer;
+        border-radius: 3px;
+        background: white;
+        border: 1px solid #666666;
+        color: #252424;
+      }
+
+      .btn:hover {
+        background: #666666;
+        color: white;
+      }
+
+      input[type="text"],
+      input[type="number"] {
+        outline: none;
+        border-radius: 3px;
+        border: 1px solid #cccccc;
+        width: 400px;
+        height: 30px;
+        font-size: 14px;
+        max-width: 100%;
+        color: #252424;
+      }
+
+      input[type="radio"] {
+        margin: 4px;
+      }
+
+      input[type="submit"] {
+        display: none;
+      }
+
+      .round-corner {
+        border-radius: 3px;
+      }
+    </style>
+
+    <h1>Choose your next step:</h1>
+    <div class="spacer-large"></div>
+
+    <section class="container">
+      <div class="left-half">
+        <form id="nextTaskForm" action="" onchange="onChange()">
+          <!-- More Webview URL -->
+          <h3>
+            <input
+              type="radio"
+              name="nextStep"
+              value="moreWebview"
+              onkeyup="onChange()"
+              checked
+            />
+            1. More Webview URL
+          </h3>
+          <div class="spacer-small"></div>
+          <input
+            type="text"
+            placeholder="overwrite to redirect to other URL"
+            name="url"
+            id="url"
+            onkeyup="onChange()"
+          />
+          <br />
+          <div class="spacer-large"></div>
+
+          <!-- More Card -->
+          <h3>
+            <input
+              type="radio"
+              name="nextStep"
+              value="moreCard"
+              onkeyup="onChange()"
+            />
+            2. More Card payload
+          </h3>
+          <div class="spacer-small"></div>
+          <textarea
+            class="round-corner"
+            style="outline: none"
+            rows="10"
+            cols="63"
+            name="card"
+            form="nextTaskForm"
+            onkeyup="onChange()"
+            placeholder="adaptive card payload to overwrite the default (the current card)"
+          ></textarea>
+          <br />
+          <div class="spacer-large"></div>
+
+          <!-- Done Empty -->
+          <h3>
+            <input
+              type="radio"
+              name="nextStep"
+              value="doneEmpty"
+              onkeyup="onChange()"
+            />
+            3. Done - Empty
+          </h3>
+          <div class="spacer-large"></div>
+
+          <!-- Done Message -->
+          <h3>
+            <input
+              type="radio"
+              name="nextStep"
+              value="doneMessage"
+              onkeyup="onChange()"
+            />
+            4. Done - Message
+          </h3>
+          <div class="spacer-small"></div>
+          <input
+            type="text"
+            placeholder="message to display on dialog"
+            name="doneMessage"
+            id="doneMessage"
+            onkeyup="onChange()"
+          />
+          <br />
+          <div class="spacer-large"></div>
+
+          <!-- Done Card -->
+          <h3>
+            <input
+              type="radio"
+              name="nextStep"
+              value="doneCard"
+              onkeyup="onChange()"
+            />
+            5. Done - Card
+          </h3>
+          <div class="spacer-small"></div>
+          <textarea
+            class="round-corner"
+            style="outline: none"
+            rows="10"
+            cols="63"
+            name="doneCard"
+            form="nextTaskForm"
+            onkeyup="onChange()"
+            placeholder="adaptive card payload to overwrite the default (we'll generate it!)"
+          ></textarea>
+          <br />
+          <div class="spacer-large"></div>
+
+          <!-- Next Dialog Title -->
+          <h3>Next dialog Title</h3>
+          <div class="spacer-small"></div>
+          <input type="text" name="title" id="title" onkeyup="onChange()" />
+          <br />
+          <div class="spacer-large"></div>
+
+          <!-- Width -->
+          <h3>Next dialog wdith</h3>
+          <div class="spacer-small"></div>
+          <input type="radio" name="width" value="small" /> Small
+          <br />
+          <input type="radio" name="width" value="medium" /> Medium
+          <br />
+          <input type="radio" name="width" value="large" /> Large <br />
+          Custom:
+          <input
+            type="number"
+            name="widthCustom"
+            placeholder="units in 'vh'"
+            onkeyup="onChange()"
+          />
+          <br />
+          <div class="spacer-large"></div>
+
+          <!-- Height -->
+          <h3>Next dialog height</h3>
+          <div class="spacer-small"></div>
+          <input type="radio" name="height" value="small" /> Small
+          <br />
+          <input type="radio" name="height" value="medium" /> Medium
+          <br />
+          <input type="radio" name="height" value="large" /> Large <br />
+          Custom:
+          <input
+            type="number"
+            name="heightCustom"
+            placeholder="units in 'vw'"
+            onkeyup="onChange()"
+          />
+          <br />
+          <div class="spacer-large"></div>
+
+          <!-- Fallback URL -->
+          <h3>Fallback URL</h3>
+          <div class="spacer-small"></div>
+          <input
+            type="text"
+            name="fallbackUrl"
+            id="fallbackUrl"
+            onkeyup="onChange()"
+          />
+          <br />
+          <div class="spacer-large"></div>
+
+          <br />
+        </form>
+      </div>
+      <div class="right-half">
+        <button class="btn round-corner" onclick="onSubmit()">Next</button>
+        <div id="error" style="color: red"></div>
+        <div class="spacer-large"></div>
+        <div id="message"></div>
+        <div class="spacer-large"></div>
+
+        <!-- Opt-In data -->
+        <h3>Opt-In data</h3>
+        <div class="spacer-small"></div>
+        <textarea
+          class="round-corner"
+          style="outline: none"
+          rows="20"
+          cols="63"
+          name="optInData"
+          id="optInData"
+          form="nextTaskForm"
+          onkeyup="onChange()"
+          placeholder="No data. You may put some here in JSON format"
+        ></textarea>
+        <br />
+      </div>
+    </section>
+  </body>
+</html>

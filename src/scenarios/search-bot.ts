@@ -1,9 +1,15 @@
 import { InvokeResponse, StatusCodes, TurnContext } from "botbuilder-core";
+import _ from "lodash";
+import config from "../config";
 import {
+  UniversalSearchError,
   UniversalSearchItem,
+  UniversalSearchRateLimit,
   UniversalSearchRequest,
   UniversalSearchResponse,
+  UniversalSearchResultWrapper,
   UniversalSearchStatusCodes,
+  UniversalSearchUnauthorized,
 } from "../search.interface";
 import { IScenarioBuilder, ITeamsScenario } from "../teams-bot";
 
@@ -12,14 +18,48 @@ export class SearchBot implements ITeamsScenario {
     teamsBot.registerUniversalSearch("xbox", (request, ctx) =>
       this.handleSearch(request, ctx)
     );
+
+    teamsBot.registerUniversalSearch("dta-error500", async (request, ctx) => ({
+      status: StatusCodes.OK,
+      body: this.getError500(),
+    }));
+
+    teamsBot.registerUniversalSearch("dta-error504", async (request, ctx) => ({
+      status: StatusCodes.OK,
+      body: this.getError504(),
+    }));
+
+    teamsBot.registerUniversalSearch("dta-login", async (request, ctx) => ({
+      status: StatusCodes.OK,
+      body: this.getLogin(),
+    }));
+
+    teamsBot.registerUniversalSearch(
+      "dta-rate-limit",
+      async (request, ctx) => ({
+        status: StatusCodes.OK,
+        body: this.getRateLimit(),
+      })
+    );
+
+    teamsBot.registerUniversalSearch("dta-empty", async (request, ctx) => ({
+      status: StatusCodes.OK,
+      body: this.getNoContent(),
+    }));
   }
 
   private async handleSearch(
     request: UniversalSearchRequest,
     ctx: TurnContext
   ): Promise<InvokeResponse<UniversalSearchResponse>> {
+    const itemCount = 50;
     const qTxt = request.queryText;
     const results: UniversalSearchItem[] = [
+      {
+        value: "item-qTxt",
+        title: `qTxt title - ${qTxt}`,
+        subTitle: `qTxt sub - ${qTxt}`,
+      },
       {
         value: "item-1",
         title: "Item 1 - title",
@@ -34,20 +74,70 @@ export class SearchBot implements ITeamsScenario {
         imageUrl:
           "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Microsoft_Office_Teams_%282018%E2%80%93present%29.svg/258px-Microsoft_Office_Teams_%282018%E2%80%93present%29.svg.png",
       },
-      {
-        value: "item-qTxt",
-        title: `qTxt title - ${qTxt}`,
-        subTitle: `qTxt sub - ${qTxt}`,
-      },
+      ..._.range(3, itemCount).map((i) => ({
+        value: `item-${i}`,
+        title: `Item ${i} - title`,
+        subTitle: `Item ${i} - subtitle`,
+        imageUrl:
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Microsoft_Office_Teams_%282018%E2%80%93present%29.svg/258px-Microsoft_Office_Teams_%282018%E2%80%93present%29.svg.png",
+      })),
     ];
     const body: UniversalSearchResponse = {
       statusCode: UniversalSearchStatusCodes.Success,
       type: "application/vnd.microsoft.search.searchResponse",
       value: {
-        results,
+        results: results.slice(0, 30),
         totalResultCount: results.length,
+        moreResultsAvailable: true,
       },
     };
     return { status: StatusCodes.OK, body };
+  }
+
+  private getError500(): UniversalSearchError {
+    return {
+      statusCode: UniversalSearchStatusCodes.InternalServerError,
+      type: "application/vnd.microsoft.error",
+      value: {
+        code: "500",
+        message: "error message: internal Server Error",
+      },
+    };
+  }
+
+  private getError504(): UniversalSearchError {
+    return {
+      statusCode: UniversalSearchStatusCodes.ServiceUnavailable,
+      type: "application/vnd.microsoft.error",
+      value: {
+        code: "504",
+        message: "error message: service Unavailable",
+      },
+    };
+  }
+
+  private getLogin(): UniversalSearchUnauthorized {
+    return {
+      statusCode: UniversalSearchStatusCodes.Unauthorized,
+      type: "application/vnd.microsoft.activity.loginRequest",
+      value: {
+        loginUrl: `${config.host}/auth/loginCallback?accessCode=12345`,
+      },
+    };
+  }
+
+  private getRateLimit(): UniversalSearchRateLimit {
+    return {
+      statusCode: UniversalSearchStatusCodes.RateLimit,
+      type: "application/vnd.microsoft.activity.retryAfter",
+      value: 2000, // units in ms
+    };
+  }
+
+  private getNoContent(): UniversalSearchResultWrapper {
+    return {
+      statusCode: UniversalSearchStatusCodes.NoContent,
+      type: "application/vnd.microsoft.search.searchResponse",
+    };
   }
 }

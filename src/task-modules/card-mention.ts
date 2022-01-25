@@ -21,7 +21,8 @@ export class TaskModuleCardMention implements IMessagingExtensionAction {
   ): Promise<MessagingExtensionActionResponse> {
     const members: TeamsChannelAccount[] = [];
     try {
-      members.push(...(await TeamsInfo.getMembers(ctx)));
+      const users = await TeamsInfo.getMembers(ctx);
+      members.push(...users);
     } catch (e) {
       return respondTaskModuleError(e.message, true, true);
     }

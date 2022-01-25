@@ -20,7 +20,7 @@
     "adaptivecards": "^2.10.0-beta1",
     "azure-storage": "^2.10.3",
     "body-parser": "^1.19.0",
-    "botbuilder": "^4.12.0",
+    "botbuilder": "^4.15.0",
     "botframework-config": "^4.11.1",
     "cookie-parser": "^1.4.5",
     "dotenv": "^6.2.0",

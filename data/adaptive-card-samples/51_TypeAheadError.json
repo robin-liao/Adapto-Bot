@@ -1,0 +1,103 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.5",
+  "type": "AdaptiveCard",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "Dynamic Type Ahead",
+      "weight": "bolder",
+      "size": "extraLarge"
+    },
+    {
+      "type": "TextBlock",
+      "text": "Error - InternalServerError (500)",
+      "weight": "bolder",
+      "size": "large"
+    },
+    {
+      "id": "error500",
+      "type": "Input.ChoiceSet",
+      "isMultiSelect": false,
+      "style": "filtered",
+      "choices.data": {
+        "type": "Data.Query",
+        "dataset": "dta-error500",
+        "count": 10,
+        "skip": 1
+      }
+    },
+    {
+      "type": "TextBlock",
+      "text": "Error - ServiceUnavailable (504)",
+      "weight": "bolder",
+      "size": "large"
+    },
+    {
+      "id": "error504",
+      "type": "Input.ChoiceSet",
+      "isMultiSelect": false,
+      "style": "filtered",
+      "choices.data": {
+        "type": "Data.Query",
+        "dataset": "dta-error504",
+        "count": 10,
+        "skip": 1
+      }
+    },
+    {
+      "type": "TextBlock",
+      "text": "Unauthorized (401)",
+      "weight": "bolder",
+      "size": "large"
+    },
+    {
+      "id": "login",
+      "type": "Input.ChoiceSet",
+      "isMultiSelect": false,
+      "style": "filtered",
+      "choices.data": {
+        "type": "Data.Query",
+        "dataset": "dta-login",
+        "count": 10,
+        "skip": 1
+      }
+    },
+    {
+      "type": "TextBlock",
+      "text": "Rate Limit (429)",
+      "weight": "bolder",
+      "size": "large"
+    },
+    {
+      "id": "rateLimit",
+      "type": "Input.ChoiceSet",
+      "isMultiSelect": false,
+      "style": "filtered",
+      "choices.data": {
+        "type": "Data.Query",
+        "dataset": "dta-rate-limit",
+        "count": 10,
+        "skip": 1
+      }
+    },
+    {
+      "type": "TextBlock",
+      "text": "No Content (204)",
+      "weight": "bolder",
+      "size": "large"
+    },
+    {
+      "id": "noContent",
+      "type": "Input.ChoiceSet",
+      "isMultiSelect": false,
+      "style": "filtered",
+      "choices.data": {
+        "type": "Data.Query",
+        "dataset": "dta-empty",
+        "count": 10,
+        "skip": 1
+      }
+    }
+  ]
+}

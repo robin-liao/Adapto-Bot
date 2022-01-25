@@ -33,6 +33,7 @@ import { CardGenerator } from "./card-gen";
 import { CardUpdate } from "./scenarios/card-update";
 import { DefaultBot } from "./scenarios/default-bot";
 import { FileBot } from "./scenarios/file-bot";
+import { MentionBot } from "./scenarios/mention-bot";
 import { MessageExtensionBot } from "./scenarios/message-extension-bot";
 import { SearchBot } from "./scenarios/search-bot";
 import { TaskModuleFullTest } from "./scenarios/task-module-full-test";
@@ -329,6 +330,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     new MessageExtensionBot().accept(this);
     new SearchBot().accept(this);
     new TaskModuleFullTest().accept(this);
+    new MentionBot().accept(this);
   }
 
   private async handleOnMessage(ctx: TurnContext, next: () => Promise<void>) {
@@ -778,7 +780,7 @@ class InvokeHandler {
     const intentQry: string = ctx.activity.value?.intent;
     if (this.lookup[intentQry]) {
       return this.lookup[intentQry]?.(ctx);
-    } else {
+    } else if (ctx.activity.name === "application/search") {
       const datasetQry = (ctx.activity.value as UniversalSearchRequest)
         ?.dataset;
       if (this.lookupSearch[datasetQry]) {

@@ -28,7 +28,7 @@ stages:
     pool:
       vmImage: $(vmImageName)
     steps:
-    - task: YarnBuild@2
+    - task: CmdLine@2
       inputs:
         script: 'yarn build'
     - task: Docker@2

@@ -71,22 +71,84 @@
   ],
   "actions": [
     {
+      "type": "Action.OpenUrl",
       "url": "https://teams.microsoft.com/l/file/d1a31720-fc08-4c2c-b394-a5222394c779?fileType=eml&tenantId=72f988bf-86f1-41af-91ab-2d7cd011db47&objectUrl=https%3A%2F%2Fmicrosoft.sharepoint.com%2Fteams%2FMushroom%2FShared%20Documents%2FSTTO%2FEmail%20Messages%2FRe%20Is%20there%20a%20requirement%20for%20ES5%20support%20in%20adap_760560620.eml&baseUrl=https%3A%2F%2Fmicrosoft.sharepoint.com%2Fteams%2FMushroom&threadId=19%3A735a15dea4df4c09bb68fc39a5f62052%40thread.skype&serviceName=teams&emailHtmlLink=https%3A%2F%2Fus-api.asm.skype.com%2Fv1%2Fobjects%2F0-wus-d2-f55b7e583dda5314fd1e5701a845ce51%2Fviews%2Foriginal",
       "title": "Open in Teams",
       "iconUrl": "https://statics.teams.cdn.office.net/evergreen-assets/icons/microsoft_teams_logo_refresh.ico",
       "msTeams": {
         "overflow": true
-      },
-      "type": "Action.OpenUrl"
+      }
     },
     {
+      "type": "Action.OpenUrl",
       "url": "https://teams.microsoft.com/l/fileDownload/d1a31720-fc08-4c2c-b394-a5222394c779?fileType=eml&tenantId=72f988bf-86f1-41af-91ab-2d7cd011db47&objectUrl=https%3A%2F%2Fmicrosoft.sharepoint.com%2Fteams%2FMushroom%2FShared%20Documents%2FSTTO%2FEmail%20Messages%2FRe%20Is%20there%20a%20requirement%20for%20ES5%20support%20in%20adap_760560620.eml&baseUrl=https%3A%2F%2Fmicrosoft.sharepoint.com%2Fteams%2FMushroom&threadId=19%3A735a15dea4df4c09bb68fc39a5f62052%40thread.skype&serviceName=teams",
       "title": "Download",
       "iconUrl": "https://statics.teams.cdn.office.net/evergreen-assets/adaptiveemail/DownloadIcon2x.png",
       "msTeams": {
         "overflow": true
-      },
-      "type": "Action.OpenUrl"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "MessageBack",
+      "data": {
+        "msteams": {
+          "type": "messageBack",
+          "displayText": "I clicked a messageBack button",
+          "text": "text to bots",
+          "value": "{\"bfKey\": \"bfVal\", \"conflictKey\": \"teams action data\" }"
+        },
+        "acCardHiddenData": 1.23456,
+        "conflictKey": "adaptive card data"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Invoke",
+      "data": {
+        "msteams": {
+          "type": "invoke",
+          "value": "{\"bfKey\": \"bfVal\", \"conflictKey\": \"teams action data\" }"
+        },
+        "acCardHiddenData": 1.23456,
+        "conflictKey": "adaptive card data"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "imBack",
+      "data": {
+        "msteams": {
+          "type": "imback",
+          "value": "I clicked imBack button"
+        },
+        "acCardHiddenData": 1.23456,
+        "conflictKey": "adaptive card data"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Sign in",
+      "data": {
+        "msteams": {
+          "type": "signin",
+          "value": "https://chebyshev.azurewebsites.net/tabInitTaskModule"
+        },
+        "acCardHiddenData": 1.23456,
+        "conflictKey": "adaptive card data"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "openUrl",
+      "data": {
+        "msteams": {
+          "type": "openUrl",
+          "value": "https://microsoft.com"
+        },
+        "acCardHiddenData": 1.23456,
+        "conflictKey": "adaptive card data"
+      }
     }
   ],
   "msTeams": {

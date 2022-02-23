@@ -11,10 +11,10 @@ resources:
 variables:
   # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: '8cd1befe-44fa-47e5-93e7-24c78f449d67'
-  imageRepository: 'adapto-v4-bot'
+  imageRepository: 'robin/adapto-v4-bot'
   containerRegistry: 'robin.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
-  tag: '$(Build.BuildId)'
+  tag: 'latest'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'

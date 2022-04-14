@@ -54,11 +54,11 @@ export class TaskModuleCardMention implements IMessagingExtensionAction {
                 {
                   type: "TextBlock",
                   size: "Medium",
-                  text: "Choose user(s) to mention:",
+                  text: "Choose user(s) to mention (current context):",
                 },
                 {
                   type: "Input.ChoiceSet",
-                  id: "selectedUsers",
+                  id: "selectedUsersCurrent",
                   style: "people",
                   choices: [],
                   "choices.data": {
@@ -66,7 +66,24 @@ export class TaskModuleCardMention implements IMessagingExtensionAction {
                     dataset: "graph.microsoft.com/users?scope=currentContext",
                   },
                   isMultiSelect: true,
-                  placeholder: "Choose user(s)",
+                  placeholder: "Search user(s)",
+                },
+                {
+                  type: "TextBlock",
+                  size: "Medium",
+                  text: "Choose user(s) to mention (global context):",
+                },
+                {
+                  type: "Input.ChoiceSet",
+                  id: "selectedUsersGlobal",
+                  style: "people",
+                  choices: [],
+                  "choices.data": {
+                    type: "Data.Query",
+                    dataset: "graph.microsoft.com/users",
+                  },
+                  isMultiSelect: true,
+                  placeholder: "Search global user(s)",
                 },
               ],
             },
@@ -134,13 +151,24 @@ export class TaskModuleCardMention implements IMessagingExtensionAction {
       return;
     }
 
-    const { selectedUsers, returnAs, members = [] } = request.data;
+    const {
+      selectedUsersCurrent,
+      selectedUsersGlobal,
+      returnAs,
+      members = [],
+    } = request.data;
 
-    if (!selectedUsers) {
+    if (!selectedUsersCurrent && !selectedUsersGlobal) {
       return;
     }
 
-    const selectedMriList = (selectedUsers as string).split(",");
+    const selectedMriListCurrent = (selectedUsersCurrent as string).split(",");
+    const selectedMriListGlobal = (selectedUsersGlobal as string).split(",");
+    const selectedMriList = [
+      ...selectedMriListCurrent,
+      ...selectedMriListGlobal,
+    ];
+
     const users: TeamsChannelAccount[] = selectedMriList.map((mri) =>
       members.find((m) => m.aadObjectId === mri)
     );

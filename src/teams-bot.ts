@@ -141,39 +141,87 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     ctx: TurnContext,
     query: AppBasedLinkQuery
   ): Promise<MessagingExtensionResponse> {
+    await sleep(5000);
     return Promise.resolve<MessagingExtensionResponse>({
       composeExtension: {
-        type: "result",
-        attachmentLayout: "list",
         attachments: [
           {
-            ...CardGenerator.adaptive.appBasedLinkCard(query.url),
+            content: {
+              type: "AdaptiveCard",
+              body: [
+                {
+                  color: null,
+                  horizontalAlignment: null,
+                  isSubtle: false,
+                  maxLines: 0,
+                  size: "large",
+                  text: "Adatum Corporation",
+                  weight: "bolder",
+                  wrap: false,
+                  separator: false,
+                  type: "TextBlock",
+                },
+                {
+                  color: null,
+                  horizontalAlignment: null,
+                  isSubtle: false,
+                  maxLines: 0,
+                  size: "medium",
+                  text: "Customer Card",
+                  weight: null,
+                  wrap: true,
+                  spacing: "none",
+                  separator: false,
+                  type: "TextBlock",
+                },
+                {
+                  altText: "Specifies the picture for Customer Card",
+                  horizontalAlignment: "center",
+                  size: "stretch",
+                  style: "person",
+                  url: "https://us-api.asm.skype.com/v1/objects/0-wus-d2-10a3eec86072a6fdf698ad27317ab9d7/views/img_preview",
+                  height: "175px",
+                  spacing: "none",
+                  separator: false,
+                  type: "Image",
+                },
+                {
+                  facts: [
+                    { title: "No.:", value: "10000" },
+                    { title: "Balance ($):", value: "0" },
+                    { title: "Contact Name:", value: "Robert Townes" },
+                    { title: "Balance Due ($):", value: "0" },
+                  ],
+                  separator: false,
+                  type: "FactSet",
+                },
+              ],
+              actions: [
+                {
+                  url: "https://teams.microsoft.com/l/stage/84c2de91-84e8-4bbf-b15d-9ef33245ad29/0?context=%7B%22contentUrl%22%3A%22https%3A%2F%2Fbusinesscentral.dynamics.com%2Fd0ba1a99-176f-4fac-b3ab-9c267ea124d5%2FProduction%2Fteams%3Fpage%3D21%26company%3DCRONUS%20USA%252C%20Inc.%26dc%3D0%26bookmark%3D21%253bEgAAAAJ7BTEAMAAwADAAMA%253d%253d%22%2C%22websiteUrl%22%3A%22https%3A%2F%2Fbusinesscentral.dynamics.com%3A443%2Fd0ba1a99-176f-4fac-b3ab-9c267ea124d5%2FProduction%3Fpage%3D21%26company%3DCRONUS%2520USA%252C%2520Inc.%26dc%3D0%26bookmark%3D21%253bEgAAAAJ7BTEAMAAwADAAMA%253d%253d%22%2C%22name%22%3A%22Adatum%20Corporation%22%7D",
+                  title: "Details",
+                  type: "Action.OpenUrl",
+                },
+              ],
+              version: "1.2",
+            },
+            contentType: "application/vnd.microsoft.card.adaptive",
             preview: {
-              contentType: CardFactory.contentTypes.heroCard,
-              content: {
-                title: "App-Based Link Preview Card",
-                subtitle: query.url,
-                text: JSON.stringify(query),
-              },
+              content: { title: "Customer Card", text: "" },
+              contentType: "application/vnd.microsoft.card.hero",
             },
           },
         ],
         suggestedActions: {
           actions: [
-            {
-              type: "setDefaultUrlPreviewType",
-              value: "Card",
-              title: "",
-            },
-            {
-              type: "setCachePolicy",
-              value: `{\"type\":\"no-cache\"}`,
-              title: "",
-            },
+            { title: "", type: "setCachePolicy", value: `{"type":"no-cache"}` },
           ],
         },
+        type: "result",
+        attachmentLayout: "list",
       },
-    });
+      responseType: "composeExtension",
+    } as any);
   }
 
   protected async handleTeamsMessagingExtensionQuery(

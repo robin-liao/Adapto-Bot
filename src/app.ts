@@ -96,7 +96,12 @@ conversationState = new ConversationState(memoryStorage);
 
 // Create HTTP server
 const app = express();
-app.use(bodyParser.json());
+const rawBodySaver = (req, res, buf, encoding) => {
+  if (buf && buf.length) {
+    req.rawBody = buf.toString(encoding || "utf8");
+  }
+};
+app.use(bodyParser.json({ verify: rawBodySaver }));
 app.use(Auth.rootPath, Auth.router);
 let realSend;
 app.use((req, res, next) => {
@@ -153,6 +158,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/task", bot.getTaskModuleRouter());
+
+app.use("/webhook", bot.getOutgoingWebhookRouter());
 
 app.listen(config.port, () => {
   console.log(`\n${app.name} listening on PORT ${config.port}`);

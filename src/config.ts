@@ -14,4 +14,7 @@ export default {
     port: parseInt(process.env.REDIS_PORT) || 6379,
     password: process.env.REDIS_PASS,
   },
+  outgoingWebhook: {
+    secret: process.env.OUTGOING_WEBHOOK_SECRET,
+  },
 };

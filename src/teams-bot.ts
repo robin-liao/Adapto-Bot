@@ -30,6 +30,7 @@ import { Router } from "express";
 import { Auth } from "./auth";
 import { DOWNLOAD_INFO_CONTENT_TYPE, IBotFileHandler } from "./bot-file-helper";
 import { CardGenerator } from "./card-gen";
+import { outgoingWebhookRouter } from "./outgoing-webhook-router";
 import { CardUpdate } from "./scenarios/card-update";
 import { DefaultBot } from "./scenarios/default-bot";
 import { FileBot } from "./scenarios/file-bot";
@@ -92,6 +93,10 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
 
   public getTaskModuleRouter() {
     return this.tmHandler.taskModuleRouter;
+  }
+
+  public getOutgoingWebhookRouter() {
+    return outgoingWebhookRouter;
   }
 
   public registerTextCommand(pattern: RegExp, handler: TextCommandCallback) {

@@ -399,10 +399,6 @@ export class DefaultBot implements ITeamsScenario {
       "createWithPreview",
       new tm.TaskModuleCardCreate("createWithPreview")
     );
-    teamsBot.registerTaskModule(
-      "cardMention",
-      new tm.TaskModuleCardMention("cardMention")
-    );
   }
 
   private registerTabs(teamsBot: IScenarioBuilder) {

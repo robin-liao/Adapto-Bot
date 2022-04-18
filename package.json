@@ -23,7 +23,6 @@
     "botbuilder": "^4.15.0",
     "botframework-config": "^4.11.1",
     "cookie-parser": "^1.4.5",
-    "crypto": "^1.0.1",
     "dotenv": "^6.2.0",
     "express": "^5.0.0-alpha.8",
     "lodash": "^4.17.19",

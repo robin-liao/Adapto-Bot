@@ -17,4 +17,5 @@ export default {
   outgoingWebhook: {
     secret: process.env.OUTGOING_WEBHOOK_SECRET,
   },
+  PAT: process.env.PAT,
 };

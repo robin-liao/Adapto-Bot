@@ -4,6 +4,8 @@ import { Router } from "express";
 import config from "../config";
 import MarkdownIt from "markdown-it";
 import mdCollapsible from "markdown-it-collapsible";
+import { AzureTable } from "../storage/azure-storage";
+import { Area, areaTags } from "./exp-tags";
 
 const baseUrl =
   "https://domoreexp.visualstudio.com/DefaultCollection/Teamspace/_apis/";
@@ -96,8 +98,13 @@ export interface ExpConfig {
   value: boolean;
 }
 
-export type TableRow = { [K in ExpRing]?: ExpEnv[] };
-export type Table = { [key: string]: TableRow };
+export type TableRow = {
+  area?: Area;
+  rings: { [K in ExpRing]?: ExpEnv[] };
+};
+
+export type Table = { [expFlag: string]: TableRow };
+export type AllFilesResult = { [fname: string]: Table };
 
 const inheritedRings: { [K in ExpRing]?: ExpRing[] } = {
   ring0_s: [],
@@ -132,24 +139,26 @@ const inheritedRings: { [K in ExpRing]?: ExpRing[] } = {
 
 const processExpConfig = (configs: ExpConfig[], filter?: ExpEnv[]) => {
   const grid: TableRow = {
-    ring0: [],
-    ring0_s: [],
-    ring1: [],
-    ring1_5: [],
-    ring1_6: [],
-    ring2: [],
-    ring3_9: [],
-    ring3: [],
-    ring3_6: [],
-    general: [],
+    rings: {
+      ring0: [],
+      ring0_s: [],
+      ring1: [],
+      ring1_5: [],
+      ring1_6: [],
+      ring2: [],
+      ring3_9: [],
+      ring3: [],
+      ring3_6: [],
+      general: [],
+    },
   };
 
   const pushUniq = (k: ExpRing, e: ExpEnv) => {
-    const envs = grid[k];
+    const envs = grid.rings[k];
     if (!envs.includes(e)) {
       envs.push(e);
     }
-    grid[k] = envs;
+    grid.rings[k] = envs;
   };
 
   configs.forEach((cfg) => {
@@ -180,13 +189,15 @@ const processExpConfig = (configs: ExpConfig[], filter?: ExpEnv[]) => {
 
 const toMarkdown = (table: Table) => {
   const lines = [
-    "| | ring0 | ring0_s | ring1 | ring1_5 | ring1_6 | ring2 | ring3_9 | ring3 | ring3_6 | general",
-    "| -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- |",
+    "| | Area | ring0 | ring0_s | ring1 | ring1_5 | ring1_6 | ring2 | ring3_9 | ring3 | ring3_6 | general",
+    "| -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- |",
   ];
   _.keys(table).forEach((k) => {
     const row = table[k];
-    const joinedEnvs = _.mapValues(row, (r) => r.join(", "));
-    const line = `| **${k}** | ${_.values(joinedEnvs).join(" | ")}`;
+    const joinedEnvs = _.mapValues(row.rings, (r) => r.join(", "));
+    const line = `| **${k}** | ${row.area ?? ""} | ${_.values(joinedEnvs).join(
+      " | "
+    )}`;
     lines.push(line);
   });
   return lines.join("\n");
@@ -197,7 +208,7 @@ const processFile = async (
   list: ListFileResponse,
   repo: GitRepo,
   envs?: ExpEnv[]
-) => {
+): Promise<Table> => {
   const foundItem = list.value?.find(
     (item) => !item.isFolder && _.last(item.path.split("/")) === targetFile
   );
@@ -211,12 +222,15 @@ const processFile = async (
       const configs = json[key].configs;
       if (configs) {
         const row = processExpConfig(configs, envs);
+        if (areaTags[key]) {
+          row.area = areaTags[key];
+        }
         table[key] = row;
       }
     });
-    return toMarkdown(table);
+    return table;
   }
-  return "";
+  return {};
 };
 
 const findAllFiles = (list: ListFileResponse) => {
@@ -230,24 +244,31 @@ const findAllFiles = (list: ListFileResponse) => {
   return files;
 };
 
-const router = Router();
-
-interface QueryParams {
-  pat?: string;
-  envs?: ExpEnv[];
-}
-
-router.get("/", async (req, res) => {
-  const query: QueryParams = req.query;
-  const PAT = query.pat || config.PAT;
-  const repo = new GitRepo("teams-modular-packages", PAT);
-  const body = await repo.listFiles("exp-configs/multi-window/extensibility");
-  const targetFiles = findAllFiles(body);
-  let markdown = "";
+const processAllFiles = async (
+  targetFiles: string[],
+  list: ListFileResponse,
+  repo: GitRepo,
+  envs?: ExpEnv[]
+): Promise<AllFilesResult> => {
+  const res = {};
   for (const file of targetFiles) {
-    const table = await processFile(file, body, repo, query.envs);
-    markdown += `+++ ${file}\n${table}\n+++\n`;
+    const table = await processFile(file, list, repo, envs);
+    res[file] = table;
   }
+  return res;
+};
+
+const getMarkdown = (result: AllFilesResult) => {
+  let markdown = "";
+  _.each(result, (v, file) => {
+    const table = toMarkdown(v);
+    markdown += `+++ ${file}\n${table}\n+++\n`;
+  });
+  return markdown;
+};
+
+const getHtml = (result: AllFilesResult) => {
+  const markdown = getMarkdown(result);
   const md = new MarkdownIt().use(mdCollapsible, { html: true });
   const mdToHtml = md.render(markdown);
   const html = `
@@ -290,8 +311,37 @@ router.get("/", async (req, res) => {
   </style>
   ${mdToHtml}
   `;
-  res.contentType("text/html; charset=UTF-8");
-  res.send(html);
+  return html;
+};
+
+const router = Router();
+
+interface QueryParams {
+  pat?: string;
+  envs?: ExpEnv[];
+  format?: "json" | "html" | "markdown";
+}
+
+router.get("/", async (req, res) => {
+  const query: QueryParams = req.query;
+  const PAT = query.pat || config.PAT;
+  const format = query.format || "html";
+  const repo = new GitRepo("teams-modular-packages", PAT);
+  const body = await repo.listFiles("exp-configs/multi-window/extensibility");
+  const targetFiles = findAllFiles(body);
+  const result = await processAllFiles(targetFiles, body, repo, query.envs);
+  if (format === "html") {
+    const html = getHtml(result);
+    res.contentType("text/html; charset=UTF-8");
+    res.send(html);
+  } else if (format === "markdown") {
+    const markdown = getMarkdown(result);
+    res.contentType("text/plain; charset=UTF-8");
+    res.send(markdown);
+  } else {
+    res.contentType("application/json");
+    res.send(result);
+  }
   res.end();
 });
 

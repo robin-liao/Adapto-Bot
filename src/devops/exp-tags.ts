@@ -1,0 +1,80 @@
+export type Area =
+  | "Bot"
+  | "Bot (C2)"
+  | "Card"
+  | "ME"
+  | "ME-App based link"
+  | "ME-Action"
+  | "App"
+  | "ACv2"
+  | "Connector (C2)"
+  | "Task Module"
+  | "Unknown";
+
+export const areaTags: { [expFlag: string]: Area } = {
+  enableAppBasedLink: "ME-App based link",
+  enableAppBasedLinkSsoAuth: "ME-App based link",
+  enableAppBasedLinkForApps: "ME-App based link",
+  enableAppControlMessages: "Bot",
+  enableBotEphemeralMessages: "Bot",
+  enableBotAtMentions: "Bot",
+  enableFeaturedAppsInstall: "App",
+  enableInstalledAppsV2: "App",
+  enableInstalledAppsSubscriptionV2: "App",
+  enableAtGetBots: "Bot",
+  enableAppsQueryOptimization: "App",
+  enablePreconsentedBotAtMention: "App",
+  enableContextlessFetchPolicyUpdates: "App",
+  enableBotsCallingSupport: "Bot",
+  enableBotsFileSharing: "Bot",
+  enableBotsInputMenu: "Bot",
+  enableBotsInputMenuInChannels: "Bot (C2)",
+  enableProactiveMessageForBots: "Bot",
+  enableCards: "Card",
+  enableCardAggregatedTelemetry: "Card",
+  enableCardHeaderInstall: "Card",
+  enableJITInstall: "Card",
+  enableSignInCard: "Card",
+  enableMentionsInCard: "Card",
+  enableAdaptiveCardTypeahead: "Card",
+  enableAdaptiveCardImageExpand: "Card",
+  enableBotCardActionFederationCheck: "App",
+  enableAdaptiveCardDynamicTypeahead: "Card",
+  enableAdaptiveCardPersona: "Card",
+  enableAdaptiveCardPersonaSet: "Card",
+  enableCardSharing: "Card",
+  enableAdaptiveCardVariableWidth: "Card",
+  enableAdaptiveCardPasswordInput: "Card",
+  enableAdaptiveCardDirectorySearch: "ACv2",
+  enableFormfeedbackAction: "Card",
+  enableAdaptiveCardOverflowActions: "Card",
+  enableOptionalCardFooterSuccessMessage: "Card",
+  enableAdaptiveCardLoopSharing: "Card",
+  enableConnectorsProfileInChannels: "Connector (C2)",
+  allowedDeeplinkUrls: "Unknown",
+  enableMessageActionApps: "ME-Action",
+  enableDynamicActionsWithPerfImprovements: "ACv2",
+  disableAppActionsInMeetingChat: "ME-Action",
+  enableMenuChildrenApi: "ME-Action",
+  enableMessageExtensionFlyoutInComposeBox: "ME",
+  enableMessageExtensionSsoAuth: "ME",
+  enableMessageExtensionInPrivateMeeting: "ME",
+  enableMessageExtensionInChannelMeeting: "ME",
+  enableActionCommands: "ME",
+  enableAppContextMenu: "ME",
+  enablePinnedMessageExtensions: "ME",
+  disableMessageExtensionsInMeeting: "ME",
+  disableMessageExtensionsOneOnOneChat: "ME",
+  enableSilentInstallForPreConsentedApps: "ME",
+  enableMessageExtensionAppsMru: "ME",
+  enableWorkflowMEFlyout: "ME",
+  enableMoreAppsButton: "ME",
+  enableMEFlyoutButton: "ME",
+  enableCommandsUpdateOnWorkflowFlyoutLaunch: "ME",
+  enableMessageExtensionAppCollection: "ME",
+  enableOnBehalfOfUserAttribution: "ACv2",
+  enableTaskModuleLaunchFromBotCard: "Task Module",
+  enableTaskModuleDeepLinkFromCard: "Task Module",
+  enableTaskModuleUpdateSubscription: "Task Module",
+  enableReactTaskModuleForBIM: "Task Module",
+};

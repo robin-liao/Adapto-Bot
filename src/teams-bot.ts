@@ -67,6 +67,10 @@ export interface IScenarioBuilder {
     commandId: string,
     handler: MessageExtensionQueryCallback
   );
+  registerMessageExtensionSetting(
+    commandId: string,
+    handler: MessageExtensionSettingHandler
+  );
   registerFileHandler(handler: IBotFileHandler);
 
   sendCard(
@@ -93,6 +97,10 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
 
   public getTaskModuleRouter() {
     return this.tmHandler.taskModuleRouter;
+  }
+
+  public getMessageExtensionSettingRouter() {
+    return this.msgExtHandler.settingRouter;
   }
 
   public getOutgoingWebhookRouter() {
@@ -127,6 +135,13 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     handler: MessageExtensionQueryCallback
   ) {
     this.msgExtHandler.register(commandId, handler);
+  }
+
+  public registerMessageExtensionSetting(
+    commandId: string,
+    handler: MessageExtensionSettingHandler
+  ) {
+    this.msgExtHandler.registerSetting(commandId, handler);
   }
 
   public registerFileHandler(handler: IBotFileHandler) {
@@ -238,6 +253,30 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
       cmdId,
       ctx,
       query
+    );
+  }
+
+  protected async handleTeamsMessagingExtensionConfigurationQuerySettingUrl(
+    ctx: TurnContext,
+    query: MessagingExtensionQuery
+  ): Promise<MessagingExtensionResponse> {
+    const cmdId = query.commandId;
+    return this.msgExtHandler.handleTeamsMessagingExtensionConfigurationQuerySettingUrl(
+      cmdId,
+      ctx,
+      query
+    );
+  }
+
+  protected async handleTeamsMessagingExtensionConfigurationSetting(
+    ctx: TurnContext,
+    settings: any
+  ): Promise<void> {
+    const cmdId = ctx.activity.value.commandId as string;
+    await this.msgExtHandler.handleTeamsMessagingExtensionConfigurationSetting(
+      cmdId,
+      ctx,
+      settings
     );
   }
 
@@ -756,11 +795,48 @@ type MessageExtensionQueryCallback = (
   query: MessagingExtensionQuery
 ) => Promise<MessagingExtensionResponse>;
 
+type MessageExtensionSettingHandler = {
+  querySettingUrl: MessageExtensionQueryCallback;
+  updateSettings: (ctx: TurnContext, settings: any) => Promise<void>;
+  getRouter?: () => Router;
+};
+
 class MessageExtensionHandler {
+  private router = Router();
+
+  constructor() {
+    // default root
+    this.router.get("/", (req, res) => {
+      const json = {
+        path: req.path,
+        query: req.query,
+        params: req.params,
+      };
+      res.send(json);
+      res.end();
+    });
+  }
+
   private lookup: { [cmdId: string]: MessageExtensionQueryCallback } = {};
+  private lookupSettings: { [cmdId: string]: MessageExtensionSettingHandler } =
+    {};
+
+  public get settingRouter() {
+    return this.router;
+  }
 
   public register(cmdID: string, handler: MessageExtensionQueryCallback) {
     this.lookup[cmdID] = handler;
+  }
+
+  public registerSetting(
+    cmdID: string,
+    handler: MessageExtensionSettingHandler
+  ) {
+    if (handler.getRouter) {
+      this.router.use(`/${cmdID}`, handler.getRouter());
+    }
+    this.lookupSettings[cmdID] = handler;
   }
 
   public handleTeamsMessagingExtensionQuery(
@@ -770,6 +846,28 @@ class MessageExtensionHandler {
   ): Promise<MessagingExtensionResponse> {
     const x = this.lookup[commandId];
     return x ? x(ctx, query) : Promise.resolve({});
+  }
+
+  public handleTeamsMessagingExtensionConfigurationQuerySettingUrl(
+    commandId: string,
+    ctx: TurnContext,
+    query: MessagingExtensionQuery
+  ): Promise<MessagingExtensionResponse> {
+    const x = this.lookupSettings[commandId];
+    return x?.querySettingUrl
+      ? x.querySettingUrl(ctx, query)
+      : Promise.resolve({});
+  }
+
+  public handleTeamsMessagingExtensionConfigurationSetting(
+    commandId: string,
+    ctx: TurnContext,
+    settings: any
+  ): Promise<void> {
+    const x = this.lookupSettings[commandId];
+    return x?.updateSettings
+      ? x.updateSettings(ctx, settings)
+      : Promise.resolve();
   }
 }
 

@@ -159,6 +159,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/task", bot.getTaskModuleRouter());
+app.use("/messageExtension", bot.getMessageExtensionSettingRouter());
 app.use("/webhook", bot.getOutgoingWebhookRouter());
 app.use("/devops", azureDevOpsRouter);
 

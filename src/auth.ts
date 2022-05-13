@@ -5,7 +5,7 @@ import cookieParser from "cookie-parser";
 import { CardFactory, TurnContext } from "botbuilder";
 import config from "./config";
 
-const teamsSdk = {
+export const teamsSdk = {
   release:
     "https://statics.teams.cdn.office.net/sdk/v1.7.0/js/MicrosoftTeams.min.js",
   debug: "https://statics.teams.cdn.office.net/sdk/v1.7.0/js/MicrosoftTeams.js",

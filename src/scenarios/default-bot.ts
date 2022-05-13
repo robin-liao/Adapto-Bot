@@ -12,14 +12,16 @@ import {
   StatusCodes,
 } from "botframework-schema";
 import _ from "lodash";
-import { Auth } from "../auth";
+import { Auth, teamsSdk } from "../auth";
 import { CardGenerator, JsonCardLoader } from "../card-gen";
 import { ConvSettingTable } from "../storage/setting-table";
 import { IScenarioBuilder, ITeamsScenario } from "../teams-bot";
-import { getConversationId, isEmail, sleep } from "../utils";
+import { getConversationId, isEmail, OneOnOneHelper, sleep } from "../utils";
 import * as tm from "../task-modules";
 import * as teamsTab from "../tabs";
 import { attachments as carouselCards } from "./carousel-attachments";
+import config from "../config";
+import { Router } from "express";
 
 export class DefaultBot implements ITeamsScenario {
   public accept(teamsBot: IScenarioBuilder) {
@@ -27,7 +29,7 @@ export class DefaultBot implements ITeamsScenario {
     this.registerTaskModules(teamsBot);
     this.registerTabs(teamsBot);
     this.registerInvokes(teamsBot);
-    this.registerMsgExtQuery(teamsBot);
+    this.registerMsgExt(teamsBot);
   }
 
   private registerTextCommands(teamsBot: IScenarioBuilder) {
@@ -337,8 +339,10 @@ export class DefaultBot implements ITeamsScenario {
     });
   }
 
-  private registerMsgExtQuery(teamsBot: IScenarioBuilder) {
-    teamsBot.registerMessageExtensionQuery("queryCards", async (ctx, query) => {
+  private registerMsgExt(teamsBot: IScenarioBuilder) {
+    const cmdId = "queryCards";
+
+    teamsBot.registerMessageExtensionQuery(cmdId, async (ctx, query) => {
       const attachments: MessagingExtensionAttachment[] = [];
       const queryTxt = (query.parameters?.[0].value as string) || undefined;
 
@@ -386,6 +390,71 @@ export class DefaultBot implements ITeamsScenario {
           attachments,
         },
       };
+    });
+
+    teamsBot.registerMessageExtensionSetting(cmdId, {
+      querySettingUrl: async (ctx, query) => ({
+        composeExtension: {
+          type: "config",
+          suggestedActions: {
+            actions: [
+              {
+                type: "openUrl",
+                title: "ME Setting",
+                value: `${config.host}/messageExtension/${cmdId}/setting`,
+              },
+            ],
+          },
+        },
+      }),
+
+      getRouter: () => {
+        const router = Router();
+        router.get("/setting", (req, res) => {
+          const html = `
+          <html>
+            <head>
+              <script src='${teamsSdk.release}'></script>
+            </head>
+            <body>
+              <script>
+              function execute(ok) {
+                console.dir(microsoftTeams);
+                microsoftTeams.initialize(() => {
+                  if (ok) {
+                    const val = document.getElementById("setting").value;
+                    microsoftTeams.authentication.notifySuccess(val);
+                  } else {
+                    microsoftTeams.authentication.notifyFailure();
+                  }
+                });
+              }
+              </script>
+              <div>Enter your setting: </div>
+              <input type="text" id="setting" value="">
+              <div>will send back to bot via <span style="font-family: Courier">microsoftTeams.authentication.notifySuccess()</span></div><br/>
+              <button onClick="execute(true)" style="width:64px; height:32px; cursor:pointer">Ok</button>
+              <button onClick="execute(false)" style="width:64px; height:32px; cursor:pointer">Notify Failure</button>
+            </body>
+          </html>
+          `;
+          res.contentType("html");
+          res.send(html);
+        });
+        return router;
+      },
+
+      updateSettings: async (ctx, settings) => {
+        const msg: Partial<Activity> = {
+          type: "message",
+          textFormat: "xml",
+          text: `
+            <strong>Message Extension Setting Update!</strong>
+            <pre>${JSON.stringify(settings, null, 2)}</pre>
+          `,
+        };
+        await OneOnOneHelper.sendOneOnOneMessage(ctx, msg);
+      },
     });
   }
 

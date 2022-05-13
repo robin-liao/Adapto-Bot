@@ -66,6 +66,7 @@
   "composeExtensions": [
     {
       "botId": "e524fc50-3773-4dad-a19f-ebba5bffb381",
+      "canUpdateConfiguration": true,
       "commands": [
         {
           "id": "queryCards",

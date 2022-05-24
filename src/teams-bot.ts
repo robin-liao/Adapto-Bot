@@ -37,6 +37,7 @@ import { FileBot } from "./scenarios/file-bot";
 import { MentionBot } from "./scenarios/mention-bot";
 import { MessageExtensionBot } from "./scenarios/message-extension-bot";
 import { SearchBot } from "./scenarios/search-bot";
+import { TaskModuleAppJIT } from "./scenarios/task-module-app-jit";
 import { TaskModuleFullTest } from "./scenarios/task-module-full-test";
 import { WorkBot } from "./scenarios/work-bot";
 import {
@@ -423,6 +424,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     new SearchBot().accept(this);
     new TaskModuleFullTest().accept(this);
     new MentionBot().accept(this);
+    new TaskModuleAppJIT().accept(this);
   }
 
   private async handleOnMessage(ctx: TurnContext, next: () => Promise<void>) {
@@ -749,23 +751,28 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
       displayName: "Robin Liao",
     }
   ): Promise<string[]> {
-    const send = () =>
-      ctx.sendActivity({
-        attachments: [card],
-        channelData: {
-          notification: { alert },
-          ...(onBehalf && {
-            onBehalf: [
-              {
-                itemId: 0,
-                mentionType: "person",
-                mri: onBehalf.mri,
-                displayName: onBehalf.displayName,
-              },
-            ],
-          }),
-        } as TeamsChannelData,
-      });
+    const send = () => {
+      try {
+        return ctx.sendActivity({
+          attachments: [card],
+          channelData: {
+            notification: { alert },
+            ...(onBehalf && {
+              onBehalf: [
+                {
+                  itemId: 0,
+                  mentionType: "person",
+                  mri: onBehalf.mri,
+                  displayName: onBehalf.displayName,
+                },
+              ],
+            }),
+          } as TeamsChannelData,
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
     if (repeat <= 1) {
       const res = await send();

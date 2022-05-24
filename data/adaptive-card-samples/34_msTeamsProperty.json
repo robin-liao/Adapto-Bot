@@ -149,6 +149,15 @@
         "acCardHiddenData": 1.23456,
         "conflictKey": "adaptive card data"
       }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "JIT Install",
+      "data": {
+        "msteams": {
+          "justInTimeInstall": true
+        }
+      }
     }
   ],
   "msTeams": {

@@ -135,7 +135,8 @@ export const isEmail = (email: string) => {
 
 export const getConversationId = (activity: Activity) =>
   activity.conversation.conversationType === "channel"
-    ? (activity.channelData as TeamsChannelData).channel.id
+    ? (activity.channelData as TeamsChannelData)?.channel?.id ||
+      activity.conversation.id
     : activity.conversation.id;
 
 export class OneOnOneHelper {

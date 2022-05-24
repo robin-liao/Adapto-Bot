@@ -1,7 +1,7 @@
 {
   "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
   "type": "AdaptiveCard",
-  "version": "1.0",
+  "version": "1.2",
   "body": [
     {
       "type": "TextBlock",
@@ -10,22 +10,77 @@
       "text": "App JIT Test"
     },
     {
-      "type": "Input.Text",
       "id": "card",
+      "type": "Input.Text",
       "isMultiline": true,
       "placeholder": "Card payload to render if app is not installed in current context"
+    },
+    {
+      "id": "toggleActionCardInput",
+      "type": "ActionSet",
+      "actions": [
+        {
+          "type": "Action.Submit",
+          "title": "Open Task Module",
+          "data": {
+            "msteams": {
+              "type": "task/fetch"
+            },
+            "commandId": "appJIT"
+          }
+        },
+        {
+          "type": "Action.ToggleVisibility",
+          "title": "Default JIT card",
+          "targetElements": [
+            "textDefaultCard",
+            "card",
+            "toggleActionCardInput",
+            "toggleActionDefault"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "textDefaultCard",
+      "type": "RichTextBlock",
+      "isVisible": false,
+      "inlines": [
+        {
+          "type": "TextRun",
+          "text": "{\n  \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n  \"version\": \"1.5\",\n  \"type\": \"AdaptiveCard\",\n  \"body\": [\n    {\n      \"type\": \"TextBlock\",\n      \"size\": \"Large\",\n      \"weight\": \"Bolder\",\n      \"color\": \"Attention\",\n      \"text\": \"App not installed\"\n    },\n    {\n      \"type\": \"TextBlock\",\n      \"size\": \"Medium\",\n      \"weight\": \"Bolder\",\n      \"text\": \"Click button to install app\"\n    }\n  ],\n  \"actions\": [\n    {\n      \"type\": \"Action.Submit\",\n      \"title\": \"JIT Install\",\n      \"data\": {\n \"commandId\": \"appJIT\", \n        \"msteams\": {\n          \"justInTimeInstall\": true\n        }\n      }\n    }\n  ]\n}",
+          "fontType": "monospace"
+        }
+      ]
+    },
+    {
+      "id": "toggleActionDefault",
+      "type": "ActionSet",
+      "isVisible": false,
+      "actions": [
+        {
+          "type": "Action.Submit",
+          "title": "Open Task Module",
+          "data": {
+            "msteams": {
+              "type": "task/fetch"
+            },
+            "commandId": "appJIT",
+            "card": "{\n  \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n  \"version\": \"1.5\",\n  \"type\": \"AdaptiveCard\",\n  \"body\": [\n    {\n      \"type\": \"TextBlock\",\n      \"size\": \"Large\",\n      \"weight\": \"Bolder\",\n      \"color\": \"Attention\",\n      \"text\": \"App not installed\"\n    },\n    {\n      \"type\": \"TextBlock\",\n      \"size\": \"Medium\",\n      \"weight\": \"Bolder\",\n      \"text\": \"Click button to install app\"\n    }\n  ],\n  \"actions\": [\n    {\n      \"type\": \"Action.Submit\",\n      \"title\": \"JIT Install\",\n      \"data\": {\n \"commandId\": \"appJIT\", \n        \"msteams\": {\n          \"justInTimeInstall\": true\n        }\n      }\n    }\n  ]\n}"
+          }
+        },
+        {
+          "type": "Action.ToggleVisibility",
+          "title": "User input JIT card",
+          "targetElements": [
+            "textDefaultCard",
+            "card",
+            "toggleActionCardInput",
+            "toggleActionDefault"
+          ]
+        }
+      ]
     }
   ],
-  "actions": [
-    {
-      "type": "Action.Submit",
-      "title": "Open Task Module",
-      "data": {
-        "msteams": {
-          "type": "task/fetch"
-        },
-        "commandId": "appJIT"
-      }
-    }
-  ]
+  "actions": []
 }

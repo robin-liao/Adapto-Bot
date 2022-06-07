@@ -16,6 +16,11 @@ import config from "./config";
 import * as _ from "lodash";
 import * as fs from "fs";
 import { ConvSetting } from "./storage/setting-table";
+import {
+  createAdaptiveCardPersona,
+  createAdaptiveCardPersonaSet,
+  IComponentUser,
+} from "./adaptive-card-helper";
 
 interface ITypedAttachment<T = any> extends Attachment {
   content?: T;
@@ -119,11 +124,79 @@ class AdaptiveCardGenerator extends JsonCardLoader<any> {
       text: entity.text,
     }));
 
+    const mapToComponentUser = (user: TeamsChannelAccount): IComponentUser => ({
+      id: user.aadObjectId,
+      displayName: user.name,
+      userPrincipalName: user.userPrincipalName,
+    });
+
+    const personaList = users.map((user) =>
+      createAdaptiveCardPersona(mapToComponentUser(user))
+    );
+
+    const personaSet = createAdaptiveCardPersonaSet(
+      users.map(mapToComponentUser)
+    );
+
     return CardFactory.adaptiveCard({
       type: "AdaptiveCard",
       $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
       version: "1.2",
-      body: mentions,
+      body: [
+        {
+          type: "ColumnSet",
+          separator: true,
+          columns: [
+            {
+              type: "Column",
+              width: "auto",
+              items: [
+                {
+                  type: "TextBlock",
+                  text: "Mentions",
+                  weight: "bolder",
+                  separator: true,
+                },
+              ],
+            },
+            {
+              type: "Column",
+              width: "stretch",
+              items: mentions,
+            },
+          ],
+        },
+        {
+          type: "ColumnSet",
+          separator: true,
+          columns: [
+            {
+              type: "Column",
+              width: "auto",
+              items: [
+                {
+                  type: "TextBlock",
+                  text: "Persona",
+                  weight: "bolder",
+                  separator: true,
+                },
+              ],
+            },
+            {
+              type: "Column",
+              width: "stretch",
+              items: personaList,
+            },
+          ],
+        },
+        {
+          type: "TextBlock",
+          text: "Persona Set",
+          weight: "bolder",
+          separator: true,
+        },
+        personaSet,
+      ],
       msTeams: {
         entities,
       },

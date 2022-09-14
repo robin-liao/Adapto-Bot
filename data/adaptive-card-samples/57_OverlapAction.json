@@ -1,0 +1,26 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "selectAction": {
+    "type": "Action.Submit",
+    "title": "Dummy"
+  },
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "container has Action.Submit action"
+    },
+    {
+      "type": "TextBlock",
+      "text": "[hyperlink to open](https://microsoft.com)"
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.OpenUrl",
+      "title": "Open URL",
+      "url": "https://microsoft.com"
+    }
+  ]
+}

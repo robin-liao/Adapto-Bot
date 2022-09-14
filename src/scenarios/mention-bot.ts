@@ -62,13 +62,30 @@ export class MentionBot implements ITeamsScenario, IMessagingExtensionAction {
                 {
                   type: "TextBlock",
                   size: "Medium",
-                  text: "Choose user(s) to mention (current context):",
+                  text: "Choose user(s) to mention (current context) - with Choices:",
                 },
                 {
                   type: "Input.ChoiceSet",
                   id: "selectedUsersCurrent",
                   style: "people",
                   choices,
+                  "choices.data": {
+                    type: "Data.Query",
+                    dataset: "graph.microsoft.com/users?scope=currentContext",
+                  },
+                  isMultiSelect: true,
+                  placeholder: "Search user(s)",
+                },
+                {
+                  type: "TextBlock",
+                  size: "Medium",
+                  text: "Choose user(s) to mention (current context) - Search Only:",
+                },
+                {
+                  type: "Input.ChoiceSet",
+                  id: "selectedUsersCurrent",
+                  style: "people",
+                  choices: [],
                   "choices.data": {
                     type: "Data.Query",
                     dataset: "graph.microsoft.com/users?scope=currentContext",

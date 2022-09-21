@@ -1,0 +1,35 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "id": "ac-img-1",
+      "type": "Image",
+      "url": "https://www.dropbox.com/s/vvn3lutl0jghgas/meme.png?dl=1"
+    },
+    {
+      "id": "ac-meme-line-1",
+      "type": "Input.Text",
+      "placeholder": "Line 1"
+    },
+    {
+      "id": "ac-meme-line-2",
+      "type": "Input.Text",
+      "placeholder": "Line 2"
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Drop",
+      "data": {
+        "msteams": {
+          "type": "script",
+          "mode": "default"
+        },
+        "action": "sendMeme"
+      }
+    }
+  ]
+}

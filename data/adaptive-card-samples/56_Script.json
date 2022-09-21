@@ -6,11 +6,66 @@
     {
       "id": "ac-text-block-1",
       "type": "TextBlock",
-      "text": "test script"
+      "text": "Calculated by App Worker = "
+    },
+    {
+      "id": "ac-text-block-2",
+      "type": "TextBlock",
+      "text": "Your Input:"
     },
     {
       "id": "ac-input-eval",
       "type": "Input.Text"
+    },
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "id": "ac-text-block-status",
+              "type": "TextBlock",
+              "text": "Status: ",
+              "color": "Good"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "ActionSet",
+              "actions": [
+                {
+                  "type": "Action.Submit",
+                  "title": "Start",
+                  "data": {
+                    "msteams": {
+                      "type": "script",
+                      "mode": "default"
+                    },
+                    "action": "start"
+                  }
+                },
+                {
+                  "type": "Action.Submit",
+                  "title": "Stop",
+                  "data": {
+                    "msteams": {
+                      "type": "script",
+                      "mode": "default"
+                    },
+                    "action": "stop"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ],
   "actions": [
@@ -21,7 +76,8 @@
         "msteams": {
           "type": "script",
           "mode": "default"
-        }
+        },
+        "action": "eval"
       }
     }
   ]

@@ -4,9 +4,10 @@
   "version": "1.5",
   "body": [
     {
-      "id": "ac-text-block-1",
       "type": "TextBlock",
-      "text": "Calculated by App Worker = "
+      "text": "Real Time Input & Eval",
+      "weight": "bolder",
+      "size": "large"
     },
     {
       "id": "ac-text-block-2",
@@ -16,6 +17,34 @@
     {
       "id": "ac-input-eval",
       "type": "Input.Text"
+    },
+    {
+      "id": "ac-text-block-1",
+      "type": "TextBlock",
+      "weight": "bolder",
+      "text": "Calculated by App Worker = "
+    },
+    {
+      "type": "ActionSet",
+      "actions": [
+        {
+          "type": "Action.Submit",
+          "title": "Run Script",
+          "data": {
+            "msteams": {
+              "type": "script",
+              "mode": "default"
+            },
+            "action": "eval"
+          }
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Real Time Timer",
+      "weight": "bolder",
+      "size": "large"
     },
     {
       "type": "ColumnSet",
@@ -66,19 +95,6 @@
           ]
         }
       ]
-    }
-  ],
-  "actions": [
-    {
-      "type": "Action.Submit",
-      "title": "Run Script",
-      "data": {
-        "msteams": {
-          "type": "script",
-          "mode": "default"
-        },
-        "action": "eval"
-      }
     }
   ]
 }

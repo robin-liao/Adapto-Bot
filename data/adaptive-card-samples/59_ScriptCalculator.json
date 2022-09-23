@@ -1,0 +1,503 @@
+{
+  "type": "AdaptiveCard",
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.5",
+  "fallbackText": "calculatorCard",
+  "body": [
+    {
+      "id": "ac-txt-ans",
+      "type": "TextBlock",
+      "text": "0",
+      "wrap": true,
+      "maxLines": 1,
+      "horizontalAlignment": "Right",
+      "weight": "bolder",
+      "size": "ExtraLarge",
+      "color": "Accent"
+    },
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "selectAction": {
+            "type": "Action.Submit",
+            "data": {
+              "key": "1",
+              "msteams": {
+                "type": "script",
+                "mode": "default"
+              }
+            }
+          },
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "1",
+              "wrap": true,
+              "horizontalAlignment": "Center",
+              "weight": "bolder",
+              "color": "Default",
+              "size": "large"
+            }
+          ],
+          "minHeight": "50px",
+          "verticalContentAlignment": "Center",
+          "style": "emphasis",
+          "bleed": true
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "selectAction": {
+            "type": "Action.Submit",
+            "data": {
+              "key": "2",
+              "msteams": {
+                "type": "script",
+                "mode": "default"
+              }
+            }
+          },
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "2",
+              "wrap": true,
+              "horizontalAlignment": "Center",
+              "weight": "bolder",
+              "color": "Default",
+              "size": "large"
+            }
+          ],
+          "minHeight": "50px",
+          "verticalContentAlignment": "Center",
+          "style": "emphasis",
+          "bleed": true
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "selectAction": {
+            "type": "Action.Submit",
+            "data": {
+              "key": "3",
+              "msteams": {
+                "type": "script",
+                "mode": "default"
+              }
+            }
+          },
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "3",
+              "wrap": true,
+              "horizontalAlignment": "Center",
+              "weight": "bolder",
+              "color": "Default",
+              "size": "large"
+            }
+          ],
+          "minHeight": "50px",
+          "verticalContentAlignment": "Center",
+          "style": "emphasis",
+          "bleed": true
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "selectAction": {
+            "type": "Action.Submit",
+            "data": {
+              "key": "+",
+              "msteams": {
+                "type": "script",
+                "mode": "default"
+              }
+            }
+          },
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "＋",
+              "wrap": true,
+              "horizontalAlignment": "Center",
+              "weight": "bolder",
+              "color": "good",
+              "size": "large"
+            }
+          ],
+          "minHeight": "50px",
+          "verticalContentAlignment": "Center",
+          "style": "emphasis",
+          "bleed": true
+        }
+      ]
+    },
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "selectAction": {
+            "type": "Action.Submit",
+            "data": {
+              "key": "4",
+              "msteams": {
+                "type": "script",
+                "mode": "default"
+              }
+            }
+          },
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "4",
+              "wrap": true,
+              "horizontalAlignment": "Center",
+              "weight": "bolder",
+              "color": "Default",
+              "size": "large"
+            }
+          ],
+          "minHeight": "50px",
+          "verticalContentAlignment": "Center",
+          "style": "emphasis",
+          "bleed": true
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "selectAction": {
+            "type": "Action.Submit",
+            "data": {
+              "key": "5",
+              "msteams": {
+                "type": "script",
+                "mode": "default"
+              }
+            }
+          },
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "5",
+              "wrap": true,
+              "horizontalAlignment": "Center",
+              "weight": "bolder",
+              "color": "Default",
+              "size": "large"
+            }
+          ],
+          "minHeight": "50px",
+          "verticalContentAlignment": "Center",
+          "style": "emphasis",
+          "bleed": true
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "selectAction": {
+            "type": "Action.Submit",
+            "data": {
+              "key": "6",
+              "msteams": {
+                "type": "script",
+                "mode": "default"
+              }
+            }
+          },
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "6",
+              "wrap": true,
+              "horizontalAlignment": "Center",
+              "weight": "bolder",
+              "color": "Default",
+              "size": "large"
+            }
+          ],
+          "minHeight": "50px",
+          "verticalContentAlignment": "Center",
+          "style": "emphasis",
+          "bleed": true
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "selectAction": {
+            "type": "Action.Submit",
+            "data": {
+              "key": "-",
+              "msteams": {
+                "type": "script",
+                "mode": "default"
+              }
+            }
+          },
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "－",
+              "wrap": true,
+              "horizontalAlignment": "Center",
+              "weight": "bolder",
+              "color": "good",
+              "size": "large"
+            }
+          ],
+          "minHeight": "50px",
+          "verticalContentAlignment": "Center",
+          "style": "emphasis",
+          "bleed": true
+        }
+      ]
+    },
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "selectAction": {
+            "type": "Action.Submit",
+            "data": {
+              "key": "7",
+              "msteams": {
+                "type": "script",
+                "mode": "default"
+              }
+            }
+          },
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "7",
+              "wrap": true,
+              "horizontalAlignment": "Center",
+              "weight": "bolder",
+              "color": "Default",
+              "size": "large"
+            }
+          ],
+          "minHeight": "50px",
+          "verticalContentAlignment": "Center",
+          "style": "emphasis",
+          "bleed": true
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "selectAction": {
+            "type": "Action.Submit",
+            "data": {
+              "key": "8",
+              "msteams": {
+                "type": "script",
+                "mode": "default"
+              }
+            }
+          },
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "8",
+              "wrap": true,
+              "horizontalAlignment": "Center",
+              "weight": "bolder",
+              "color": "Default",
+              "size": "large"
+            }
+          ],
+          "minHeight": "50px",
+          "verticalContentAlignment": "Center",
+          "style": "emphasis",
+          "bleed": true
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "selectAction": {
+            "type": "Action.Submit",
+            "data": {
+              "key": "9",
+              "msteams": {
+                "type": "script",
+                "mode": "default"
+              }
+            }
+          },
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "9",
+              "wrap": true,
+              "horizontalAlignment": "Center",
+              "weight": "bolder",
+              "color": "Default",
+              "size": "large"
+            }
+          ],
+          "minHeight": "50px",
+          "verticalContentAlignment": "Center",
+          "style": "emphasis",
+          "bleed": true
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "selectAction": {
+            "type": "Action.Submit",
+            "data": {
+              "key": "*",
+              "msteams": {
+                "type": "script",
+                "mode": "default"
+              }
+            }
+          },
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "×",
+              "wrap": true,
+              "horizontalAlignment": "Center",
+              "weight": "bolder",
+              "color": "good",
+              "size": "large"
+            }
+          ],
+          "minHeight": "50px",
+          "verticalContentAlignment": "Center",
+          "style": "emphasis",
+          "bleed": true
+        }
+      ]
+    },
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "selectAction": {
+            "type": "Action.Submit",
+            "data": {
+              "key": "0",
+              "msteams": {
+                "type": "script",
+                "mode": "default"
+              }
+            }
+          },
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "0",
+              "wrap": true,
+              "horizontalAlignment": "Center",
+              "weight": "bolder",
+              "color": "Default",
+              "size": "large"
+            }
+          ],
+          "minHeight": "50px",
+          "verticalContentAlignment": "Center",
+          "style": "emphasis",
+          "bleed": true
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "selectAction": {
+            "type": "Action.Submit",
+            "data": {
+              "key": ".",
+              "msteams": {
+                "type": "script",
+                "mode": "default"
+              }
+            }
+          },
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": ".",
+              "wrap": true,
+              "horizontalAlignment": "Center",
+              "weight": "bolder",
+              "color": "Default",
+              "size": "large"
+            }
+          ],
+          "minHeight": "50px",
+          "verticalContentAlignment": "Center",
+          "style": "emphasis",
+          "bleed": true
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "selectAction": {
+            "type": "Action.Submit",
+            "data": {
+              "key": "=",
+              "msteams": {
+                "type": "script",
+                "mode": "default"
+              }
+            }
+          },
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "=",
+              "wrap": true,
+              "horizontalAlignment": "Center",
+              "weight": "bolder",
+              "color": "Default",
+              "size": "large"
+            }
+          ],
+          "minHeight": "50px",
+          "verticalContentAlignment": "Center",
+          "style": "emphasis",
+          "bleed": true
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "selectAction": {
+            "type": "Action.Submit",
+            "data": {
+              "key": "/",
+              "msteams": {
+                "type": "script",
+                "mode": "default"
+              }
+            }
+          },
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "÷",
+              "wrap": true,
+              "horizontalAlignment": "Center",
+              "weight": "bolder",
+              "color": "good",
+              "size": "large"
+            }
+          ],
+          "minHeight": "50px",
+          "verticalContentAlignment": "Center",
+          "style": "emphasis",
+          "bleed": true
+        }
+      ]
+    }
+  ]
+}

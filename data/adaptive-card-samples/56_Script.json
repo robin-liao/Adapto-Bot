@@ -4,25 +4,97 @@
   "version": "1.5",
   "body": [
     {
-      "id": "ac-text-block-1",
       "type": "TextBlock",
-      "text": "test script"
+      "text": "Real Time Input & Eval",
+      "weight": "bolder",
+      "size": "large"
+    },
+    {
+      "id": "ac-text-block-2",
+      "type": "TextBlock",
+      "text": "Your Input:"
     },
     {
       "id": "ac-input-eval",
       "type": "Input.Text"
-    }
-  ],
-  "actions": [
+    },
     {
-      "type": "Action.Submit",
-      "title": "Run Script",
-      "data": {
-        "msteams": {
-          "type": "script",
-          "mode": "default"
+      "id": "ac-text-block-1",
+      "type": "TextBlock",
+      "weight": "bolder",
+      "text": "Calculated by App Worker = "
+    },
+    {
+      "type": "ActionSet",
+      "actions": [
+        {
+          "type": "Action.Submit",
+          "title": "Run Script",
+          "data": {
+            "msteams": {
+              "type": "script",
+              "mode": "default"
+            },
+            "action": "eval"
+          }
         }
-      }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Real Time Timer",
+      "weight": "bolder",
+      "size": "large"
+    },
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "id": "ac-text-block-status",
+              "type": "TextBlock",
+              "text": "Status: ",
+              "color": "Good"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "ActionSet",
+              "actions": [
+                {
+                  "type": "Action.Submit",
+                  "title": "Start",
+                  "data": {
+                    "msteams": {
+                      "type": "script",
+                      "mode": "default"
+                    },
+                    "action": "start"
+                  }
+                },
+                {
+                  "type": "Action.Submit",
+                  "title": "Stop",
+                  "data": {
+                    "msteams": {
+                      "type": "script",
+                      "mode": "default"
+                    },
+                    "action": "stop"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
 }

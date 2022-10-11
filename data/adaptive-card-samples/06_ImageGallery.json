@@ -53,6 +53,10 @@
         {
           "type": "Image",
           "url": "https://picsum.photos/300/200?image=900"
+        },
+        {
+          "type": "Image",
+          "url": "https://www.mathworks.com/matlabcentral/mlc-downloads/downloads/submissions/21944/versions/3/previews/Animated_GIF/DancingPeaks.gif"
         }
       ]
     }

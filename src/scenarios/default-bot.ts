@@ -253,6 +253,12 @@ export class DefaultBot implements ITeamsScenario {
         await sendError(error);
       }
     });
+
+    teamsBot.registerTextCommand(/^typing/i, async (ctx) => {
+      await ctx.sendActivity({
+        type: ActivityTypes.Typing,
+      });
+    });
   }
 
   private registerInvokes(teamsBot: IScenarioBuilder) {

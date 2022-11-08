@@ -1,4 +1,5 @@
 import {
+  CardAction,
   CardFactory,
   MessageFactory,
   MessagingExtensionAttachment,
@@ -258,6 +259,76 @@ export class DefaultBot implements ITeamsScenario {
       await ctx.sendActivity({
         type: ActivityTypes.Typing,
       });
+    });
+
+    teamsBot.registerTextCommand(/^url/i, async (ctx, _command, args) => {
+      const [url] = args;
+      const attachments = [
+        CardFactory.heroCard(
+          "Hero Card",
+          `<a href="${url}">html href</a><br/>[markdown NOT support](${url})`,
+          undefined,
+          [{ type: "openUrl", title: "OpenURL", value: url }] as CardAction[]
+        ),
+        CardFactory.o365ConnectorCard({
+          title: "O365 card",
+          text: `<a href="${url}">html href</a><br/>[markdown link](${url})`,
+          sections: [
+            {
+              title: "Section 1 - Markdown = true",
+              markdown: true,
+              text: `<a href="${url}">html href</a><br/>[markdown link](${url})`,
+            },
+            {
+              title: "Section 2 - Markdown = false",
+              markdown: false,
+              text: `<a href="${url}">html href</a><br/>[markdown link](${url})`,
+            },
+          ],
+        }),
+        CardFactory.adaptiveCard({
+          body: [
+            {
+              type: "TextBlock",
+              size: "large",
+              weight: "Bolder",
+              text: "Adaptive Card",
+            },
+            {
+              type: "TextBlock",
+              text: `TextBlock: [markdown link](${url})`,
+            },
+          ],
+          actions: [
+            {
+              type: "Action.OpenUrl",
+              title: "Action.OpenUrl",
+              url,
+            },
+          ],
+        }),
+      ];
+      await ctx.sendActivities([
+        {
+          textFormat: "markdown",
+          text: `textFormat = markdown --> [markdown link](${url})`,
+        },
+        {
+          textFormat: "markdown",
+          text: `textFormat = markdown --> <a href="${url}">html href</a>`,
+        },
+        {
+          textFormat: "xml",
+          text: `textFormat = xml --> [markdown link](${url})`,
+        },
+        {
+          textFormat: "xml",
+          text: `textFormat = xml --> <a href="${url}">html href</a>`,
+        },
+        {
+          attachments,
+        },
+      ]);
     });
   }
 

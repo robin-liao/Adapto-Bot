@@ -1,0 +1,155 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.5",
+  "type": "AdaptiveCard",
+  "body": [
+    {
+      "type": "ColumnSet",
+      "height": "stretch",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "stretch",
+          "verticalContentAlignment": "center",
+          "items": [
+            {
+              "type": "TextBlock",
+              "size": "Large",
+              "weight": "Bolder",
+              "text": "OpenAI GPT Chat",
+              "color": "accent"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "20px",
+          "verticalContentAlignment": "center",
+          "items": [
+            {
+              "type": "Image",
+              "url": "https://www.iconsdb.com/icons/preview/royal-blue/info-xxl.png",
+              "width": "20px",
+              "selectAction": {
+                "type": "Action.ToggleVisibility",
+                "title": "",
+                "iconUrl": "https://www.iconsdb.com/icons/preview/royal-blue/info-xxl.png",
+                "targetElements": ["infoCard"]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Input.Text",
+      "placeholder": "Chat here...",
+      "id": "text",
+      "isMultiline": true
+    },
+    {
+      "id": "infoCard",
+      "isVisible": false,
+      "type": "Table",
+      "showGridLines": false,
+      "columns": [
+        {
+          "width": 1
+        },
+        {
+          "width": 1
+        }
+      ],
+      "rows": [
+        {
+          "type": "TableRow",
+          "verticalCellContentAlignment": "center",
+          "cells": [
+            {
+              "type": "TableCell",
+              "style": "emphasis",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Temperature",
+                  "color": "good",
+                  "weight": "bolder"
+                },
+                {
+                  "id": "temperature",
+                  "type": "Input.Number",
+                  "value": 0.9
+                }
+              ]
+            },
+            {
+              "type": "TableCell",
+              "style": "emphasis",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Max Tokens",
+                  "color": "good",
+                  "weight": "bolder"
+                },
+                {
+                  "id": "max_tokens",
+                  "type": "Input.Number",
+                  "value": 1000
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "TableRow",
+          "cells": [
+            {
+              "type": "TableCell",
+              "style": "emphasis",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Frequency Penalty",
+                  "color": "good",
+                  "weight": "bolder"
+                },
+                {
+                  "id": "frequency_penalty",
+                  "type": "Input.Number",
+                  "value": 0.0
+                }
+              ]
+            },
+            {
+              "type": "TableCell",
+              "style": "emphasis",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Presence Penalty",
+                  "color": "good",
+                  "weight": "bolder"
+                },
+                {
+                  "id": "presence_penalty",
+                  "type": "Input.Number",
+                  "value": 0.6
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Submit",
+      "data": {
+        "intent": "gptSubmit"
+      }
+    }
+  ]
+}

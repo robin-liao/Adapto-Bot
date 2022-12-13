@@ -41,6 +41,23 @@
         "displayName": "Robin Liao",
         "userPrincipalName": "yilia@microsoft.com"
       }
+    },
+    {
+      "type": "TextBlock",
+      "text": "<at>Robin Liao</at>"
     }
-  ]
+  ],
+  "msTeams": {
+    "width": "full",
+    "entities": [
+      {
+        "type": "mention",
+        "text": "<at>Robin Liao</at>",
+        "mentioned": {
+          "id": "97b1ec61-45bf-453c-9059-6e8984e0cef4",
+          "name": "Robin Liao"
+        }
+      }
+    ]
+  }
 }

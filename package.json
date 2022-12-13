@@ -29,6 +29,7 @@
     "markdown-it": "^13.0.1",
     "markdown-it-collapsible": "^1.0.0",
     "nodemon": "^1.18.9",
+    "openai": "^3.1.0",
     "redis": "^3.1.2",
     "request": "^2.88.2",
     "string-template": "^1.0.0",

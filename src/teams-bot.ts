@@ -30,6 +30,7 @@ import { Router } from "express";
 import { Auth } from "./auth";
 import { DOWNLOAD_INFO_CONTENT_TYPE, IBotFileHandler } from "./bot-file-helper";
 import { CardGenerator } from "./card-gen";
+import { GPTBot } from "./gpt-bot";
 import { outgoingWebhookRouter } from "./outgoing-webhook-router";
 import { CardUpdate } from "./scenarios/card-update";
 import { DefaultBot } from "./scenarios/default-bot";
@@ -425,6 +426,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     new TaskModuleFullTest().accept(this);
     new MentionBot().accept(this);
     new TaskModuleAppJIT().accept(this);
+    new GPTBot().accept(this);
   }
 
   private async handleOnMessage(ctx: TurnContext, next: () => Promise<void>) {

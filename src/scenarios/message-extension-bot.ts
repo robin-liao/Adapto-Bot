@@ -93,7 +93,7 @@ export class MessageExtensionBot
     }
     await userTbl.update({ meQueryOverwrite });
 
-    return { tab: {} };
+    return;
   }
 
   private async handleUserDefinedMEQuery(

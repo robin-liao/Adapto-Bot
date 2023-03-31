@@ -2,8 +2,8 @@
   "$schema": "https://github.com/OfficeDev/microsoft-teams-app-schema/blob/preview/DevPreview/MicrosoftTeams.schema.json",
   "manifestVersion": "devPreview",
   "version": "1.0",
-  "id": "8E689F90-2B78-478E-A706-845AF644CE47",
-  "packageName": "com.microsoft.teams.samples.yelp",
+  "id": "28508c2c-cf88-11ed-afa1-0242ac120002",
+  "packageName": "com.microsoft.teams.samples.wolframalpha",
   "developer": {
     "name": "Microsoft",
     "websiteUrl": "https://example.azurewebsites.net",
@@ -11,12 +11,12 @@
     "termsOfUseUrl": "https://example.azurewebsites.net/termsofuse"
   },
   "name": {
-    "short": "Yelp",
-    "full": "Yelp"
+    "short": "Wolfram Alpha",
+    "full": "Wolfram Alpha"
   },
   "description": {
-    "short": "SME Sample - Yelp",
-    "full": "SME Sample - Yelp"
+    "short": "SME Sample - Wolfram Alpha",
+    "full": "SME Sample - Wolfram Alpha"
   },
   "icons": {
     "outline": "icon-outline.png",
@@ -28,13 +28,13 @@
       "endpoint": "example.azurewebsites.net",
       "commands": [
         {
-          "id": "query-api-yelp",
+          "id": "query-openai-wolfram-alpha",
           "context": ["compose"],
-          "description": "Query command using API endpoint",
-          "title": "Search Yelp",
+          "description": "Query command using ChatGPT",
+          "title": "Search Wolfram Alpha",
           "parameters": [
             {
-              "name": "queryText",
+              "name": "input",
               "title": "Query parameter",
               "description": "Query parameter"
             }

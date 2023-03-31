@@ -5,14 +5,14 @@
   "id": "8E689F90-2B78-478E-A706-845AF644CE47",
   "packageName": "com.microsoft.teams.samples.yelp",
   "developer": {
-    "name": "Robin Liao",
+    "name": "Microsoft",
     "websiteUrl": "https://example.azurewebsites.net",
     "privacyUrl": "https://example.azurewebsites.net/privacy",
     "termsOfUseUrl": "https://example.azurewebsites.net/termsofuse"
   },
   "name": {
-    "short": "Yelp",
-    "full": "Yelp"
+    "short": "Search and share restaurants",
+    "full": "Search and share restaurants"
   },
   "description": {
     "short": "SME Sample - Yelp",
@@ -25,14 +25,13 @@
   "accentColor": "#C41200",
   "composeExtensions": [
     {
-      "botId": "159e1c0f-15ef-4597-a8c6-44ba1fd89b78",
+      "endpoint": "example.azurewebsites.net",
       "commands": [
         {
           "id": "query-api-yelp",
-          "context": ["message", "compose"],
+          "context": ["compose"],
           "description": "Query command using API endpoint",
           "title": "Search Yelp",
-          "initialRun": true,
           "parameters": [
             {
               "name": "queryText",
@@ -43,6 +42,5 @@
         }
       ]
     }
-  ],
-  "validDomains": ["*.azurewebsites.net", "*.ngrok.io"]
+  ]
 }

@@ -25,6 +25,7 @@
   "accentColor": "#C41200",
   "composeExtensions": [
     {
+      "type": "api",
       "apiEndpoint": "https://adapto-bot.azurewebsites.net/skillrequest",
       "commands": [
         {

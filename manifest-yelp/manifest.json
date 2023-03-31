@@ -1,0 +1,48 @@
+{
+  "$schema": "https://github.com/OfficeDev/microsoft-teams-app-schema/blob/preview/DevPreview/MicrosoftTeams.schema.json",
+  "manifestVersion": "devPreview",
+  "version": "1.0",
+  "id": "8E689F90-2B78-478E-A706-845AF644CE47",
+  "packageName": "com.microsoft.teams.samples.yelp",
+  "developer": {
+    "name": "Robin Liao",
+    "websiteUrl": "https://example.azurewebsites.net",
+    "privacyUrl": "https://example.azurewebsites.net/privacy",
+    "termsOfUseUrl": "https://example.azurewebsites.net/termsofuse"
+  },
+  "name": {
+    "short": "Yelp",
+    "full": "Yelp"
+  },
+  "description": {
+    "short": "SME Sample - Yelp",
+    "full": "SME Sample - Yelp"
+  },
+  "icons": {
+    "outline": "icon-outline.png",
+    "color": "icon-color.png"
+  },
+  "accentColor": "#C41200",
+  "composeExtensions": [
+    {
+      "botId": "159e1c0f-15ef-4597-a8c6-44ba1fd89b78",
+      "commands": [
+        {
+          "id": "query-api-yelp",
+          "context": ["message", "compose"],
+          "description": "Query command using API endpoint",
+          "title": "Search Yelp",
+          "initialRun": true,
+          "parameters": [
+            {
+              "name": "queryText",
+              "title": "Query parameter",
+              "description": "Query parameter"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "validDomains": ["*.azurewebsites.net", "*.ngrok.io"]
+}

@@ -25,7 +25,7 @@
   "accentColor": "#C41200",
   "composeExtensions": [
     {
-      "endpoint": "https://adapto-bot.azurewebsites.net/skillrequest",
+      "apiEndpoint": "https://adapto-bot.azurewebsites.net/skillrequest",
       "commands": [
         {
           "id": "query-api-yelp",

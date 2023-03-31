@@ -25,7 +25,7 @@
   "accentColor": "#C41200",
   "composeExtensions": [
     {
-      "apiUrl": "https://www.wolframalpha.com/.well-known/apispec.json",
+      "apiSpecUrl": "https://www.wolframalpha.com/.well-known/apispec.json",
       "commands": [
         {
           "id": "query-openai-wolfram-alpha",

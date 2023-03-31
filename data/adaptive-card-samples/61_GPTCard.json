@@ -117,6 +117,8 @@
                 {
                   "id": "frequency_penalty",
                   "type": "Input.Number",
+                  "min": -2.0,
+                  "max": 2.0,
                   "value": 0.0
                 }
               ]
@@ -134,6 +136,8 @@
                 {
                   "id": "presence_penalty",
                   "type": "Input.Number",
+                  "min": -2.0,
+                  "max": 2.0,
                   "value": 0.6
                 }
               ]

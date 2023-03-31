@@ -31,8 +31,13 @@ class AuthHandler {
     );
   }
 
-  public getSigninCard(userId: string) {
+  public getAuthUrl(userId: string) {
     const url = `${config.host}${this.rootPath}${this.startPath}/${userId}/?width=1500&height=1000`;
+    return url;
+  }
+
+  public getSigninCard(userId: string) {
+    const url = this.getAuthUrl(userId);
     return CardFactory.signinCard("Login", url, "Please Login");
   }
 

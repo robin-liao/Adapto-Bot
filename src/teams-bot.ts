@@ -32,6 +32,7 @@ import { DOWNLOAD_INFO_CONTENT_TYPE, IBotFileHandler } from "./bot-file-helper";
 import { CardGenerator } from "./card-gen";
 import { GPTBot } from "./gpt-bot";
 import { outgoingWebhookRouter } from "./outgoing-webhook-router";
+import { AuthBot } from "./scenarios/auth-bot";
 import { CardUpdate } from "./scenarios/card-update";
 import { DefaultBot } from "./scenarios/default-bot";
 import { FileBot } from "./scenarios/file-bot";
@@ -427,6 +428,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     new MentionBot().accept(this);
     new TaskModuleAppJIT().accept(this);
     new GPTBot().accept(this);
+    new AuthBot().accept(this);
   }
 
   private async handleOnMessage(ctx: TurnContext, next: () => Promise<void>) {

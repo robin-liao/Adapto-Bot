@@ -9,7 +9,7 @@ export const outgoingWebhookRouter = Router();
 
 outgoingWebhookRouter.use(bodyParser.raw());
 
-outgoingWebhookRouter.post("/", (req, res) => {
+outgoingWebhookRouter.post("/", async (req, res) => {
   const secret = config.outgoingWebhook.secret;
   const { hashCheck, hashComputed, verified } = hmacAuthorize(secret, req);
 
@@ -94,14 +94,30 @@ outgoingWebhookRouter.post("/", (req, res) => {
     ],
   });
 
+  const from = req.body.from;
+
   const message: Partial<Activity> = {
     type: "message",
     textFormat: "xml",
     text: `
+      user who mentions me: <at>${from.name}</at><br/>
       <strong>Payload Received</strong><br/>
       <pre>${JSON.stringify(req.body, null, 2)}</pre>`,
     attachments: [card],
   };
+
+  message.entities = [
+    {
+      type: "mention",
+      mentioned: {
+        id: from.id,
+        name: from.name,
+        aadObjectId: from.aadObjectId,
+        userRole: "user",
+      },
+      text: `<at>${from.name}</at>`,
+    },
+  ];
 
   res.json(message);
 });

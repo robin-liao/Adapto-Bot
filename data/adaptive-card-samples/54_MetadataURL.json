@@ -6,6 +6,14 @@
   },
   "body": [
     {
+      "type": "Container",
+      "style": "good",
+      "minHeight": "150px",
+      "backgroundImage": "https://adaptivecards.io/content/AlkiBeach.jpg",
+      "bleed": true,
+      "items": []
+    },
+    {
       "size": "large",
       "text": "Overflow Action Test Card",
       "weight": "bolder",

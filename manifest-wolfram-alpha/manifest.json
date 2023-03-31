@@ -25,7 +25,7 @@
   "accentColor": "#C41200",
   "composeExtensions": [
     {
-      "endpoint": "example.azurewebsites.net",
+      "apiUrl": "https://www.wolframalpha.com/.well-known/apispec.json",
       "commands": [
         {
           "id": "query-openai-wolfram-alpha",
@@ -38,7 +38,9 @@
               "title": "Query parameter",
               "description": "Query parameter"
             }
-          ]
+          ],
+          "requestDescriptionForModel": "Given the following request payload, and API spec. Generate the endpoint to call. Request payload: [Input] {{$input}} [End Input] API spec: [Input] {{$input}} [End Input]",
+          "responseDescriptionForModel": "Convert this input to json for an array of adaptive cards. Do not include any buttons in the card and do not include any inputs. The adaptive card json should be enclosed in <result> </result> tags. The result should only contain valid json for the cards only and explicitly render the entire cards. Do not include comments. Ignore the query. [Input] {{$input}} [End Input]"
         }
       ]
     }

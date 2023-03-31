@@ -6,6 +6,7 @@ import {
   MessagingExtensionAttachment,
 } from "botbuilder";
 import { ITeamsScenario, IScenarioBuilder } from "../teams-bot";
+import request from "request";
 
 export class SMEMessageExtension implements ITeamsScenario {
   public accept(teamsBot: IScenarioBuilder) {
@@ -23,6 +24,9 @@ export class SMEMessageExtension implements ITeamsScenario {
     ctx: TurnContext,
     query: MessagingExtensionQuery
   ): Promise<MessagingExtensionResponse> {
+    const manifest = await this.getManifest();
+    const apiEndpoint = this.findEndpoint(manifest);
+
     const queryTxt = (query.parameters?.[0].value as string) || undefined;
 
     const card = CardFactory.adaptiveCard({
@@ -48,5 +52,20 @@ export class SMEMessageExtension implements ITeamsScenario {
         attachments: [meCard],
       },
     };
+  }
+
+  private async getManifest() {
+    const url =
+      "https://copilotdemo.blob.core.windows.net/sme/api-manifest.json";
+
+    return await new Promise((resolve, reject) => {
+      request(url, (err, res, body) =>
+        err ? reject(err) : resolve(res.toJSON)
+      );
+    });
+  }
+
+  private async findEndpoint(manifest: any) {
+    return manifest.composeExtensions[0]?.apiEndpoint;
   }
 }

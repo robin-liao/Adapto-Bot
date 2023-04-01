@@ -17,7 +17,7 @@ variables:
   tag: 'latest'
 
   # Agent VM image name
-  vmImageName: 'ubuntu-latest'
+  vmImageName: 'ubuntu-20.04'
 
 stages:
 - stage: Build

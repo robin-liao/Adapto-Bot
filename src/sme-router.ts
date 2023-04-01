@@ -24,8 +24,8 @@ smeRouter.post("/query-api-yelp", async (req, res) => {
   const query: SMERequest = req.body;
   const queryTxt = (query.parameters?.[0].value as string) || undefined;
 
-  // const location = await findLocation(queryTxt);
-  const attachments = await searchYelp(queryTxt, "Seattle");
+  const location = await findLocation(queryTxt);
+  const attachments = await searchYelp(queryTxt, location);
 
   const result: SMEResponse = {
     type: "result",
@@ -37,7 +37,7 @@ smeRouter.post("/query-api-yelp", async (req, res) => {
 });
 
 const findLocation = async (queryTxt: string, defaultLoc = "Seattle") => {
-  const prompt = `gpt figure out the location in the query: "${queryTxt}", and tell me the answer in JSON format of {"location": "<value>"}`;
+  const prompt = `figure out the location in the query: "${queryTxt}", and tell me the answer in JSON format of {"location": "<value>"}`;
   try {
     const res = await OpenAI.gpt(prompt);
     const loc = JSON.parse(res).location ?? defaultLoc;

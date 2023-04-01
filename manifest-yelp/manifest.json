@@ -2,7 +2,7 @@
   "$schema": "https://github.com/OfficeDev/microsoft-teams-app-schema/blob/preview/DevPreview/MicrosoftTeams.schema.json",
   "manifestVersion": "devPreview",
   "version": "1.0",
-  "id": "8E689F90-2B78-478E-A706-845AF644CE47",
+  "id": "514286c7-b6ed-4815-808a-800888a9097d",
   "packageName": "com.microsoft.teams.samples.yelp",
   "developer": {
     "name": "Microsoft",
@@ -25,7 +25,7 @@
   "accentColor": "#C41200",
   "composeExtensions": [
     {
-      "botId": "159e1c0f-15ef-4597-a8c6-44ba1fd89b78",
+      "botId": "e524fc50-3773-4dad-a19f-ebba5bffb381",
       "commands": [
         {
           "id": "query-api-yelp",

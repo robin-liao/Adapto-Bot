@@ -11,8 +11,8 @@
     "termsOfUseUrl": "https://example.azurewebsites.net/termsofuse"
   },
   "name": {
-    "short": "Yelp",
-    "full": "Yelp"
+    "short": "Yelp (Dev)",
+    "full": "Yelp (Dev)"
   },
   "description": {
     "short": "SME Sample - Yelp",
@@ -25,8 +25,7 @@
   "accentColor": "#C41200",
   "composeExtensions": [
     {
-      "type": "api",
-      "apiEndpoint": "https://adapto-bot.azurewebsites.net/skillrequest",
+      "botId": "159e1c0f-15ef-4597-a8c6-44ba1fd89b78",
       "commands": [
         {
           "id": "query-api-yelp",

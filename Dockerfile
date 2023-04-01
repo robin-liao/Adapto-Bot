@@ -11,7 +11,6 @@ COPY ./package*.json ./
 COPY ./tsconfig.json ./
 COPY ./tslint.json ./
 COPY ./yarn.lock ./
-COPY ./.env ./
 
 RUN yarn install
 

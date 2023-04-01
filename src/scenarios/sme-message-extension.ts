@@ -1,16 +1,17 @@
 import {
-  TurnContext,
   MessagingExtensionQuery,
   MessagingExtensionResponse,
-  CardFactory,
-  MessagingExtensionAttachment,
+  TurnContext,
 } from "botbuilder";
-import { ITeamsScenario, IScenarioBuilder } from "../teams-bot";
 import request from "request";
-
+import { SMERequest, SMEResponse } from "../sme-router";
+import { IScenarioBuilder, ITeamsScenario } from "../teams-bot";
+import axios from "axios";
 export class SMEMessageExtension implements ITeamsScenario {
+  private readonly cmdId = "query-api-yelp";
+
   public accept(teamsBot: IScenarioBuilder) {
-    teamsBot.registerMessageExtensionQuery("query-api-yelp", (ctx, query) =>
+    teamsBot.registerMessageExtensionQuery(this.cmdId, (ctx, query) =>
       this.handleQueryAPI(ctx, query)
     );
 
@@ -25,32 +26,10 @@ export class SMEMessageExtension implements ITeamsScenario {
     query: MessagingExtensionQuery
   ): Promise<MessagingExtensionResponse> {
     const manifest = await this.getManifest();
-    const apiEndpoint = this.findEndpoint(manifest);
-
-    const queryTxt = (query.parameters?.[0].value as string) || undefined;
-
-    const card = CardFactory.adaptiveCard({
-      type: "AdaptiveCard",
-      version: "1.0",
-      body: [
-        {
-          type: "TextBlock",
-          text: queryTxt,
-        },
-      ],
-    });
-
-    const meCard: MessagingExtensionAttachment = {
-      preview: CardFactory.heroCard(queryTxt),
-      ...card,
-    };
-
+    const apiEndpoint = this.findEndpoint(manifest) + "/" + this.cmdId;
+    const response = await this.performQuery(apiEndpoint, query);
     return {
-      composeExtension: {
-        type: "result",
-        attachmentLayout: "list",
-        attachments: [meCard],
-      },
+      composeExtension: response,
     };
   }
 
@@ -60,12 +39,21 @@ export class SMEMessageExtension implements ITeamsScenario {
 
     return await new Promise((resolve, reject) => {
       request(url, (err, res, body) =>
-        err ? reject(err) : resolve(res.toJSON)
+        err ? reject(err) : resolve(JSON.parse(body))
       );
     });
   }
 
-  private async findEndpoint(manifest: any) {
+  private findEndpoint(manifest: any) {
     return manifest.composeExtensions[0]?.apiEndpoint;
+  }
+
+  private async performQuery(
+    apiEndpoint: string,
+    query: SMERequest
+  ): Promise<SMEResponse> {
+    const res = await axios.post(apiEndpoint, query);
+    const json = res.data;
+    return json;
   }
 }

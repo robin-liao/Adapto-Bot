@@ -1,23 +1,8 @@
-import {
-  ActivityTypes,
-  MessageFactory,
-  StatusCodes,
-  TurnContext,
-} from "botbuilder";
-import { Configuration, OpenAIApi } from "openai";
+import { ActivityTypes, MessageFactory, StatusCodes } from "botbuilder";
 import { CardGenerator } from "./card-gen";
 import { IScenarioBuilder, ITeamsScenario } from "./teams-bot";
-
+import { OpenAI } from "./openai-api";
 export class GPTBot implements ITeamsScenario {
-  private readonly openai: OpenAIApi;
-
-  constructor() {
-    const configuration = new Configuration({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-    this.openai = new OpenAIApi(configuration);
-  }
-
   public accept(teamsBot: IScenarioBuilder) {
     this.registerTextCommands(teamsBot);
     teamsBot.registerInvoke("gptSubmit", async (ctx) => {
@@ -29,8 +14,7 @@ export class GPTBot implements ITeamsScenario {
         presence_penalty,
       } = ctx.activity.value;
 
-      const res = await this.processGPT(
-        ctx,
+      const res = await OpenAI.gpt(
         text,
         parseFloat(temperature),
         parseInt(max_tokens),
@@ -54,37 +38,13 @@ export class GPTBot implements ITeamsScenario {
         return;
       }
 
-      const res = await this.processGPT(ctx, text);
+      ctx.sendActivity({
+        type: ActivityTypes.Typing,
+      });
+
+      const res = await OpenAI.gpt(text);
       const msg = MessageFactory.text(res);
       await ctx.sendActivities([msg]);
     });
-  }
-
-  private async processGPT(
-    ctx: TurnContext,
-    text: string,
-    temperature = 0.9,
-    max_tokens = 1000,
-    frequency_penalty = 0.0,
-    presence_penalty = 0.6
-  ) {
-    ctx.sendActivity({
-      type: ActivityTypes.Typing,
-    });
-
-    console.log(
-      `text=${text}\ntemperature=${temperature}\nmax_tokens=${max_tokens}\nfrequency_penalty=${frequency_penalty}\npresence_penalty=${presence_penalty}`
-    );
-    const response = await this.openai.createCompletion({
-      model: "text-davinci-003",
-      prompt: text,
-      temperature,
-      max_tokens,
-      top_p: 1,
-      frequency_penalty,
-      presence_penalty,
-    });
-
-    return response.data.choices[0].text;
   }
 }

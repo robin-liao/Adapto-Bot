@@ -18,6 +18,7 @@
   "license": "ISC",
   "dependencies": {
     "adaptivecards": "^2.10.0-beta1",
+    "axios": "^1.3.4",
     "azure-storage": "^2.10.3",
     "body-parser": "^1.19.0",
     "botbuilder": "^4.15.0",
@@ -58,7 +59,7 @@
     "svg-inline-loader": "^0.8.2",
     "ts-loader": "^8.3.0",
     "tslint": "^6.1.0",
-    "typescript": "^3.9.7",
+    "typescript": "^5.0.3",
     "webpack": "5",
     "webpack-cli": "^3.3.12",
     "webpack-node-externals": "^3.0.0"

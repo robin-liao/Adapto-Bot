@@ -26,7 +26,7 @@
   "composeExtensions": [
     {
       "type": "api",
-      "apiEndpoint": "https://adapto-bot.azurewebsites.net/skillrequest",
+      "apiEndpoint": "https://ypliao.ngrok.io/skillrequest",
       "commands": [
         {
           "id": "query-api-yelp",

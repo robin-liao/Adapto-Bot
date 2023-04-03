@@ -13,6 +13,8 @@ import * as _ from "lodash";
 import { OpenAI } from "../openai-api";
 import { XMLParser } from "fast-xml-parser";
 
+let _manifestOpenAI: any;
+
 export class SMEMessageExtension implements ITeamsScenario {
   private readonly cmdIdYelp = "query-api-yelp";
   private readonly cmdIdWolframAlpha = "query-openai-wolfram-alpha";
@@ -27,6 +29,16 @@ export class SMEMessageExtension implements ITeamsScenario {
       this.cmdIdWolframAlpha,
       (ctx, query) => this.handleQueryWolframAlpha(ctx, query)
     );
+  }
+
+  private async getManifestOpenAI() {
+    if (!_manifestOpenAI) {
+      const manifestUrl =
+        "https://copilotdemo.blob.core.windows.net/sme/openai-manifest.json";
+      const manifest = await this.httpGet(manifestUrl);
+      _manifestOpenAI = manifest;
+    }
+    return _manifestOpenAI;
   }
 
   private async handleQueryYelp(
@@ -47,41 +59,49 @@ export class SMEMessageExtension implements ITeamsScenario {
     ctx: TurnContext,
     query: MessagingExtensionQuery
   ): Promise<MessagingExtensionResponse> {
-    const manifestUrl =
-      "https://copilotdemo.blob.core.windows.net/sme/openai-manifest.json";
-    const manifest = await this.httpGet(manifestUrl);
-    const { apiSpec, requestPrompt, responsePrompt } =
-      await this.parseOpenAIManifest(manifest, this.cmdIdWolframAlpha);
+    const manifest = await this.getManifestOpenAI();
+    const { requestPrompt, responsePrompt } = await this.parseOpenAIManifest(
+      manifest,
+      this.cmdIdWolframAlpha
+    );
 
     // sample: make a bar chart with 100, 30, 80, and 51
     const queryTxt = (query.parameters?.[0].value as string) || undefined;
 
     // open AI input
-    const inputPrompt = this.composePrompt(requestPrompt, {
-      apispec: JSON.stringify(apiSpec),
-      input: queryTxt,
-    });
-    const inputConverted = await OpenAI.gpt(inputPrompt);
+    // const inputPrompt = this.composePrompt(requestPrompt, {
+    //   apispec: JSON.stringify(apiSpec),
+    //   input: queryTxt,
+    // });
+    // const inputConverted = await OpenAI.gpt(inputPrompt);
 
     // perform Wolfram Alpha
-    const apiEndpoint =
-      this.parseXMLAndGetResult(inputConverted) +
-      `&appid=${this.wolframAlphaAppId}`;
+    // const apiEndpoint =
+    //   this.parseXMLAndGetResult(inputConverted) +
+    //   `&appid=${this.wolframAlphaAppId}`;
+    const apiEndpoint = `https://www.wolframalpha.com/api/v1/llm-api?input=${encodeURIComponent(
+      queryTxt
+    )}&appid=${this.wolframAlphaAppId}`;
+
+    console.log("Call Wolfram Alpha API....");
     const wolframRes = (await this.httpGet(apiEndpoint, false)) as string;
+    console.log("Call Wolfram Alpha API....Done!");
 
     // open AI output
     const outputPrompt = this.composePrompt(responsePrompt, {
       input: wolframRes,
     });
-    const outputConverted = await OpenAI.gpt(outputPrompt, 0.9, 2000);
+    const outputConverted = await OpenAI.gpt(outputPrompt, 0.85, 2000);
+    console.log(outputConverted);
+
     const output = JSON.parse(
       this.parseXMLAndGetResult(outputConverted)
     ) as any[];
 
     // prepare ME results
-    const { title, images = [] } = output[1];
+    // const { title, images = [] } = output[1];
     const meCard: MessagingExtensionAttachment = {
-      preview: CardFactory.thumbnailCard(title, images),
+      preview: CardFactory.thumbnailCard("Result", queryTxt),
       ...CardFactory.adaptiveCard(output[0]),
     };
 
@@ -108,13 +128,13 @@ export class SMEMessageExtension implements ITeamsScenario {
 
   private async parseOpenAIManifest(manifest: any, lookupCmdId) {
     const me = manifest.composeExtensions[0];
-    const apiSpec: any = await this.httpGet(me.apiSpecUrl);
+    // const apiSpec: any = await this.httpGet(me.apiSpecUrl);
     const command = (me.commands as any[]).find(
       (cmd) => cmd.id === lookupCmdId
     );
     const requestPrompt: string = command.requestDescriptionForModel;
     const responsePrompt: string = command.responseDescriptionForModel;
-    return { apiSpec, requestPrompt, responsePrompt };
+    return { requestPrompt, responsePrompt };
   }
 
   private async performQuery(

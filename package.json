@@ -17,7 +17,9 @@
   "author": "Robin Liao",
   "license": "ISC",
   "dependencies": {
+    "adaptive-expressions": "^4.19.3",
     "adaptivecards": "^2.10.0-beta1",
+    "adaptivecards-templating": "^2.3.1",
     "axios": "^1.3.4",
     "azure-storage": "^2.10.3",
     "body-parser": "^1.19.0",
@@ -32,6 +34,7 @@
     "markdown-it-collapsible": "^1.0.0",
     "nodemon": "^1.18.9",
     "openai": "^3.1.0",
+    "parse-curl-js": "^1.0.3",
     "redis": "^3.1.2",
     "request": "^2.88.2",
     "string-template": "^1.0.0",

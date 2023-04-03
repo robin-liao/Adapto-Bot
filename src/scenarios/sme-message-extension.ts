@@ -12,13 +12,18 @@ import axios from "axios";
 import * as _ from "lodash";
 import { OpenAI } from "../openai-api";
 import { XMLParser } from "fast-xml-parser";
+import { CURLParser } from "parse-curl-js";
+import { ParsedCURL } from "parse-curl-js/dist/interface";
+import * as ACData from "adaptivecards-templating";
 
 let _manifestOpenAI: any;
 
 export class SMEMessageExtension implements ITeamsScenario {
   private readonly cmdIdYelp = "query-api-yelp";
   private readonly cmdIdWolframAlpha = "query-openai-wolfram-alpha";
+  private readonly cmdKlarna = "query-openai-klarna";
   private readonly wolframAlphaAppId = "VVJ72P-7GHL9A3AP8";
+  private readonly curlTemplate: { [cmdId: string]: string } = {};
 
   public accept(teamsBot: IScenarioBuilder) {
     teamsBot.registerMessageExtensionQuery(this.cmdIdYelp, (ctx, query) =>
@@ -29,16 +34,10 @@ export class SMEMessageExtension implements ITeamsScenario {
       this.cmdIdWolframAlpha,
       (ctx, query) => this.handleQueryWolframAlpha(ctx, query)
     );
-  }
 
-  private async getManifestOpenAI() {
-    if (!_manifestOpenAI) {
-      const manifestUrl =
-        "https://copilotdemo.blob.core.windows.net/sme/openai-manifest.json";
-      const manifest = await this.httpGet(manifestUrl);
-      _manifestOpenAI = manifest;
-    }
-    return _manifestOpenAI;
+    teamsBot.registerMessageExtensionQuery(this.cmdKlarna, (ctx, query) =>
+      this.handleQueryKlarna(ctx, query)
+    );
   }
 
   private async handleQueryYelp(
@@ -114,6 +113,40 @@ export class SMEMessageExtension implements ITeamsScenario {
     };
   }
 
+  private async handleQueryKlarna(
+    ctx: TurnContext,
+    query: MessagingExtensionQuery
+  ): Promise<MessagingExtensionResponse> {
+    const manifest = await this.getManifestKlarna();
+    const { apiSpecUrl, defaultVals, queryParamName } =
+      await this.parseOpenAIManifest(manifest, this.cmdKlarna);
+    const curlTmp = await this.getCurlTemplate(this.cmdKlarna, apiSpecUrl);
+
+    const queryTxt = (query.parameters?.[0].value as string) || undefined;
+    const inputs = { [queryParamName]: queryTxt, ...defaultVals };
+    const curlReq = this.generateCurlRequest(curlTmp, inputs);
+    const curlRes = await this.performCurlRequest(curlReq);
+
+    const cards = this.generateAdaptiveCardsFromCurlResult(curlRes);
+    const previews = this.generatePreviewCardsFromCurlResults(curlRes);
+
+    const meCards = _.zip(previews, cards).map(([preview, card]) => {
+      const meCard: MessagingExtensionAttachment = {
+        preview,
+        ...CardFactory.adaptiveCard(card),
+      };
+      return meCard;
+    });
+
+    return {
+      composeExtension: {
+        type: "result",
+        attachmentLayout: "list",
+        attachments: meCards,
+      },
+    };
+  }
+
   private async httpGet(url: string, parseJson = true) {
     return await new Promise((resolve, reject) => {
       request(url, (err, res, body) =>
@@ -129,12 +162,29 @@ export class SMEMessageExtension implements ITeamsScenario {
   private async parseOpenAIManifest(manifest: any, lookupCmdId) {
     const me = manifest.composeExtensions[0];
     // const apiSpec: any = await this.httpGet(me.apiSpecUrl);
+    const apiSpecUrl = me.apiSpecUrl;
     const command = (me.commands as any[]).find(
       (cmd) => cmd.id === lookupCmdId
     );
     const requestPrompt: string = command.requestDescriptionForModel;
     const responsePrompt: string = command.responseDescriptionForModel;
-    return { requestPrompt, responsePrompt };
+
+    const queryParamName = command.parameters[0].name;
+
+    // prepare defaults
+    const defaultVals = {};
+    (command.parameters as any[]).forEach((cmd) => {
+      if (!_.isUndefined(cmd.defaultValue)) {
+        defaultVals[cmd.name] = cmd.defaultValue;
+      }
+    });
+    return {
+      apiSpecUrl,
+      requestPrompt,
+      responsePrompt,
+      queryParamName,
+      defaultVals,
+    };
   }
 
   private async performQuery(
@@ -161,5 +211,159 @@ export class SMEMessageExtension implements ITeamsScenario {
     const parser = new XMLParser();
     const jObj = parser.parse(xml);
     return jObj.result;
+  }
+
+  private async getCurlTemplate(cmdId: string, apiSpecUrl: string) {
+    if (!this.curlTemplate[cmdId]) {
+      const apiSpec: any = await this.httpGet(apiSpecUrl);
+      const prompt = `Generate a curl template with input placeholders by following open API spec where placeholder formats in angle bracket <>. Directly respond curl string without prefix and suffix. [Sepc]${JSON.stringify(
+        apiSpec
+      )}[End Spec]`;
+      const curl = await OpenAI.gpt(prompt);
+      console.log(curl);
+      this.curlTemplate[cmdId] = curl;
+    }
+    return this.curlTemplate[cmdId];
+  }
+
+  private generateCurlRequest(curlTemplate: string, inputs = {}) {
+    let curlSub = curlTemplate;
+    _.each(inputs, (val, key) => {
+      curlSub = curlSub.replace(`<${key}>`, val);
+    });
+    console.log(curlSub);
+    const parser = new CURLParser(curlSub.trim());
+    const curlParsed = parser.parse();
+    return curlParsed;
+  }
+
+  private async performCurlRequest(curlReq: ParsedCURL) {
+    if (curlReq.method === "GET") {
+      const url = curlReq.url.replace(/'|"/g, "");
+      const body: any = await this.httpGet(url);
+      return body;
+    }
+  }
+
+  private generateAdaptiveCardsFromCurlResult(body: any) {
+    const templatePayload = this.getAdaptiveCardTemplateForKlarna();
+    const template = new ACData.Template(templatePayload);
+    // !!!HARD-CODING!!!
+    const items: any[] = body.products;
+    const cards = items.map((item) => {
+      const card = template.expand({
+        $root: item,
+      });
+      return card;
+    });
+    return cards;
+  }
+
+  private generatePreviewCardsFromCurlResults(body: any) {
+    // !!!HARD-CODING!!!
+    const items: any[] = body.products;
+    const previews = items.map((item) =>
+      CardFactory.thumbnailCard(item.name, item.price)
+    );
+    return previews;
+  }
+
+  private async getManifestOpenAI() {
+    if (!_manifestOpenAI) {
+      const manifestUrl =
+        "https://copilotdemo.blob.core.windows.net/sme/openai-manifest.json";
+      const manifest = await this.httpGet(manifestUrl);
+      _manifestOpenAI = manifest;
+    }
+    return _manifestOpenAI;
+  }
+
+  private async getManifestKlarna() {
+    return {
+      $schema:
+        "https://github.com/OfficeDev/microsoft-teams-app-schema/blob/preview/DevPreview/MicrosoftTeams.schema.json",
+      manifestVersion: "devPreview",
+      version: "1.0",
+      id: "8a2e45c1-928b-4c7a-8f53-5dabf24f0c12",
+      packageName: "com.microsoft.teams.samples.klarna",
+      developer: {
+        name: "Microsoft",
+        websiteUrl: "https://example.azurewebsites.net",
+        privacyUrl: "https://example.azurewebsites.net/privacy",
+        termsOfUseUrl: "https://example.azurewebsites.net/termsofuse",
+      },
+      name: {
+        short: "Klarna (Dev)",
+        full: "Klarna (Dev)",
+      },
+      description: {
+        short: "SME Sample - Klarna",
+        full: "SME Sample - Klarna",
+      },
+      icons: {
+        outline: "icon-outline.png",
+        color: "icon-color.png",
+      },
+      accentColor: "#FF5A00",
+      composeExtensions: [
+        {
+          type: "openai",
+          apiSpecUrl:
+            "https://www.klarna.com/us/shopping/public/openai/v0/api-docs/",
+          commands: [
+            {
+              id: "query-openai-klarna",
+              context: ["compose", "commandBox"],
+              description: "Query command using ChatGPT",
+              title: "Search Klarna",
+              parameters: [
+                {
+                  name: "query",
+                  title: "Query parameter",
+                  description: "Query parameter",
+                },
+                {
+                  name: "size",
+                  title: "Size",
+                  description: "Number of products returned",
+                  defaultValue: 5,
+                },
+                {
+                  name: "budget",
+                  title: "Budget",
+                  description:
+                    "Maximum price of the matching product in local currency, filters results",
+                  defaultValue: 300,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+  }
+
+  private getAdaptiveCardTemplateForKlarna() {
+    return {
+      $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
+      type: "AdaptiveCard",
+      version: "1.4",
+      body: [
+        {
+          type: "TextBlock",
+          text: "${name}",
+          weight: "bolder",
+          size: "large",
+          wrap: true,
+        },
+        {
+          type: "TextBlock",
+          text: "${price}",
+          size: "medium",
+          wrap: true,
+        },
+      ],
+      actions: [{ type: "Action.OpenUrl", title: "Read more", url: "${url}" }],
+    };
   }
 }

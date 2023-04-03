@@ -11,8 +11,8 @@
     "termsOfUseUrl": "https://example.azurewebsites.net/termsofuse"
   },
   "name": {
-    "short": "Wolfram Alpha (Dev)",
-    "full": "Wolfram Alpha (Dev)"
+    "short": "Wolfram Alpha",
+    "full": "Wolfram Alpha"
   },
   "description": {
     "short": "SME Sample - Wolfram Alpha",

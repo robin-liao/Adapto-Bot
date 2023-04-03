@@ -29,7 +29,7 @@
       "commands": [
         {
           "id": "query-api-yelp",
-          "context": ["compose"],
+          "context": ["compose", "commandBox"],
           "description": "Query command using API endpoint",
           "title": "Search Yelp",
           "parameters": [

@@ -345,43 +345,34 @@ export class SMEMessageExtension implements ITeamsScenario {
 
   private getAdaptiveCardTemplateForKlarna() {
     return {
-      $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
       type: "AdaptiveCard",
-      version: "1.0",
       body: [
         {
-          type: "ColumnSet",
-          columns: [
+          type: "TextBlock",
+          text: "Klarna Product",
+        },
+        {
+          type: "TextBlock",
+          text: "Name: ${name}",
+          style: "strong",
+        },
+        {
+          type: "TextBlock",
+          text: "Price: ${price}",
+        },
+        {
+          type: "ActionSet",
+          actions: [
             {
-              type: "Column",
-              width: "stretch",
-              items: [
-                {
-                  type: "TextBlock",
-                  size: "medium",
-                  weight: "bolder",
-                  text: "Product Information",
-                },
-                {
-                  type: "TextBlock",
-                  text: "Name: ${name}",
-                  wrap: true,
-                },
-                {
-                  type: "TextBlock",
-                  text: "Price: ${price}",
-                  wrap: true,
-                },
-                {
-                  type: "TextBlock",
-                  text: "URL: ${url}",
-                  wrap: true,
-                },
-              ],
+              type: "Action.OpenUrl",
+              title: "Product URL",
+              url: "${url}",
             },
           ],
         },
       ],
+      $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
+      version: "1.0",
     };
   }
 }

@@ -347,23 +347,41 @@ export class SMEMessageExtension implements ITeamsScenario {
     return {
       $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
       type: "AdaptiveCard",
-      version: "1.4",
+      version: "1.0",
       body: [
         {
-          type: "TextBlock",
-          text: "${name}",
-          weight: "bolder",
-          size: "large",
-          wrap: true,
-        },
-        {
-          type: "TextBlock",
-          text: "${price}",
-          size: "medium",
-          wrap: true,
+          type: "ColumnSet",
+          columns: [
+            {
+              type: "Column",
+              width: "stretch",
+              items: [
+                {
+                  type: "TextBlock",
+                  size: "medium",
+                  weight: "bolder",
+                  text: "Product Information",
+                },
+                {
+                  type: "TextBlock",
+                  text: "Name: ${name}",
+                  wrap: true,
+                },
+                {
+                  type: "TextBlock",
+                  text: "Price: ${price}",
+                  wrap: true,
+                },
+                {
+                  type: "TextBlock",
+                  text: "URL: ${url}",
+                  wrap: true,
+                },
+              ],
+            },
+          ],
         },
       ],
-      actions: [{ type: "Action.OpenUrl", title: "Read more", url: "${url}" }],
     };
   }
 }

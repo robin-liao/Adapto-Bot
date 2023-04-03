@@ -102,7 +102,7 @@ export class SMEMessageExtension implements ITeamsScenario {
     // const { title, images = [] } = output[1];
     const meCard: MessagingExtensionAttachment = {
       preview: CardFactory.thumbnailCard("Result", queryTxt),
-      ...CardFactory.adaptiveCard(output[0]),
+      ...CardFactory.adaptiveCard(output),
     };
 
     return {

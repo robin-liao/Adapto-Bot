@@ -41,7 +41,7 @@
             }
           ],
           "requestDescriptionForModel": "Given the following request payload, and API spec. Generate the endpoint to call from the API sepc based on the value in the request payload. Put the url in between <result></result> tags [Request payload] {{$input}} [End Request Payload] [API Spec] {{$apispec}} [End API Spec]",
-          "responseDescriptionForModel": "Convert this input to one Microsoft adaptive card using version 1.4. Only convert up to 5 sections in the input from beginning excluding query, input interpretation and website results. Do not include any buttons in the card and do not include any inputs. The result should only contain valid json for the cards only and explicitly render the entire cards. Do not include comments. Put the json array of cards in <result></result> tags. [Input] {{$input}} [End Input]"
+          "responseDescriptionForModel": "The input is in text and has a few facts. Take first 5 facts to make a Microsoft Adaptive Card using version 1.4 and TextBlock or Image elements. Card result must not be too long and only have 5 elements. Do not include any buttons in the card and do not include any inputs. The result must be in JSON and enclosed in <result></result> tags. Ignore the query and Wolfram|Alpha website result heading. [Input] {{$input}} [End Input]"
         }
       ]
     }

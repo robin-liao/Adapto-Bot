@@ -25,7 +25,7 @@
   "accentColor": "#C41200",
   "composeExtensions": [
     {
-      "botId": "e524fc50-3773-4dad-a19f-ebba5bffb381",
+      "botId": "159e1c0f-15ef-4597-a8c6-44ba1fd89b78",
       "commands": [
         {
           "id": "query-openai-wolfram-alpha",

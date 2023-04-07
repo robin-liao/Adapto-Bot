@@ -1,0 +1,56 @@
+{
+  "$schema": "https://github.com/OfficeDev/microsoft-teams-app-schema/blob/preview/DevPreview/MicrosoftTeams.schema.json",
+  "manifestVersion": "devPreview",
+  "version": "1.0",
+  "id": "3b72c2e9-1f08-4421-a50b-3e3f3a3bf827",
+  "packageName": "com.microsoft.teams.samples.klarna",
+  "developer": {
+    "name": "Microsoft",
+    "websiteUrl": "https://example.azurewebsites.net",
+    "privacyUrl": "https://example.azurewebsites.net/privacy",
+    "termsOfUseUrl": "https://example.azurewebsites.net/termsofuse"
+  },
+  "name": {
+    "short": "Klarna",
+    "full": "Klarna"
+  },
+  "description": {
+    "short": "SME Sample - Klarna",
+    "full": "SME Sample - Klarna"
+  },
+  "icons": {
+    "outline": "icon-outline.png",
+    "color": "icon-color.png"
+  },
+  "accentColor": "#FF5A00",
+  "composeExtensions": [
+    {
+      "botId": "e524fc50-3773-4dad-a19f-ebba5bffb381",
+      "commands": [
+        {
+          "id": "query-openai-klarna",
+          "context": ["compose", "commandBox"],
+          "description": "Query command using ChatGPT",
+          "title": "Search Klarna",
+          "parameters": [
+            {
+              "name": "q",
+              "title": "Query parameter",
+              "description": "Query parameter"
+            },
+            {
+              "name": "size",
+              "title": "Size",
+              "description": "Number of products returned"
+            },
+            {
+              "name": "budget",
+              "title": "Budget",
+              "description": "Maximum price of the matching product in local currency, filters results"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

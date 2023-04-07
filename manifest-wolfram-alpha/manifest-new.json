@@ -1,0 +1,48 @@
+{
+  "$schema": "https://github.com/OfficeDev/microsoft-teams-app-schema/blob/preview/DevPreview/MicrosoftTeams.schema.json",
+  "manifestVersion": "devPreview",
+  "version": "1.0",
+  "id": "28508c2c-cf88-11ed-afa1-0242ac120002",
+  "packageName": "com.microsoft.teams.samples.wolframalpha",
+  "developer": {
+    "name": "Microsoft",
+    "websiteUrl": "https://example.azurewebsites.net",
+    "privacyUrl": "https://example.azurewebsites.net/privacy",
+    "termsOfUseUrl": "https://example.azurewebsites.net/termsofuse"
+  },
+  "name": {
+    "short": "Wolfram Alpha",
+    "full": "Wolfram Alpha"
+  },
+  "description": {
+    "short": "SME Sample - Wolfram Alpha",
+    "full": "SME Sample - Wolfram Alpha"
+  },
+  "icons": {
+    "outline": "icon-outline.png",
+    "color": "icon-color.png"
+  },
+  "accentColor": "#C41200",
+  "composeExtensions": [
+    {
+      "type": "openai",
+      "apiSpecUrl": "https://www.wolframalpha.com/.well-known/apispec.json",
+      "commands": [
+        {
+          "id": "query-openai-wolfram-alpha",
+          "context": ["compose"],
+          "description": "Query command using ChatGPT",
+          "title": "Search Wolfram Alpha",
+          "parameters": [
+            {
+              "name": "input",
+              "title": "Query parameter",
+              "description": "Query parameter"
+            }
+          ],
+          "responseDescriptionForModel": "The input is in text and has a few facts. Take first 5 facts to make a Microsoft Adaptive Card using version 1.4 and TextBlock or Image elements. Card result must not be too long and only have 5 elements. Do not include any buttons in the card and do not include any inputs. The result must be in JSON and enclosed in <result></result> tags. Ignore the query and Wolfram|Alpha website result heading. [Input] {{$input}} [End Input]"
+        }
+      ]
+    }
+  ]
+}

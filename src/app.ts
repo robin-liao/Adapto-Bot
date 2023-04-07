@@ -21,6 +21,7 @@ import { TeamsBot } from "./teams-bot";
 import config from "./config";
 import { printableJson } from "./utils";
 import azureDevOpsRouter from "./devops/read-git-file";
+import { smeRouter } from "./sme-router";
 
 // Read botFilePath and botFileSecret from .env file
 // Note: Ensure you have a .env file and include botFilePath and botFileSecret.
@@ -162,6 +163,7 @@ app.use("/task", bot.getTaskModuleRouter());
 app.use("/messageExtension", bot.getMessageExtensionSettingRouter());
 app.use("/webhook", bot.getOutgoingWebhookRouter());
 app.use("/devops", azureDevOpsRouter);
+app.use("/skillrequest", smeRouter);
 
 app.listen(config.port, () => {
   console.log(`\n${app.name} listening on PORT ${config.port}`);

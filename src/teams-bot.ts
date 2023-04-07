@@ -39,6 +39,7 @@ import { FileBot } from "./scenarios/file-bot";
 import { MentionBot } from "./scenarios/mention-bot";
 import { MessageExtensionBot } from "./scenarios/message-extension-bot";
 import { SearchBot } from "./scenarios/search-bot";
+import { SMEMessageExtension } from "./scenarios/sme-message-extension";
 import { TaskModuleAppJIT } from "./scenarios/task-module-app-jit";
 import { TaskModuleFullTest } from "./scenarios/task-module-full-test";
 import { WorkBot } from "./scenarios/work-bot";
@@ -429,6 +430,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     new TaskModuleAppJIT().accept(this);
     new GPTBot().accept(this);
     new AuthBot().accept(this);
+    new SMEMessageExtension().accept(this);
   }
 
   private async handleOnMessage(ctx: TurnContext, next: () => Promise<void>) {

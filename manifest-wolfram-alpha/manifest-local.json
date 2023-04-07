@@ -1,0 +1,46 @@
+{
+  "$schema": "https://github.com/OfficeDev/microsoft-teams-app-schema/blob/preview/DevPreview/MicrosoftTeams.schema.json",
+  "manifestVersion": "devPreview",
+  "version": "1.0",
+  "id": "28508c2c-cf88-11ed-afa1-0242ac120002",
+  "packageName": "com.microsoft.teams.samples.wolframalpha",
+  "developer": {
+    "name": "Microsoft",
+    "websiteUrl": "https://example.azurewebsites.net",
+    "privacyUrl": "https://example.azurewebsites.net/privacy",
+    "termsOfUseUrl": "https://example.azurewebsites.net/termsofuse"
+  },
+  "name": {
+    "short": "Wolfram Alpha (Dev)",
+    "full": "Wolfram Alpha (Dev)"
+  },
+  "description": {
+    "short": "SME Sample - Wolfram Alpha",
+    "full": "SME Sample - Wolfram Alpha"
+  },
+  "icons": {
+    "outline": "icon-outline.png",
+    "color": "icon-color.png"
+  },
+  "accentColor": "#C41200",
+  "composeExtensions": [
+    {
+      "botId": "159e1c0f-15ef-4597-a8c6-44ba1fd89b78",
+      "commands": [
+        {
+          "id": "query-openai-wolfram-alpha",
+          "context": ["compose", "commandBox"],
+          "description": "Query command using ChatGPT",
+          "title": "Search Wolfram Alpha",
+          "parameters": [
+            {
+              "name": "input",
+              "title": "Query parameter",
+              "description": "Query parameter"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

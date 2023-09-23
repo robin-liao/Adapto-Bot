@@ -1,0 +1,38 @@
+{
+    "@type": "MessageCard",
+    "@context": "http://schema.org/extensions",
+    "summary": "Summary",
+    "title": "Connector Card Markdown formatting",
+    "sections": [
+        {
+            "text": "This is some **bold** text"
+        },
+        {
+            "text": "This is some _italic_ text"
+        },
+        {
+            "text": "# Header 1\r## Header 2\r### Header 3"
+        },
+        {
+            "text": "- Bullet \r- List \r"
+        },
+        {
+            "text": "1. Numbered\r1. List \r"
+        },
+        {
+            "text": "Link: [Bing](https://www.bing.com)"
+        },
+        {
+            "text": "embedded image link: ![Duck on a rock](https://aka.ms/Fo983c)"
+        },
+        {
+            "text": "`preformatted text`"
+        },
+        {
+            "text": "Newlines (backslash n, backslash n):\n\nline a\n\nline b\n\nline c"
+        },
+        {
+            "text": ">This is a blockquote"
+        }
+    ]
+}

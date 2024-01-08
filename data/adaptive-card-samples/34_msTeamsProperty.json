@@ -67,6 +67,35 @@
           "url": "https://picsum.photos/300/200?image=900"
         }
       ]
+    },
+    {
+      "type": "Container",
+      "style": "emphasis",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Action.Submit Custom Footer",
+          "weight": "bolder"
+        },
+        {
+          "type": "ActionSet",
+          "actions": [
+            {
+              "type": "Action.Submit",
+              "title": "Default"
+            },
+            {
+              "type": "Action.Submit",
+              "title": "Hide Feedback",
+              "msteams": {
+                "feedback": {
+                  "hide": true
+                }
+              }
+            }
+          ]
+        }
+      ]
     }
   ],
   "actions": [

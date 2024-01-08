@@ -1,0 +1,136 @@
+{
+  "type": "AdaptiveCard",
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "Responsiveness Test Card",
+      "size": "Large",
+      "weight": "Bolder"
+    },
+    {
+      "type": "Container",
+      "style": "emphasis",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Layout of **veryNarrow**",
+          "size": "Large",
+          "wrap": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "targetWidth = veryNarrow",
+          "wrap": true,
+          "targetWidth": "veryNarrow"
+        },
+        {
+          "type": "TextBlock",
+          "text": "targetWidth = atMost:veryNarrow",
+          "wrap": true,
+          "targetWidth": "atMost:veryNarrow"
+        },
+        {
+          "type": "TextBlock",
+          "text": "targetWidth = atLeast:veryNarrow",
+          "wrap": true,
+          "targetWidth": "atLeast:veryNarrow"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "style": "good",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Layout of **narrow**",
+          "size": "Large",
+          "wrap": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "targetWidth = narrow",
+          "wrap": true,
+          "targetWidth": "narrow"
+        },
+        {
+          "type": "TextBlock",
+          "text": "targetWidth = atMost:narrow",
+          "wrap": true,
+          "targetWidth": "atMost:narrow"
+        },
+        {
+          "type": "TextBlock",
+          "text": "targetWidth = atLeast:narrow",
+          "wrap": true,
+          "targetWidth": "atLeast:narrow"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "style": "warning",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Layout of **standard**",
+          "size": "Large",
+          "wrap": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "targetWidth = standard",
+          "wrap": true,
+          "targetWidth": "standard"
+        },
+        {
+          "type": "TextBlock",
+          "text": "targetWidth = atMost:standard",
+          "wrap": true,
+          "targetWidth": "atMost:standard"
+        },
+        {
+          "type": "TextBlock",
+          "text": "targetWidth = atLeast:standard",
+          "wrap": true,
+          "targetWidth": "atLeast:standard"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "style": "accent",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Layout of **wide**",
+          "size": "Large",
+          "wrap": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "targetWidth = wide",
+          "wrap": true,
+          "targetWidth": "wide"
+        },
+        {
+          "type": "TextBlock",
+          "text": "targetWidth = atMost:wide",
+          "wrap": true,
+          "targetWidth": "atMost:wide"
+        },
+        {
+          "type": "TextBlock",
+          "text": "targetWidth = atLeast:wide",
+          "wrap": true,
+          "targetWidth": "atLeast:wide"
+        }
+      ]
+    }
+  ],
+  "msTeams": {
+    "width": "full"
+  }
+}

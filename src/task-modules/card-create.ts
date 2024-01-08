@@ -76,6 +76,9 @@ export class TaskModuleCardCreate implements IMessagingExtensionAction {
         ...(text && { text }),
         ...(textFormat && { textFormat }),
         ...(extraPayload && JSON.parse(extraPayload)),
+        channelData: {
+          notification: { alert: true },
+        },
       });
     }
 

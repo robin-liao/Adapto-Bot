@@ -1,0 +1,42 @@
+{
+  "type": "AdaptiveCard",
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "Default",
+      "wrap": true,
+      "size": "Large"
+    },
+    {
+      "type": "Image",
+      "url": "https://yt3.ggpht.com/a/AATXAJzXc6NxfXzlwiAwWQx_7JNZA3I35bovXHiQbQ=s900-c-k-c0xffffffff-no-rj-mo",
+      "size": "Large"
+    },
+    {
+      "type": "TextBlock",
+      "text": "Rounded corners",
+      "wrap": true,
+      "size": "Large"
+    },
+    {
+      "type": "Image",
+      "url": "https://yt3.ggpht.com/a/AATXAJzXc6NxfXzlwiAwWQx_7JNZA3I35bovXHiQbQ=s900-c-k-c0xffffffff-no-rj-mo",
+      "size": "Large",
+      "style": "RoundedCorners"
+    },
+    {
+      "type": "TextBlock",
+      "text": "Person",
+      "wrap": true,
+      "size": "Large"
+    },
+    {
+      "type": "Image",
+      "url": "https://yt3.ggpht.com/a/AATXAJzXc6NxfXzlwiAwWQx_7JNZA3I35bovXHiQbQ=s900-c-k-c0xffffffff-no-rj-mo",
+      "size": "Large",
+      "style": "Person"
+    }
+  ]
+}

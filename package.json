@@ -26,6 +26,7 @@
     "botbuilder": "^4.19.3",
     "botframework-config": "^4.11.1",
     "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
     "dotenv": "^6.2.0",
     "express": "^5.0.0-alpha.8",
     "fast-xml-parser": "^4.1.3",

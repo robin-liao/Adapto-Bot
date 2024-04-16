@@ -1,0 +1,22 @@
+{
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.6",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "This is some text",
+      "size": "large",
+      "fontType": "monospace",
+      "X-gradientBackgroundColor": true,
+      "X-adjustSize": "auto",
+      "randomProperty": "remove"
+    },
+    {
+      "type": "CodeBlock",
+      "language": "json",
+      "startLineNumber ": 1,
+      "codeSnippet": "{\n  \"$schema\": \"https://adaptivecards.io/schemas/adaptive-card.json\",\n  \"type\": \"AdaptiveCard\",\n  \"version\": \"1.6\",\n  \"body\": [\n    {\n      \"type\": \"TextBlock\",\n      \"text\": \"Hello World\"\n    }\n  ]\n}"
+    }
+  ]
+}

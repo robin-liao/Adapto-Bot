@@ -124,6 +124,69 @@ export class DefaultBot implements ITeamsScenario {
       });
     });
 
+    teamsBot.registerTextCommand(/^ai-ux/i, async (ctx) => {
+      await ctx.sendActivity({
+        type: ActivityTypes.Message,
+        text: `Hey I'm a friendly AI bot and I don't mess up during demos :). This is what you sent: ${ctx.activity.text}`,
+        channelData: {
+          feedbackLoopEnabled: true, // Feedback buttons
+        },
+        attachments: [CardGenerator.adaptive.getJsonCardOfId(1)],
+        entities: [
+          {
+            type: "https://schema.org/Message",
+            "@type": "Message",
+            "@context": "https://schema.org",
+            "@id": "",
+            additionalType: ["AIGeneratedContent"], // AI Generated label
+            usageInfo: {
+              "@type": "CreativeWork",
+              description: "UsageInfo 1 description", // Sensitivity description
+              name: "UsageInfo 1", // Sensitivity title
+            },
+            citation: [
+              {
+                "@type": "Claim",
+                position: 1, // required
+                appearance: {
+                  "@type": "DigitalDocument",
+                  name: "Some secret citation", // required
+                  text: "Text 1", // optional, ignored in teams
+                  url: "https://example.com/claim-1",
+                  abstract: "Abstract 1",
+                  encodingFormat: "text/html", // for now ignored, later used for icon
+                  image:
+                    "https://botapiint.blob.core.windows.net/tests/Bender_Rodriguez.png",
+                  keywords: ["Keyword1 - 1", "Keyword1 - 2", "Keyword1 - 3"],
+                  usageInfo: {
+                    "@type": "CreativeWork",
+                    "@id": "usage-info-1",
+                    description: "UsageInfo 1 description",
+                    name: "UsageInfo 1",
+                    position: 5, // optional, ignored in teams
+                    pattern: {
+                      // optional, ignored in teams
+                      "@type": "DefinedTerm",
+                      inDefinedTermSet: "https://www.w3.org/TR/css-values-4/",
+                      name: "color",
+                      termCode: "#454545",
+                    },
+                  },
+                },
+                claimInterpreter: {
+                  // optional, ignored in teams
+                  "@type": "Project",
+                  name: "Claim Interpreter name",
+                  slogan: "Claim Interpreter slogan",
+                  url: "https://www.example.com/claim-interpreter",
+                },
+              },
+            ],
+          },
+        ],
+      });
+    });
+
     teamsBot.registerTextCommand(/^card/i, async (ctx, _command, args) => {
       const [cardType, name, ...subCommands] = args;
 
@@ -329,6 +392,34 @@ export class DefaultBot implements ITeamsScenario {
           attachments,
         },
       ]);
+    });
+
+    teamsBot.registerTextCommand(/^suggestedAction/i, async (ctx) => {
+      await ctx.sendActivity({
+        text: "hello",
+        suggestedActions: {
+          to: [ctx.activity.from.id],
+          actions: [
+            {
+              type: "imBack",
+              title: "imBack",
+              value: "imBack",
+            },
+            {
+              type: "messageBack",
+              title: "messageBack",
+              text: "messageBack",
+              displayText: "displayText",
+              value: "messageBack",
+            },
+            {
+              type: "openUrl",
+              title: "Red",
+              value: "httpsL//www.microsoft.com",
+            },
+          ],
+        },
+      });
     });
   }
 

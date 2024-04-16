@@ -4,7 +4,7 @@
 import express from "express";
 import * as bodyParser from "body-parser";
 import * as _ from "lodash";
-
+import cors from "cors";
 import { Auth } from "./auth";
 
 // Import required bot services. See https://aka.ms/bot-services to learn more about the different parts of a bot.
@@ -164,6 +164,8 @@ app.use("/messageExtension", bot.getMessageExtensionSettingRouter());
 app.use("/webhook", bot.getOutgoingWebhookRouter());
 app.use("/devops", azureDevOpsRouter);
 app.use("/skillrequest", smeRouter);
+app.use(cors());
+app.use("/static", express.static(config.dataPrefix));
 
 app.listen(config.port, () => {
   console.log(`\n${app.name} listening on PORT ${config.port}`);

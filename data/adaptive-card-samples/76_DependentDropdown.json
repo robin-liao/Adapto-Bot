@@ -1,0 +1,39 @@
+{
+  "type": "AdaptiveCard",
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "Input.Text",
+      "placeholder": "Enter country",
+      "size": "ExtraLarge",
+      "label": "Change this to trigger dependent dropdown",
+      "id": "selectedCountry",
+      "valueChangedAction": {
+        "type": "Action.ResetInputs",
+        "targetInputIds": ["choiceset"]
+      }
+    },
+    {
+      "type": "Input.ChoiceSet",
+      "choices": [
+        {
+          "title": "Choice 1",
+          "value": "Choice 1"
+        },
+        {
+          "title": "Choice 2",
+          "value": "Choice 2"
+        }
+      ],
+      "placeholder": "Placeholder text",
+      "id": "choiceset",
+      "label": "Dependent dropwdown",
+      "choices.data": {
+        "type": "Data.Query",
+        "dataset": "states",
+        "associatedInputs": "auto"
+      }
+    }
+  ]
+}

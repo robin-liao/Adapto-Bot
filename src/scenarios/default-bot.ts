@@ -127,7 +127,7 @@ export class DefaultBot implements ITeamsScenario {
     teamsBot.registerTextCommand(/^ai-ux/i, async (ctx) => {
       await ctx.sendActivity({
         type: ActivityTypes.Message,
-        text: `Hey I'm a friendly AI bot and I don't mess up during demos :). This is what you sent: ${ctx.activity.text}`,
+        text: `Hey I'm a friendly AI bot and I don't mess up during demos :).[1] This is what you sent: ${ctx.activity.text}`,
         channelData: {
           feedbackLoopEnabled: true, // Feedback buttons
         },
@@ -150,7 +150,7 @@ export class DefaultBot implements ITeamsScenario {
                 position: 1, // required
                 appearance: {
                   "@type": "DigitalDocument",
-                  name: "Some secret citation", // required
+                  name: "Some secret citation", // required. Title of the citation
                   text: "Text 1", // optional, ignored in teams
                   url: "https://example.com/claim-1",
                   abstract: "Abstract 1",
@@ -396,26 +396,44 @@ export class DefaultBot implements ITeamsScenario {
 
     teamsBot.registerTextCommand(/^suggestedAction/i, async (ctx) => {
       await ctx.sendActivity({
-        text: "hello",
+        text: "Hello! I have some suggested actions for you. Let me know if you need any help.",
         suggestedActions: {
           to: [ctx.activity.from.id],
           actions: [
             {
               type: "imBack",
-              title: "imBack",
-              value: "imBack",
+              title: "1",
+              value: "imBack value",
             },
             {
-              type: "messageBack",
-              title: "messageBack",
-              text: "messageBack",
-              displayText: "displayText",
-              value: "messageBack",
+              type: "imBack",
+              title: "2",
+              value: JSON.stringify({ key: "value" }),
             },
             {
-              type: "openUrl",
-              title: "Red",
-              value: "httpsL//www.microsoft.com",
+              type: "imBack",
+              title: "3",
+              value: JSON.stringify({ key: "value" }),
+            },
+            {
+              type: "imBack",
+              title: "4",
+              value: "imBack value",
+            },
+            {
+              type: "imBack",
+              title: "5",
+              value: JSON.stringify({ key: "value" }),
+            },
+            {
+              type: "imBack",
+              title: "6",
+              value: "imBack value",
+            },
+            {
+              type: "imBack",
+              title: "7",
+              value: JSON.stringify({ key: "value" }),
             },
           ],
         },

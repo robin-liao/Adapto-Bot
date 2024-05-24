@@ -485,6 +485,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     if (ctx.activity.name) {
       switch (ctx.activity.name) {
         case "composeExtension/fetchCommands":
+        case "message/submitAction":
           return { status: StatusCodes.OK };
       }
     }
@@ -760,6 +761,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     const send = () => {
       try {
         return ctx.sendActivity({
+          summary: "Hey you got a card message!",
           attachments: [card],
           channelData: {
             notification: { alert },

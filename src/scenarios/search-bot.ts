@@ -1,5 +1,5 @@
 import { InvokeResponse, StatusCodes, TurnContext } from "botbuilder-core";
-import _ from "lodash";
+import _, { values } from "lodash";
 import config from "../config";
 import {
   UniversalSearchError,
@@ -46,6 +46,10 @@ export class SearchBot implements ITeamsScenario {
       status: StatusCodes.OK,
       body: this.getNoContent(),
     }));
+
+    teamsBot.registerUniversalSearch("states", (request, ctx) =>
+      this.handleSearchForDependentDropdown(request, ctx)
+    );
   }
 
   private async handleSearch(
@@ -82,6 +86,65 @@ export class SearchBot implements ITeamsScenario {
           "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Microsoft_Office_Teams_%282018%E2%80%93present%29.svg/258px-Microsoft_Office_Teams_%282018%E2%80%93present%29.svg.png",
       })),
     ];
+    const body: UniversalSearchResponse = {
+      statusCode: UniversalSearchStatusCodes.Success,
+      type: "application/vnd.microsoft.search.searchResponse",
+      value: {
+        results: results.slice(0, 30),
+        totalResultCount: results.length,
+        moreResultsAvailable: true,
+      },
+    };
+    return { status: StatusCodes.OK, body };
+  }
+
+  private async handleSearchForDependentDropdown(
+    request: UniversalSearchRequest,
+    ctx: TurnContext
+  ): Promise<InvokeResponse<UniversalSearchResponse>> {
+    const { selectedCountry = "" } = ctx.activity.value?.data;
+    const results: UniversalSearchItem[] = [];
+
+    switch (selectedCountry.toLowerCase()) {
+      case "usa":
+        results.push(
+          ...[
+            {
+              value: "item-CA",
+              title: "CA - California",
+            },
+            {
+              value: "item-FL",
+              title: "FL - Florida",
+            },
+            {
+              value: "item-TX",
+              title: "TX - Texas",
+            },
+          ]
+        );
+        break;
+      case "india":
+      default:
+        results.push(
+          ...[
+            {
+              value: "item-AP",
+              title: "AP - Andhra Pradesh",
+            },
+            {
+              value: "item-TN",
+              title: "TN - Tamil Nadu",
+            },
+            {
+              value: "item-KA",
+              title: "KA - Karnataka",
+            },
+          ]
+        );
+        break;
+    }
+
     const body: UniversalSearchResponse = {
       statusCode: UniversalSearchStatusCodes.Success,
       type: "application/vnd.microsoft.search.searchResponse",

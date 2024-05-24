@@ -1,0 +1,95 @@
+{
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "Simple",
+      "size": "large",
+      "separator": true,
+      "spacing": "large"
+    },
+    {
+      "type": "Chart.VerticalBar",
+      "title": "Sample",
+      "xAxisTitle": "Days",
+      "yAxisTitle": "Sales",
+      "data": [
+        { "x": "Pear", "y": 59 },
+        { "x": "Banana", "y": 292 },
+        { "x": "Apple", "y": 143 },
+        { "x": "Peach", "y": 98 },
+        { "x": "Kiwi", "y": 179 },
+        { "x": "Grapefruit", "y": 20 },
+        { "x": "Orange", "y": 212 },
+        { "x": "Cantaloupe", "y": 68 },
+        { "x": "Grape", "y": 102 },
+        { "x": "Tangerine", "y": 38 }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Grouped",
+      "size": "large",
+      "separator": true,
+      "spacing": "large"
+    },
+    {
+      "type": "Chart.VerticalBar.Grouped",
+      "title": "Sample",
+      "xAxisTitle": "Days",
+      "yAxisTitle": "Sales",
+      "data": [
+        {
+          "legend": "Outlook",
+          "values": [
+            { "x": "2023-05-01", "y": 24 },
+            { "x": "2023-05-02", "y": 27 },
+            { "x": "2023-05-03", "y": 18 }
+          ]
+        },
+        {
+          "legend": "Teams",
+          "values": [
+            { "x": "2023-05-01", "y": 9 },
+            { "x": "2023-05-02", "y": 100 },
+            { "x": "2023-05-03", "y": 22 }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Stacked",
+      "size": "large",
+      "separator": true,
+      "spacing": "large"
+    },
+    {
+      "type": "Chart.VerticalBar.Grouped",
+      "stacked": true,
+      "title": "Sample",
+      "xAxisTitle": "Days",
+      "yAxisTitle": "Sales",
+      "data": [
+        {
+          "legend": "Outlook",
+          "values": [
+            { "x": "2023-05-01", "y": 24 },
+            { "x": "2023-05-02", "y": 27 },
+            { "x": "2023-05-03", "y": 18 }
+          ]
+        },
+        {
+          "legend": "Teams",
+          "values": [
+            { "x": "2023-05-01", "y": 9 },
+            { "x": "2023-05-02", "y": 100 },
+            { "x": "2023-05-03", "y": 22 }
+          ]
+        }
+      ]
+    }
+  ]
+}

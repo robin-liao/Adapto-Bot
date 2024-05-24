@@ -60,7 +60,22 @@
     {
       "botId": "159e1c0f-15ef-4597-a8c6-44ba1fd89b78",
       "scopes": ["groupchat", "personal", "team"],
-      "supportsFiles": true
+      "supportsFiles": true,
+      "commandLists": [
+        {
+          "scopes": ["team", "groupChat", "personal"],
+          "commands": [
+            {
+              "title": "Command 1",
+              "description": "Description of Command 1"
+            },
+            {
+              "title": "Command 2",
+              "description": "Description of Command 2"
+            }
+          ]
+        }
+      ]
     }
   ],
   "composeExtensions": [

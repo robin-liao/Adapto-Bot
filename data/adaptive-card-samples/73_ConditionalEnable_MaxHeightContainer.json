@@ -1,0 +1,72 @@
+{
+  "type": "AdaptiveCard",
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "Table",
+      "maxHeight": "200px",
+      "columns": [
+        {
+          "width": "1"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "maxHeight": "200px",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "this is some text one"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "maxHeight": "200",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "this is some text two"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "maxHeight": "0",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "this is some text three"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.OpenUrl",
+      "url": "https://www.microsoft.com",
+      "isEnabled": true
+    },
+    {
+      "type": "Action.OpenUrl",
+      "url": "https://www.microsoft.com",
+      "isEnabled": false
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Action Submit Button",
+      "isEnabled": true,
+      "associatedInputs": "Auto",
+      "conditionallyEnabled": true
+    },
+    {
+      "type": "Action.Execute",
+      "title": "Action Execute Button",
+      "isEnabled": true,
+      "associatedInputs": "None",
+      "conditionallyEnabled": false
+    }
+  ]
+}

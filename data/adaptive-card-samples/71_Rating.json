@@ -55,7 +55,7 @@
   ],
   "actions": [
     {
-      "type": "Action.Execute",
+      "type": "Action.Submit",
       "title": "Submit"
     }
   ]

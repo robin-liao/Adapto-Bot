@@ -24,70 +24,12 @@
                   "items": [
                     {
                       "type": "TextBlock",
-                      "size": "large",
-                      "text": "Choose card type:"
-                    },
-                    {
-                      "type": "Input.ChoiceSet",
-                      "id": "cardType",
-                      "style": "expanded",
-                      "placeholder": "Choose card type",
-                      "choices": [
-                        {
-                          "type": "Input.Choice",
-                          "title": "Adaptive Card",
-                          "value": "application/vnd.microsoft.card.adaptive"
-                        },
-                        {
-                          "type": "Input.Choice",
-                          "title": "O365 Connector Card",
-                          "value": "application/vnd.microsoft.teams.card.o365connector"
-                        },
-                        {
-                          "type": "Input.Choice",
-                          "title": "Profile Card",
-                          "value": "application/vnd.microsoft.teams.card.profile"
-                        },
-                        {
-                          "type": "Input.Choice",
-                          "title": "List Card",
-                          "value": "application/vnd.microsoft.teams.card.list"
-                        },
-                        {
-                          "type": "Input.Choice",
-                          "title": "Hero Card",
-                          "value": "application/vnd.microsoft.card.hero"
-                        },
-                        {
-                          "type": "Input.Choice",
-                          "title": "Thumbnail Card",
-                          "value": "application/vnd.microsoft.card.thumbnail"
-                        },
-                        {
-                          "type": "Input.Choice",
-                          "title": "Signin Card",
-                          "value": "application/vnd.microsoft.card.signin"
-                        },
-                        {
-                          "type": "Input.Choice",
-                          "title": "Receipt Card",
-                          "value": "application/vnd.microsoft.card.receipt"
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "Column",
-                  "width": "stretch",
-                  "items": [
-                    {
-                      "type": "TextBlock",
                       "text": "Return as",
                       "size": "large"
                     },
                     {
                       "type": "Input.ChoiceSet",
+                      "wrap": true,
                       "id": "returnAs",
                       "isMultiSelect": true,
                       "value": "asMECard",
@@ -105,14 +47,293 @@
                       "style": "expanded"
                     }
                   ]
+                },
+                {
+                  "type": "Column",
+                  "width": "stretch",
+                  "items": [
+                    {
+                      "type": "ActionSet",
+                      "horizontalAlignment": "Center",
+                      "actions": [
+                        {
+                          "type": "Action.ToggleVisibility",
+                          "title": "Generic Card",
+                          "targetElements": [
+                            {
+                              "elementId": "genericCard",
+                              "isVisible": true
+                            },
+                            {
+                              "elementId": "codeCard",
+                              "isVisible": false
+                            },
+                            {
+                              "elementId": "mediaCard",
+                              "isVisible": false
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Action.ToggleVisibility",
+                          "title": "Code Card",
+                          "targetElements": [
+                            {
+                              "elementId": "genericCard",
+                              "isVisible": false
+                            },
+                            {
+                              "elementId": "codeCard",
+                              "isVisible": true
+                            },
+                            {
+                              "elementId": "mediaCard",
+                              "isVisible": false
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Action.ToggleVisibility",
+                          "title": "Media Card",
+                          "targetElements": [
+                            {
+                              "elementId": "genericCard",
+                              "isVisible": false
+                            },
+                            {
+                              "elementId": "codeCard",
+                              "isVisible": false
+                            },
+                            {
+                              "elementId": "mediaCard",
+                              "isVisible": true
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             },
             {
-              "type": "Input.Text",
-              "id": "cardPayload",
-              "isMultiline": true,
-              "placeholder": "paste card payload here"
+              "type": "Container",
+              "id": "genericCard",
+              "isVisible": true,
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "size": "large",
+                  "text": "Choose card type:"
+                },
+                {
+                  "type": "Input.ChoiceSet",
+                  "wrap": true,
+                  "id": "cardType",
+                  "style": "compact",
+                  "value": "application/vnd.microsoft.card.adaptive",
+                  "placeholder": "Choose card type",
+                  "choices": [
+                    {
+                      "type": "Input.Choice",
+                      "title": "Adaptive Card",
+                      "value": "application/vnd.microsoft.card.adaptive"
+                    },
+                    {
+                      "type": "Input.Choice",
+                      "title": "O365 Connector Card",
+                      "value": "application/vnd.microsoft.teams.card.o365connector"
+                    },
+                    {
+                      "type": "Input.Choice",
+                      "title": "Profile Card",
+                      "value": "application/vnd.microsoft.teams.card.profile"
+                    },
+                    {
+                      "type": "Input.Choice",
+                      "title": "List Card",
+                      "value": "application/vnd.microsoft.teams.card.list"
+                    },
+                    {
+                      "type": "Input.Choice",
+                      "title": "Hero Card",
+                      "value": "application/vnd.microsoft.card.hero"
+                    },
+                    {
+                      "type": "Input.Choice",
+                      "title": "Thumbnail Card",
+                      "value": "application/vnd.microsoft.card.thumbnail"
+                    },
+                    {
+                      "type": "Input.Choice",
+                      "title": "Signin Card",
+                      "value": "application/vnd.microsoft.card.signin"
+                    },
+                    {
+                      "type": "Input.Choice",
+                      "title": "Receipt Card",
+                      "value": "application/vnd.microsoft.card.receipt"
+                    }
+                  ]
+                },
+                {
+                  "type": "Input.Text",
+                  "id": "cardPayload",
+                  "isMultiline": true,
+                  "placeholder": "paste card payload here"
+                }
+              ]
+            },
+            {
+              "type": "Container",
+              "id": "codeCard",
+              "isVisible": false,
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "size": "large",
+                  "text": "Create code card:"
+                },
+                {
+                  "id": "codeCardTitle",
+                  "type": "Input.Text",
+                  "placeholder": "Title"
+                },
+                {
+                  "id": "codeCardLang",
+                  "type": "Input.ChoiceSet",
+                  "style": "compact",
+                  "placeholder": "Language",
+                  "choices": [
+                    {
+                      "title": "Plain Text",
+                      "value": "PlainText"
+                    },
+                    {
+                      "title": "Bash",
+                      "value": "Bash"
+                    },
+                    {
+                      "title": "C",
+                      "value": "C"
+                    },
+                    {
+                      "title": "C++",
+                      "value": "C++"
+                    },
+                    {
+                      "title": "C#",
+                      "value": "C#"
+                    },
+                    {
+                      "title": "CSS",
+                      "value": "CSS"
+                    },
+                    {
+                      "title": "DOS",
+                      "value": "DOS"
+                    },
+                    {
+                      "title": "Go",
+                      "value": "Go"
+                    },
+                    {
+                      "title": "GraphQL",
+                      "value": "GraphQL"
+                    },
+                    {
+                      "title": "HTML",
+                      "value": "HTML"
+                    },
+                    {
+                      "title": "Java",
+                      "value": "Java"
+                    },
+                    {
+                      "title": "JavaScript",
+                      "value": "JavaScript"
+                    },
+                    {
+                      "title": "JSON",
+                      "value": "JSON"
+                    },
+                    {
+                      "title": "Perl",
+                      "value": "Perl"
+                    },
+                    {
+                      "title": "PHP",
+                      "value": "PHP"
+                    },
+                    {
+                      "title": "PowerShell",
+                      "value": "PowerShell"
+                    },
+                    {
+                      "title": "Python",
+                      "value": "Python"
+                    },
+                    {
+                      "title": "SQL",
+                      "value": "SQL"
+                    },
+                    {
+                      "title": "TypeScript",
+                      "value": "TypeScript"
+                    },
+                    {
+                      "title": "Visual Basic",
+                      "value": "Visual Basic"
+                    },
+                    {
+                      "title": "Verilog",
+                      "value": "Verilog"
+                    },
+                    {
+                      "title": "VHDL",
+                      "value": "VHDL"
+                    },
+                    {
+                      "title": "XML",
+                      "value": "XML"
+                    }
+                  ]
+                },
+                {
+                  "id": "codeCardPayload",
+                  "type": "Input.Text",
+                  "isMultiline": true,
+                  "placeholder": "paste code here"
+                }
+              ]
+            },
+            {
+              "type": "Container",
+              "id": "mediaCard",
+              "isVisible": false,
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "size": "large",
+                  "text": "Create media card:"
+                },
+                {
+                  "id": "mediaCardURL",
+                  "type": "Input.Text",
+                  "label": "Media URL"
+                },
+                {
+                  "id": "mediaCardPoster",
+                  "type": "Input.Text",
+                  "label": "Poster"
+                },
+                {
+                  "id": "mediaCardMIME",
+                  "type": "Input.Text",
+                  "label": "MIME Type",
+                  "value": "video/mp4"
+                }
+              ]
             }
           ],
           "width": "stretch"
@@ -142,6 +363,7 @@
             },
             {
               "type": "Input.ChoiceSet",
+              "wrap": true,
               "id": "textFormat",
               "style": "expanded",
               "placeholder": "Choose card type",
@@ -199,5 +421,8 @@
         "acAction": "render"
       }
     }
-  ]
+  ],
+  "msTeams": {
+    "width": "full"
+  }
 }

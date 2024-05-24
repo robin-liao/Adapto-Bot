@@ -5,6 +5,7 @@ import {
   TaskModuleTaskInfo,
   MessageFactory,
   Activity,
+  CardFactory,
 } from "botbuilder";
 import { IMessagingExtensionAction } from ".";
 import { CardGenerator } from "../card-gen";
@@ -42,16 +43,29 @@ export class TaskModuleCardCreate implements IMessagingExtensionAction {
       textContent: text,
       extraPayload,
       botMessagePreviewResponse,
+      codeCardPayload,
+      codeCardLang,
+      codeCardTitle,
+      mediaCardURL,
+      mediaCardPoster,
+      mediaCardMIME,
     } = request.data;
-    const attachments = cardPayload
-      ? [
-          {
-            contentType: cardType,
-            content: JSON.parse(cardPayload),
-          },
-        ]
-      : [];
+    const attachments = [];
 
+    if (codeCardPayload) {
+      attachments.push(
+        this.getCodeCard(cardPayload, codeCardLang, codeCardTitle)
+      );
+    } else if (mediaCardURL) {
+      attachments.push(
+        this.getMediaCard(mediaCardURL, mediaCardPoster, mediaCardMIME)
+      );
+    } else if (cardPayload) {
+      attachments.push({
+        contentType: cardType,
+        content: JSON.parse(cardPayload),
+      });
+    }
     if (
       this.commandId === "createWithPreview" &&
       attachments[0] &&
@@ -107,5 +121,64 @@ export class TaskModuleCardCreate implements IMessagingExtensionAction {
     } else if (userResponse === "edit") {
       return this.fetch(ctx, request);
     }
+  }
+
+  private getCodeCard(
+    codeCardPayload: string,
+    codeCardLang?: string,
+    codeCardTitle?: string
+  ) {
+    return CardFactory.adaptiveCard({
+      $schema: "https://adaptivecards.io/schemas/adaptive-card.json",
+      type: "AdaptiveCard",
+      version: "1.6",
+      msTeams: {
+        width: "full",
+      },
+      body: [
+        ...(codeCardTitle
+          ? [
+              {
+                type: "TextBlock",
+                text: codeCardTitle,
+                size: "large",
+                weight: "bolder",
+              },
+            ]
+          : []),
+        {
+          type: "CodeBlock",
+          language: codeCardLang ?? "text",
+          startLineNumber: 1,
+          codeSnippet: codeCardPayload,
+        },
+      ],
+    });
+  }
+
+  private getMediaCard(
+    mediaCardURL: string,
+    mediaCardPoster?: string,
+    mediaCardMIME?: string
+  ) {
+    return CardFactory.adaptiveCard({
+      $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
+      type: "AdaptiveCard",
+      version: "1.3",
+      fallbackText:
+        "This card requires Media to be viewed. Ask your platform to update to Adaptive Cards v1.1 for this and more!",
+      body: [
+        {
+          type: "Media",
+          ...(mediaCardPoster && { poster: mediaCardPoster }),
+          sources: [
+            {
+              mimeType: mediaCardMIME ?? "video/mp4",
+              url: mediaCardURL,
+            },
+          ],
+        },
+      ],
+    });
   }
 }

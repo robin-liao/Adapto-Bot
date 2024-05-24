@@ -10,7 +10,7 @@ resources:
 
 variables:
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: '8cd1befe-44fa-47e5-93e7-24c78f449d67'
+  dockerRegistryServiceConnection: '359c22d2-969e-4f4f-af87-861c1ced960b'
   imageRepository: 'robin/adapto-v4-bot'
   containerRegistry: 'robin.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'

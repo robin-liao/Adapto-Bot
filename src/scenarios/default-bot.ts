@@ -127,7 +127,7 @@ export class DefaultBot implements ITeamsScenario {
     teamsBot.registerTextCommand(/^ai-ux/i, async (ctx) => {
       await ctx.sendActivity({
         type: ActivityTypes.Message,
-        text: `Hey I'm a friendly AI bot and I don't mess up during demos :). This is what you sent: ${ctx.activity.text}`,
+        text: `Hey I'm a friendly AI bot and I don't mess up during demos :).[1] This is what you sent: ${ctx.activity.text}`,
         channelData: {
           feedbackLoopEnabled: true, // Feedback buttons
         },

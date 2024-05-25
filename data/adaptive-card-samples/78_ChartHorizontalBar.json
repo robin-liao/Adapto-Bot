@@ -1,0 +1,98 @@
+{
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "Standard with displayMode = AbsoluteWithAxis",
+      "size": "large"
+    },
+    {
+      "type": "Chart.HorizontalBar",
+      "title": "Sample",
+      "xAxisTitle": "Days",
+      "yAxisTitle": "Sales",
+      "colorSet": "diverging",
+      "data": [
+        { "x": "Pear", "y": 59 },
+        { "x": "Banana", "y": 292 },
+        { "x": "Apple", "y": 143 },
+        { "x": "Peach", "y": 98 },
+        { "x": "Kiwi", "y": 179 },
+        { "x": "Grapefruit", "y": 20 }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Standard with displayMode = AbsoluteNoAxis",
+      "size": "large",
+      "spacing": "large",
+      "separator": true
+    },
+    {
+      "type": "Chart.HorizontalBar",
+      "title": "Sample",
+      "displayMode": "AbsoluteNoAxis",
+      "data": [
+        { "x": "Pear", "y": 59 },
+        { "x": "Banana", "y": 292 },
+        { "x": "Apple", "y": 143 },
+        { "x": "Peach", "y": 98 },
+        { "x": "Kiwi", "y": 179 },
+        { "x": "Grapefruit", "y": 20 }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Standard with displayMode = PartToWhole",
+      "size": "large",
+      "spacing": "large",
+      "separator": true
+    },
+    {
+      "type": "TextBlock",
+      "text": "Learning - Have you defined your goal for today's Day of learning"
+    },
+    {
+      "type": "Chart.HorizontalBar",
+      "title": "Sample",
+      "displayMode": "PartToWhole",
+      "color": "categoricalPurple",
+      "data": [
+        { "x": "Yes, I have defined my day of learning goal", "y": 15 },
+        { "x": "No, I haven't yet had time to do it", "y": 24 },
+        { "x": "I am not interested in learning", "y": 2 }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Stacked",
+      "size": "large",
+      "spacing": "large",
+      "separator": true
+    },
+    {
+      "type": "Chart.HorizontalBar.Stacked",
+      "title": "Sample",
+      "data": [
+        {
+          "title": "Outlook",
+          "data": [
+            { "legend": "2023-05-01", "value": 24, "color": "good" },
+            { "legend": "2023-05-02", "value": 27, "color": "warning" },
+            { "legend": "2023-05-03", "value": 18, "color": "attention" }
+          ]
+        },
+        {
+          "title": "Teams",
+          "data": [
+            { "legend": "2023-05-01", "value": 9, "color": "good" },
+            { "legend": "2023-05-02", "value": 100, "color": "warning" },
+            { "legend": "2023-05-03", "value": 22, "color": "attention" }
+          ]
+        }
+      ]
+    }
+  ]
+}

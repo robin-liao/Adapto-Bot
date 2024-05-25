@@ -1,0 +1,55 @@
+{
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "Chart.Pie",
+      "colorSet": "categorical",
+      "data": [
+        { "legend": "Pear", "value": 59 },
+        { "legend": "Banana", "value": 292 },
+        { "legend": "Apple", "value": 143 },
+        { "legend": "Peach", "value": 98 },
+        { "legend": "Kiwi", "value": 179 },
+        { "legend": "Grapefruit", "value": 50 },
+        { "legend": "Orange", "value": 212 },
+        { "legend": "Cantaloupe", "value": 68 }
+      ]
+    },
+    {
+      "type": "Chart.Donut",
+      "data": [
+        { "legend": "Pear", "value": 59 },
+        { "legend": "Banana", "value": 292 },
+        { "legend": "Apple", "value": 143 },
+        { "legend": "Peach", "value": 98 },
+        { "legend": "Kiwi", "value": 179 },
+        { "legend": "Grapefruit", "value": 50 },
+        { "legend": "Orange", "value": 212 },
+        { "legend": "Cantaloupe", "value": 68 }
+      ]
+    },
+    {
+      "type": "Chart.Pie",
+      "colorSet": "diverging",
+      "data": [
+        { "legend": "Pear", "value": 59 },
+        { "legend": "Banana", "value": 292 },
+        { "legend": "Apple", "value": 143 },
+        { "legend": "Peach", "value": 98 },
+        { "legend": "Kiwi", "value": 179 },
+        { "legend": "Grapefruit", "value": 50 },
+        { "legend": "Orange", "value": 212 },
+        { "legend": "Cantaloupe", "value": 68 }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.OpenUrl",
+      "title": "More Info",
+      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+    }
+  ]
+}

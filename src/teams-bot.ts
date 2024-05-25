@@ -56,6 +56,7 @@ import {
   printableJson,
   sleep,
 } from "./utils";
+import { TaskModuleAdaptiveCardList } from "./task-modules/ac-sample-list";
 
 export interface ITeamsScenario {
   accept(teamsBot: IScenarioBuilder);
@@ -431,6 +432,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     new GPTBot().accept(this);
     new AuthBot().accept(this);
     new SMEMessageExtension().accept(this);
+    new TaskModuleAdaptiveCardList().accept(this);
   }
 
   private async handleOnMessage(ctx: TurnContext, next: () => Promise<void>) {

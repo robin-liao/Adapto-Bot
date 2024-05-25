@@ -54,7 +54,7 @@ export class TaskModuleCardCreate implements IMessagingExtensionAction {
 
     if (codeCardPayload) {
       attachments.push(
-        this.getCodeCard(cardPayload, codeCardLang, codeCardTitle)
+        this.getCodeCard(codeCardPayload, codeCardLang, codeCardTitle)
       );
     } else if (mediaCardURL) {
       attachments.push(

@@ -1,0 +1,43 @@
+{
+  "type": "AdaptiveCard",
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "Container",
+      "showBorder": true,
+      "roundedCorners": true,
+      "separator": true,
+      "spacing": "large",
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "items": [
+                {
+                  "type": "Image",
+                  "style": "RoundedCorners",
+                  "url": "https://images.hdqwalls.com/wallpapers/northern-lights-night-sky-mountains-landscape-4k-k8.jpg"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "A Container with borders and rounded corneras, containing an image with rounded corners",
+                  "wrap": true,
+                  "size": "Large"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "style": "accent"
+    }
+  ]
+}

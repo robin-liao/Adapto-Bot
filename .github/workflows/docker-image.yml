@@ -20,15 +20,24 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    # - name: Build the Docker image
+    #   run: docker build --no-cache --file Dockerfile --tag ${{ env.HOST }}/${{ secrets.ACR_USER }}/${{ env.IMG_TAG }} .
+
     - name: Build the Docker image
-      run: docker build . --no-cache --file Dockerfile --tag ${{ env.HOST }}/${{ secrets.ACR_USER }}/${{ env.IMG_TAG }}
-
-    - name: Login to ACR
-      uses: docker/login-action@v3.2.0
+      uses: cloudposse/github-action-docker-build-push@1.16.0
       with:
+        file: Dockerfile
+        image_name: ${{ secrets.ACR_USER }}/${{ env.IMG_TAG }}
         registry: ${{ env.HOST }}
-        username: ${{ secrets.ACR_USER }}
+        login: ${{ secrets.ACR_USER }}
         password: ${{ secrets.ACR_PASS }}
+        
+    # - name: Login to ACR
+    #   uses: docker/login-action@v3.2.0
+    #   with:
+    #     registry: ${{ env.HOST }}
+    #     username: ${{ secrets.ACR_USER }}
+    #     password: ${{ secrets.ACR_PASS }}
 
-    - name: Push Docker image
-      run: docker push ${{ env.HOST }}/${{ secrets.ACR_USER }}/${{ env.IMG_TAG }}
+    # - name: Push Docker image
+    #   run: docker push ${{ env.HOST }}/${{ secrets.ACR_USER }}/${{ env.IMG_TAG }}

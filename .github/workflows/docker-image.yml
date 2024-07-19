@@ -37,7 +37,7 @@ jobs:
         password: ${{ secrets.ACR_PASS }}
         registry: ${{ env.HOST }}
         repository: ${{ secrets.ACR_USER }}/adapto-v4-bot
-        tags: latest
+        tags: latest, sha-${{ github.sha }}
         dockerfile: ./Dockerfile
         context: .
 

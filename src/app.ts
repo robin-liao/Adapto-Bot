@@ -55,9 +55,6 @@ import { smeRouter } from "./sme-router";
 
 // // Create adapter.
 // See https://aka.ms/about-bot-adapter to learn more about to learn more about bot adapter.
-console.log("APP ID", config.microsoftAppID);
-console.log("APP PASSWORD", config.microsoftAppPassword);
-
 const adapter = new BotFrameworkAdapter({
   appId: config.microsoftAppID,
   appPassword: config.microsoftAppPassword,

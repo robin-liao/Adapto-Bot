@@ -27,25 +27,25 @@
     {
       "entityId": "tab-adaptivecard-settings",
       "name": "Bot Settings",
-      "contentBotId": "e524fc50-3773-4dad-a19f-ebba5bffb381",
+      "contentBotId": "be7b025a-b11b-4ed2-b096-25c228787a34",
       "scopes": ["personal", "team"]
     },
     {
       "entityId": "tab-adaptivecard-sandbox",
       "name": "AC Tab Sandbox",
-      "contentBotId": "e524fc50-3773-4dad-a19f-ebba5bffb381",
+      "contentBotId": "be7b025a-b11b-4ed2-b096-25c228787a34",
       "scopes": ["personal", "team"]
     },
     {
       "entityId": "tab-tag-work",
       "name": "My Tag Work",
-      "contentBotId": "e524fc50-3773-4dad-a19f-ebba5bffb381",
+      "contentBotId": "be7b025a-b11b-4ed2-b096-25c228787a34",
       "scopes": ["personal", "team"]
     },
     {
       "entityId": "tab-message-ext",
       "name": "ME Config",
-      "contentBotId": "e524fc50-3773-4dad-a19f-ebba5bffb381",
+      "contentBotId": "be7b025a-b11b-4ed2-b096-25c228787a34",
       "scopes": ["personal"]
     },
     {
@@ -58,14 +58,14 @@
   ],
   "bots": [
     {
-      "botId": "e524fc50-3773-4dad-a19f-ebba5bffb381",
+      "botId": "be7b025a-b11b-4ed2-b096-25c228787a34",
       "scopes": ["groupchat", "personal", "team"],
       "supportsFiles": true
     }
   ],
   "composeExtensions": [
     {
-      "botId": "e524fc50-3773-4dad-a19f-ebba5bffb381",
+      "botId": "be7b025a-b11b-4ed2-b096-25c228787a34",
       "canUpdateConfiguration": true,
       "commands": [
         {

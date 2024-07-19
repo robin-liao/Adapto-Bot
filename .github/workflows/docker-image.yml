@@ -38,6 +38,7 @@ jobs:
         registry: ${{ env.HOST }}
         repository: ${{ secrets.ACR_USER }}/adapto-v4-bot
         tags: latest, sha-${{ github.sha }}
+        image_name: ${{ secrets.ACR_USER }}/adapto-v4-bot
         dockerfile: ./Dockerfile
         context: .
 

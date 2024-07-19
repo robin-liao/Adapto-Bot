@@ -155,7 +155,7 @@ app.post("/api/messages", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("OK 98");
+  res.send("OK 10");
   res.end();
 });
 

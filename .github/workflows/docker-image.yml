@@ -8,7 +8,7 @@ on:
 
 env:
   IMG_TAG: adapto-v4-bot:latest
-  HOST: robin.azurecr.io
+  HOST: rasika.azurecr.io
 
 jobs:
 
@@ -46,20 +46,3 @@ jobs:
         file: ./Dockerfile
         push: true
         tags: ${{ env.HOST }}/${{ secrets.ACR_USER }}/${{ env.IMG_TAG }}
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-
-    steps:
-    - name: Deploy to Azure Web App
-      id: deploy-to-webapp
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: 'adapto-bot'
-        slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_3d1b1345525d42a2b4b3ffde264f037b }}
-        images: '${{ env.HOST }}/${{ secrets.ACR_USER }}/${{ env.IMG_TAG }}'

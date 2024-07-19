@@ -1,0 +1,34 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  IMG_TAG: adapto-v4-bot:latest
+  HOST: rasika.azurecr.io
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag ${{ env.HOST }}/${{ secrets.ACR_USER }}/${{ env.IMG_TAG }}
+
+    - name: Login to ACR
+      uses: docker/login-action@v3.2.0
+      with:
+        registry: ${{ env.HOST }}
+        username: ${{ secrets.ACR_USER }}
+        password: ${{ secrets.ACR_PASS }}
+
+    - name: Push Docker image
+      run: docker push ${{ env.HOST }}/${{ secrets.ACR_USER }}/${{ env.IMG_TAG }}

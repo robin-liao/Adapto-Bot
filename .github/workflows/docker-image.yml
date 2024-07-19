@@ -31,12 +31,23 @@ jobs:
         password: ${{ secrets.ACR_PASS }}
 
     - name: Build and push Docker image
-      uses: docker/build-push-action@v6.4.1
+      uses: cloudposse/github-action-docker-build-push@1.16.0
       with:
+        username: ${{ secrets.ACR_USER }}
+        password: ${{ secrets.ACR_PASS }}
+        registry: ${{ env.HOST }}
+        repository: ${{ secrets.ACR_USER }}/adapto-v4-bot
+        tags: latest
+        dockerfile: ./Dockerfile
         context: .
-        file: ./Dockerfile
-        push: true
-        tags: ${{ env.HOST }}/${{ secrets.ACR_USER }}/${{ env.IMG_TAG }}
+
+    # - name: Build and push Docker image
+    #   uses: docker/build-push-action@v6.4.1
+    #   with:
+    #     context: .
+    #     file: ./Dockerfile
+    #     push: true
+    #     tags: ${{ env.HOST }}/${{ secrets.ACR_USER }}/${{ env.IMG_TAG }}
 
     # - name: Push Docker image
     #   run: docker push ${{ env.HOST }}/${{ secrets.ACR_USER }}/${{ env.IMG_TAG }}

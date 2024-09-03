@@ -2,7 +2,7 @@
   "$schema": "https://github.com/OfficeDev/microsoft-teams-app-schema/blob/preview/DevPreview/MicrosoftTeams.schema.json",
   "manifestVersion": "devPreview",
   "version": "1.0",
-  "id": "6ba2191e-0491-493d-b9f4-e378ca19dd8b",
+  "id": "e4fb69d7-573b-496c-89a3-d4ec82f7401d",
   "packageName": "com.microsoft.teams.samples.mushroomBot",
   "developer": {
     "name": "Robin Liao",
@@ -27,25 +27,25 @@
     {
       "entityId": "tab-adaptivecard-settings",
       "name": "Bot Settings",
-      "contentBotId": "159e1c0f-15ef-4597-a8c6-44ba1fd89b78",
+      "contentBotId": "e4fb69d7-573b-496c-89a3-d4ec82f7401d",
       "scopes": ["personal", "team"]
     },
     {
       "entityId": "tab-adaptivecard-sandbox",
       "name": "AC Tab Sandbox",
-      "contentBotId": "159e1c0f-15ef-4597-a8c6-44ba1fd89b78",
+      "contentBotId": "e4fb69d7-573b-496c-89a3-d4ec82f7401d",
       "scopes": ["personal", "team"]
     },
     {
       "entityId": "tab-tag-work",
       "name": "My Tag Work",
-      "contentBotId": "159e1c0f-15ef-4597-a8c6-44ba1fd89b78",
+      "contentBotId": "e4fb69d7-573b-496c-89a3-d4ec82f7401d",
       "scopes": ["personal", "team"]
     },
     {
       "entityId": "tab-message-ext",
       "name": "ME Config",
-      "contentBotId": "159e1c0f-15ef-4597-a8c6-44ba1fd89b78",
+      "contentBotId": "e4fb69d7-573b-496c-89a3-d4ec82f7401d",
       "scopes": ["personal"]
     },
     {
@@ -58,7 +58,7 @@
   ],
   "bots": [
     {
-      "botId": "159e1c0f-15ef-4597-a8c6-44ba1fd89b78",
+      "botId": "e4fb69d7-573b-496c-89a3-d4ec82f7401d",
       "scopes": ["groupchat", "personal", "team"],
       "supportsFiles": true,
       "commandLists": [
@@ -80,7 +80,7 @@
   ],
   "composeExtensions": [
     {
-      "botId": "159e1c0f-15ef-4597-a8c6-44ba1fd89b78",
+      "botId": "e4fb69d7-573b-496c-89a3-d4ec82f7401d",
       "canUpdateConfiguration": true,
       "commands": [
         {

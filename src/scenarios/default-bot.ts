@@ -439,6 +439,12 @@ export class DefaultBot implements ITeamsScenario {
         },
       });
     });
+
+    teamsBot.registerTextCommand(/^echo/i, async (ctx, _command, args) => {
+      await ctx.sendActivity({
+        text: ctx.activity.text,
+      });
+    });
   }
 
   private registerInvokes(teamsBot: IScenarioBuilder) {
@@ -531,6 +537,43 @@ export class DefaultBot implements ITeamsScenario {
     teamsBot.registerMessageExtensionQuery(cmdId, async (ctx, query) => {
       const attachments: MessagingExtensionAttachment[] = [];
       const queryTxt = (query.parameters?.[0].value as string) || undefined;
+
+      // ME sign-in flow
+      if (
+        queryTxt.toLowerCase() === "sign in" ||
+        queryTxt.toLowerCase() === "signin"
+      ) {
+        if (!query.state) {
+          return {
+            composeExtension: {
+              type: "auth",
+              suggestedActions: {
+                actions: [
+                  {
+                    type: "openUrl",
+                    title: "Sign in",
+                    value: Auth.getAuthUrl(ctx.activity.from.aadObjectId),
+                  },
+                ],
+              },
+            },
+          };
+        } else {
+          const card = await Auth.verifySigninState(ctx, query.state, true);
+          return {
+            composeExtension: {
+              type: "result",
+              attachmentLayout: "list",
+              attachments: [
+                {
+                  ...card,
+                  preview: CardFactory.heroCard("Signin Result Card"),
+                },
+              ],
+            },
+          };
+        }
+      }
 
       // cards from JSON
       const cards = CardGenerator.adaptive.allJsonCardsWithName;

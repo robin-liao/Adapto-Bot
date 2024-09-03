@@ -72,7 +72,11 @@ class AuthHandler {
     res.send(body);
   }
 
-  public async verifySigninState(ctx: TurnContext, state?: string) {
+  public async verifySigninState(
+    ctx: TurnContext,
+    state?: string,
+    returnCardPayloadOnly?: boolean
+  ) {
     const {
       from: { aadObjectId: userId },
       conversation: { conversationType, id: convId },
@@ -142,10 +146,15 @@ class AuthHandler {
         },
       ],
     });
-    await ctx.sendActivity({
-      attachments: [card],
-      summary: `signin is valid: ${isValid}`,
-    });
+
+    if (returnCardPayloadOnly) {
+      return card;
+    } else {
+      await ctx.sendActivity({
+        attachments: [card],
+        summary: `signin is valid: ${isValid}`,
+      });
+    }
   }
 
   private onAuthStartResBody = (userId: string) => `
@@ -157,6 +166,10 @@ class AuthHandler {
         <h1>hello</h1>
         <h2>user ID = ${userId}</h2>
         <script>
+          function redirect() {
+            window.location = '${config.host}${this.rootPath}${this.loginPath}';
+          }
+
           microsoftTeams.initialize(() => {
             console.log("Init Done");
             microsoftTeams.getContext((context) => {
@@ -168,8 +181,11 @@ class AuthHandler {
               } else {
                 document.cookie = 'channelId=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
               }
-              document.write(document.cookie);
-              window.location = '${config.host}' + '${this.rootPath}' + '${this.loginPath}';
+              document.write('cookie = ' + document.cookie);
+              document.write('<br/>');
+              document.write('context: <br/><pre>' + JSON.stringify(context, null, 2) + '</pre>');
+              document.write('<button onClick="redirect()">Redirect</button>');
+              // window.location = '${config.host}' + '${this.rootPath}' + '${this.loginPath}';
             });
           });
         </script>

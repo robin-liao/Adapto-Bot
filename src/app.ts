@@ -62,6 +62,9 @@ import { smeRouter } from "./sme-router";
 //   appPassword: config.microsoftAppPassword,
 // });
 
+console.log("CERT_THUMBPRINT: \n" + config.CERT_THUMBPRINT + "\n");
+console.log("CERT_PRIVATE_KEY_PEM: \n" + config.CERT_PRIVATE_KEY_PEM);
+
 const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication({
   MicrosoftAppId: config.microsoftAppID,
   CertificateThumbprint: config.CERT_THUMBPRINT,

@@ -18,4 +18,6 @@ export default {
     secret: process.env.OUTGOING_WEBHOOK_SECRET,
   },
   PAT: process.env.PAT,
+  CERT_THUMBPRINT: process.env.CERT_THUMBPRINT,
+  CERT_PRIVATE_KEY_PEM: process.env.CERT_PRIVATE_KEY_PEM,
 };

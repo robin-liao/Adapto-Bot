@@ -12,6 +12,8 @@ import {
   BotFrameworkAdapter,
   ConversationState,
   MemoryStorage,
+  ConfigurationBotFrameworkAuthentication,
+  CloudAdapter,
 } from "botbuilder";
 
 // Import required bot configuration.
@@ -55,10 +57,18 @@ import { smeRouter } from "./sme-router";
 
 // // Create adapter.
 // See https://aka.ms/about-bot-adapter to learn more about to learn more about bot adapter.
-const adapter = new BotFrameworkAdapter({
-  appId: config.microsoftAppID,
-  appPassword: config.microsoftAppPassword,
+// const adapter = new BotFrameworkAdapter({
+//   appId: config.microsoftAppID,
+//   appPassword: config.microsoftAppPassword,
+// });
+
+const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication({
+  MicrosoftAppId: config.microsoftAppID,
+  CertificateThumbprint: config.CERT_THUMBPRINT,
+  CertificatePrivateKey: config.CERT_PRIVATE_KEY_PEM,
 });
+
+const adapter = new CloudAdapter(botFrameworkAuthentication);
 
 // Catch-all for any unhandled errors in your bot.
 adapter.onTurnError = async (turnContext, error) => {
@@ -134,7 +144,7 @@ const bot = new TeamsBot(conversationState);
 // Listen for incoming activities and route them to your bot for processing.
 
 app.post("/api/messages", (req, res) => {
-  adapter.processActivity(req, res as any, async (turnContext) => {
+  adapter.process(req, res as any, async (turnContext) => {
     turnContext.onSendActivities(async (ctx, activities, next) => {
       console.log();
       console.log("[SEND-ACTIVITIES REQUEST]");

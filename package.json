@@ -23,7 +23,7 @@
     "axios": "^1.3.4",
     "azure-storage": "^2.10.3",
     "body-parser": "^1.19.0",
-    "botbuilder": "^4.19.3",
+    "botbuilder": "^4.23.0",
     "botframework-config": "^4.11.1",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",

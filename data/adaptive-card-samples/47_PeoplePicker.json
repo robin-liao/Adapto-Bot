@@ -4,15 +4,28 @@
   "version": "1.2",
   "body": [
     {
-      "id": "selectedUsers",
       "type": "Input.ChoiceSet",
+      "id": "selectedUsersGlobal",
       "style": "people",
-      "isMultiSelect": true,
       "choices": [],
       "choices.data": {
         "type": "Data.Query",
         "dataset": "graph.microsoft.com/users"
-      }
+      },
+      "isMultiSelect": true,
+      "placeholder": "Search global user(s)"
+    },
+    {
+      "type": "Input.ChoiceSet",
+      "id": "selectedUsersCurrent",
+      "style": "people",
+      "choices": [],
+      "choices.data": {
+        "type": "Data.Query",
+        "dataset": "graph.microsoft.com/users?scope=currentContext"
+      },
+      "isMultiSelect": true,
+      "placeholder": "Search user(s)"
     }
   ],
   "actions": [

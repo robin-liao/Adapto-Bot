@@ -25,6 +25,7 @@
     "body-parser": "^1.19.0",
     "botbuilder": "^4.23.0",
     "botframework-config": "^4.11.1",
+    "cheerio": "^1.0.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "dotenv": "^6.2.0",

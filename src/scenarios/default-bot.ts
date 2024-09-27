@@ -23,6 +23,7 @@ import * as teamsTab from "../tabs";
 import { attachments as carouselCards } from "./carousel-attachments";
 import config from "../config";
 import { Router } from "express";
+import * as cheerio from "cheerio";
 
 export class DefaultBot implements ITeamsScenario {
   public accept(teamsBot: IScenarioBuilder) {
@@ -444,6 +445,29 @@ export class DefaultBot implements ITeamsScenario {
       await ctx.sendActivity({
         text: ctx.activity.text,
       });
+    });
+
+    teamsBot.registerTextCommand(/^quote|quote$/i, async (ctx) => {
+      const isHTML = ctx.activity.attachments?.[0]?.contentType === "text/html";
+      const html = ctx.activity.attachments?.[0]?.content;
+      if (isHTML && html) {
+        const $ = cheerio.load(html);
+        const blocks = $("blockquote");
+        if (blocks.length > 0) {
+          await ctx.sendActivity({
+            text: $.html(blocks) + "<div>Here's what you quoted</div>",
+          });
+          return;
+        }
+      }
+      const msgId = ctx.activity.id;
+      const userId = ctx.activity.from.aadObjectId;
+      const text = ctx.activity.text;
+      if (msgId && userId && text) {
+        await ctx.sendActivity({
+          text: `<blockquote itemscope="" itemtype="http://schema.skype.com/Reply" itemid="${msgId}">\r\n<strong itemprop="mri" itemid="8:orgid:${userId}">Mushroom Bot</strong><span itemprop="time" itemid="${msgId}"></span>\r\n<p itemprop="preview">${text}</p>\r\n</blockquote>`,
+        });
+      }
     });
   }
 

@@ -469,6 +469,59 @@ export class DefaultBot implements ITeamsScenario {
         });
       }
     });
+
+    teamsBot.registerTextCommand(/^stream/i, async (ctx, _command, args) => {
+      if (args.length < 3) {
+        await ctx.sendActivity(
+          "Usage (default): <pre>stream chunk_1 chunk_2 ... chunk_N</pre>" +
+            "Usage (informative): <pre>stream informative chunk_1 chunk_2 ... chunk_N</pre>"
+        );
+        return;
+      }
+
+      const [first, ...middle] = args;
+      const last = middle.pop();
+      let streamSequence = 1;
+      const thinkSec = 5;
+      const useInformative = first.toLocaleLowerCase() === "informative";
+      let text = useInformative ? "" : first;
+
+      const { id: streamId } = await ctx.sendActivity({
+        type: ActivityTypes.Typing,
+        text: useInformative
+          ? "thinking..."
+          : `thinking for ${thinkSec} seconds...`,
+        channelData: {
+          streamType: "informative",
+          streamSequence,
+        },
+      });
+
+      !useInformative && (await sleep(thinkSec * 1000));
+
+      for (const chunk of middle) {
+        text += ` ${chunk}`;
+        await ctx.sendActivity({
+          type: ActivityTypes.Typing,
+          text,
+          channelData: {
+            streamId,
+            streamType: useInformative ? "informative" : "streaming",
+            streamSequence: ++streamSequence,
+          },
+        });
+      }
+
+      text += ` ${last}`;
+      await ctx.sendActivity({
+        type: ActivityTypes.Message,
+        text,
+        channelData: {
+          streamId,
+          streamType: "final",
+        },
+      });
+    });
   }
 
   private registerInvokes(teamsBot: IScenarioBuilder) {

@@ -21,6 +21,7 @@ import {
   createAdaptiveCardPersonaSet,
   IComponentUser,
 } from "./adaptive-card-helper";
+import { v4 as uuid } from "uuid";
 
 interface ITypedAttachment<T = any> extends Attachment {
   content?: T;
@@ -29,6 +30,30 @@ interface ITypedAttachment<T = any> extends Attachment {
 interface IJsonCardLoader {
   name: string;
   load: () => JsonFile;
+}
+
+interface IAnnouncementBannerImage {
+  origImage?: IAnnouncementImageData;
+  croppedImage?: IAnnouncementImageData;
+}
+
+interface IAnnouncementImageData {
+  id?: string;
+  src: string;
+  imageHeight: number;
+  imageWidth: number;
+  imageAltText?: string;
+}
+
+export interface IAnnouncementCardContent {
+  colorTheme?: string | null;
+  imageData?: IAnnouncementBannerImage;
+}
+
+export interface IAnnouncementCard
+  extends ITypedAttachment<IAnnouncementCardContent> {
+  appId: "announcement-card";
+  cardClientId?: string;
 }
 
 export class JsonCardLoader<T = any> {
@@ -616,6 +641,42 @@ class FileCardGenerator {
   }
 }
 
+class AnnouncementCardGenerator {
+  public readonly announcementCardContentType =
+    "application/vnd.microsoft.teams.messaging-announcementBanner";
+
+  public createThemeBasedCard(colorTheme: string = "0"): IAnnouncementCard {
+    return {
+      appId: "announcement-card",
+      cardClientId: `announcement-card-${uuid()}`,
+      contentType: this.announcementCardContentType,
+      content: {
+        colorTheme,
+      },
+    };
+  }
+
+  public createImageBasedCardRaw(
+    imageData: IAnnouncementBannerImage
+  ): IAnnouncementCard {
+    return {
+      appId: "announcement-card",
+      cardClientId: `announcement-card-${uuid()}`,
+      contentType: this.announcementCardContentType,
+      content: { imageData },
+    };
+  }
+
+  public createImageBasedCard(img: IAnnouncementImageData): IAnnouncementCard {
+    return {
+      appId: "announcement-card",
+      cardClientId: `announcement-card-${uuid()}`,
+      contentType: this.announcementCardContentType,
+      content: { imageData: { origImage: img, croppedImage: img } },
+    };
+  }
+}
+
 export const CardGenerator = {
   hero: new HeroCardGenerator(),
   thumbnail: new ThumbnailCardGenerator(),
@@ -624,4 +685,5 @@ export const CardGenerator = {
   profile: new ProfileCardGenerator(),
   list: new ListCardGenerator(),
   file: new FileCardGenerator(),
+  announcementBanner: new AnnouncementCardGenerator(),
 };

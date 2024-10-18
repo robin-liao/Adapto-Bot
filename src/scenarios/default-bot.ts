@@ -3,6 +3,7 @@ import {
   CardFactory,
   MessageFactory,
   MessagingExtensionAttachment,
+  teamsGetChannelId,
   TeamsInfo,
   ThumbnailCard,
 } from "botbuilder";
@@ -14,17 +15,15 @@ import {
 } from "botframework-schema";
 import _ from "lodash";
 import { Auth, teamsSdk } from "../auth";
-import { CardGenerator, JsonCardLoader } from "../card-gen";
+import { CardGenerator, IAnnouncementCard, JsonCardLoader } from "../card-gen";
 import { ConvSettingTable } from "../storage/setting-table";
 import { IScenarioBuilder, ITeamsScenario } from "../teams-bot";
 import { getConversationId, isEmail, OneOnOneHelper, sleep } from "../utils";
 import * as tm from "../task-modules";
 import * as teamsTab from "../tabs";
-import { attachments as carouselCards } from "./carousel-attachments";
 import config from "../config";
 import { Router } from "express";
 import * as cheerio from "cheerio";
-
 export class DefaultBot implements ITeamsScenario {
   public accept(teamsBot: IScenarioBuilder) {
     this.registerTextCommands(teamsBot);
@@ -132,7 +131,7 @@ export class DefaultBot implements ITeamsScenario {
         channelData: {
           feedbackLoopEnabled: true, // Feedback buttons
         },
-        attachments: [CardGenerator.adaptive.getJsonCardOfId(1)],
+        // attachments: [CardGenerator.adaptive.getJsonCardOfId(1)],
         entities: [
           {
             type: "https://schema.org/Message",
@@ -142,8 +141,10 @@ export class DefaultBot implements ITeamsScenario {
             additionalType: ["AIGeneratedContent"], // AI Generated label
             usageInfo: {
               "@type": "CreativeWork",
-              description: "UsageInfo 1 description", // Sensitivity description
-              name: "UsageInfo 1", // Sensitivity title
+              description: "Sensitivity description", // Sensitivity description
+              name: "Sensitivity title", // Sensitivity title
+              priority: 5, // Sensitivity priority
+              id: "XXX", // Sensitivity ID
             },
             citation: [
               {
@@ -522,6 +523,43 @@ export class DefaultBot implements ITeamsScenario {
         },
       });
     });
+
+    teamsBot.registerTextCommand(
+      /^announcement/i,
+      async (ctx, _command, args) => {
+        const [theme] = args;
+        const themeNum = parseInt(theme);
+
+        let card: IAnnouncementCard;
+        if (!_.isNaN(themeNum)) {
+          card = CardGenerator.announcementBanner.createThemeBasedCard(
+            themeNum.toString()
+          );
+        } else {
+          card = CardGenerator.announcementBanner.createImageBasedCard({
+            imageAltText: `An announcement background with headline "ABCDE"`,
+            src: "https://us-api.asm.skype.com/v1/objects/0-wus-d5-0b80d7770390a9ae1e1896e9758f994d/views/imgpsh_fullsize",
+            imageWidth: 1317,
+            imageHeight: 366,
+            // src: "https://www.shutterstock.com/shutterstock/photos/1336362089/display_1500/stock-photo-banner-of-abstract-blurred-photo-of-conference-hall-or-seminar-room-with-attendee-background-1336362089.jpg",
+            // imageWidth: 977,
+            // imageHeight: 455,
+          });
+        }
+
+        ctx.activity.conversation.id = teamsGetChannelId(ctx.activity);
+        await ctx.sendActivity({
+          text: "HELLO",
+          channelData: {
+            announcementData: {
+              Title: "Announcement Title",
+              Subject: "Announcement Subject",
+              Cards: JSON.stringify([card]),
+            },
+          },
+        });
+      }
+    );
   }
 
   private registerInvokes(teamsBot: IScenarioBuilder) {

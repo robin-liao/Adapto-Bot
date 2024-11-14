@@ -11,7 +11,9 @@ import {
   Activity,
   ActivityTypes,
   Attachment,
+  OnBehalfOf,
   StatusCodes,
+  TeamsChannelData,
 } from "botframework-schema";
 import _ from "lodash";
 import { Auth, teamsSdk } from "../auth";
@@ -143,8 +145,6 @@ export class DefaultBot implements ITeamsScenario {
               "@type": "CreativeWork",
               description: "Sensitivity description", // Sensitivity description
               name: "Sensitivity title", // Sensitivity title
-              priority: 5, // Sensitivity priority
-              id: "XXX", // Sensitivity ID
             },
             citation: [
               {
@@ -157,8 +157,10 @@ export class DefaultBot implements ITeamsScenario {
                   url: "https://example.com/claim-1",
                   abstract: "Abstract 1",
                   encodingFormat: "text/html", // for now ignored, later used for icon
-                  image:
-                    "https://botapiint.blob.core.windows.net/tests/Bender_Rodriguez.png",
+                  image: {
+                    "@type": "ImageObject",
+                    name: "Microsoft Word",
+                  },
                   keywords: ["Keyword1 - 1", "Keyword1 - 2", "Keyword1 - 3"],
                   usageInfo: {
                     "@type": "CreativeWork",
@@ -397,11 +399,37 @@ export class DefaultBot implements ITeamsScenario {
     });
 
     teamsBot.registerTextCommand(/^suggestedAction/i, async (ctx) => {
+      const botName = ctx.activity.recipient.name;
+      const botMri = ctx.activity.recipient.id;
       await ctx.sendActivity({
         text: "Hello! I have some suggested actions for you. Let me know if you need any help.",
         suggestedActions: {
           to: [ctx.activity.from.id],
           actions: [
+            {
+              type: "Action.Compose",
+              title: `@${botName}`,
+              value: {
+                type: "Teams.chatMessage",
+                data: {
+                  body: {
+                    content: `<at id=\"0\">${botName}</at> echo "Hello World!"`,
+                  },
+                  attachments: [],
+                  mentions: [
+                    {
+                      id: 0,
+                      mentioned: {
+                        user: {
+                          displayName: botName,
+                          id: botMri,
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
             {
               type: "imBack",
               title: "1",
@@ -560,6 +588,21 @@ export class DefaultBot implements ITeamsScenario {
         });
       }
     );
+
+    teamsBot.registerTextCommand(/^OnBehalfOf/i, async (ctx) => {
+      const members = await TeamsInfo.getMembers(ctx);
+      await ctx.sendActivity({
+        text: "OnBehalfOf",
+        channelData: {
+          onBehalfOf: members.map<OnBehalfOf>((m, itemid) => ({
+            itemid: 0,
+            mentionType: "person",
+            mri: m.id,
+            displayName: m.name,
+          })),
+        } as TeamsChannelData,
+      });
+    });
   }
 
   private registerInvokes(teamsBot: IScenarioBuilder) {

@@ -56,6 +56,14 @@
       "scopes": ["personal", "team"]
     }
   ],
+  "copilotExtensions": {
+    "customEngineCopilots": [
+      {
+        "type": "bot",
+        "id": "e4fb69d7-573b-496c-89a3-d4ec82f7401d"
+      }
+    ]
+  },
   "bots": [
     {
       "botId": "e4fb69d7-573b-496c-89a3-d4ec82f7401d",

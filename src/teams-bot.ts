@@ -57,6 +57,7 @@ import {
   sleep,
 } from "./utils";
 import { TaskModuleAdaptiveCardList } from "./task-modules/ac-sample-list";
+import { ActivityGenerator } from "./scenarios/activity-generator";
 
 export interface ITeamsScenario {
   accept(teamsBot: IScenarioBuilder);
@@ -411,10 +412,10 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
       return ctx.activity.value
         ? this.handleOnMessageBack(ctx, next)
         : ctx.activity.attachments?.some(
-            (x) => x.contentType === DOWNLOAD_INFO_CONTENT_TYPE
-          )
-        ? this.handleOnMessageWithFileDownload(ctx, next)
-        : this.handleOnMessage(ctx, next);
+          (x) => x.contentType === DOWNLOAD_INFO_CONTENT_TYPE
+        )
+          ? this.handleOnMessageWithFileDownload(ctx, next)
+          : this.handleOnMessage(ctx, next);
     });
     this.registerOnTeamsEvents();
   }
@@ -433,6 +434,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     new AuthBot().accept(this);
     new SMEMessageExtension().accept(this);
     new TaskModuleAdaptiveCardList().accept(this);
+    new ActivityGenerator().accept(this);
   }
 
   private async handleOnMessage(ctx: TurnContext, next: () => Promise<void>) {
@@ -697,11 +699,11 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
             },
             ...(ctx.activity.value
               ? [
-                  {
-                    title: "value",
-                    value: JSON.stringify(ctx.activity.value),
-                  },
-                ]
+                {
+                  title: "value",
+                  value: JSON.stringify(ctx.activity.value),
+                },
+              ]
               : []),
           ],
         },
@@ -756,9 +758,9 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
       mri: string;
       displayName: string;
     } = {
-      mri: "97b1ec61-45bf-453c-9059-6e8984e0cef4",
-      displayName: "Robin Liao",
-    }
+        mri: "97b1ec61-45bf-453c-9059-6e8984e0cef4",
+        displayName: "Robin Liao",
+      }
   ): Promise<string[]> {
     const send = () => {
       try {

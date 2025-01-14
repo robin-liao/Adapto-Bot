@@ -153,14 +153,14 @@ export class DefaultBot implements ITeamsScenario {
                 appearance: {
                   "@type": "DigitalDocument",
                   name: "Some secret citation", // required. Title of the citation
-                  text: "Text 1", // optional, ignored in teams
+                  // text: "Text 1", // optional, ignored in teams
                   url: "https://example.com/claim-1",
                   abstract: "Abstract 1",
-                  encodingFormat: "text/html", // for now ignored, later used for icon
-                  image: {
-                    "@type": "ImageObject",
-                    name: "Microsoft Word",
-                  },
+                  // encodingFormat: "text/html", // for now ignored, later used for icon
+                  // image: {
+                  //   "@type": "ImageObject",
+                  //   name: "Microsoft Word",
+                  // },
                   keywords: ["Keyword1 - 1", "Keyword1 - 2", "Keyword1 - 3"],
                   usageInfo: {
                     "@type": "CreativeWork",

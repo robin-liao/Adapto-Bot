@@ -17,7 +17,7 @@
     {
       "type": "imback",
       "title": "&i am back& <>= \"",
-      "value": "&i am back& <>= \""
+      "value": "echo &i am back& <>= \""
     },
     {
       "type": "openUrl",

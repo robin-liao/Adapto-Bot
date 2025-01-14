@@ -8,7 +8,7 @@ on:
 
 env:
   IMG_TAG: adapto-v4-bot:latest
-  HOST: rasika.azurecr.io
+  HOST: robin.azurecr.io
 
 jobs:
 

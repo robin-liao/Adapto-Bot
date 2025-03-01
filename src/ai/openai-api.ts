@@ -29,4 +29,20 @@ export class OpenAI {
 
     return response.data.choices[0].text;
   }
+
+  public static async getRealtimeSession() {
+    const r = await fetch("https://api.openai.com/v1/realtime/sessions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-realtime-preview-2024-12-17",
+        voice: "verse",
+      }),
+    });
+    const data = await r.json();
+    return data;
+  }
 }

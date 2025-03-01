@@ -11,8 +11,11 @@ import {
   teamsGetChannelId,
   MessageFactory,
   TeamsChannelData,
+  ActivityTypes,
+  BotAdapter,
 } from "botbuilder";
 import { UserDataTable } from "./storage/user-table";
+import config from "./config";
 
 export const sleep = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
@@ -168,5 +171,314 @@ export class OneOnOneHelper {
         await turnCtx.sendActivity(message);
       });
     }
+  }
+}
+
+export type StreamType = "informative" | "streaming";
+
+export type Chunck = {
+  text: string;
+  streamType: StreamType | "final";
+};
+
+export class TextStreaming {
+  private streamId: string;
+  private streamSequence = 1;
+  private queue: Chunck[] = [];
+  private timer: NodeJS.Timeout;
+  private closed = false;
+  private isWorking = false;
+
+  public static async create(
+    adaptor: BotAdapter,
+    convRef: ConversationReference,
+    text: string,
+    streamType: StreamType = "informative"
+  ) {
+    const stream = new TextStreaming(adaptor, convRef);
+    await stream.start(text, streamType);
+    return stream;
+  }
+
+  private constructor(
+    private adaptor: BotAdapter,
+    private convRef: ConversationReference
+  ) {}
+
+  private async performContext(logic: (context: TurnContext) => Promise<void>) {
+    return new Promise<TurnContext>((resolve, reject) => {
+      this.adaptor.continueConversationAsync(
+        config.microsoftAppID,
+        this.convRef,
+        async (turnCtx) => {
+          turnCtx.onSendActivities(async (ctx, activities, next) => {
+            console.log();
+            console.log("[SEND-ACTIVITIES REQUEST]");
+            console.log(printableJson(activities));
+            console.log();
+
+            const result = await next();
+
+            console.log();
+            console.log("[SEND-ACTIVITIES RESPONSE]");
+            console.log(printableJson(result));
+            console.log();
+
+            return result;
+          });
+          try {
+            await logic(turnCtx);
+            resolve(turnCtx);
+          } catch (error) {
+            reject(error);
+          }
+        }
+      );
+    });
+  }
+
+  private async start(text: string, streamType) {
+    const handleError = async (error) => {
+      console.log(`ERROR: ${error.message}`);
+      await this.performContext(async (ctx) => {
+        this.streamId &&
+          (await ctx.sendActivity({
+            type: ActivityTypes.Message,
+            text,
+            entities: [
+              {
+                type: "streaminfo",
+                streamId: this.streamId,
+                streamType: "final",
+              },
+            ],
+          }));
+        await ctx.sendActivity({
+          type: ActivityTypes.Message,
+          text: `Error: ${error.message}`,
+        });
+      });
+    };
+
+    await this.performContext(async (ctx) => {
+      const send = async () => {
+        const { id: streamId } = await ctx.sendActivity({
+          type: ActivityTypes.Typing,
+          text,
+          entities: [
+            {
+              type: "streaminfo",
+              streamType,
+              streamSequence: 1,
+            },
+          ],
+        });
+        this.streamId = streamId;
+      };
+
+      let shouldTry = true;
+      let retryWait = 2;
+      while (shouldTry) {
+        try {
+          await send();
+          shouldTry = false;
+          ++this.streamSequence;
+        } catch (error) {
+          console.log(`ERROR: ${error.message}`);
+          if (error.statusCode === 429) {
+            console.log(`RETRY AFTER ${retryWait} secs...`);
+            await sleep(retryWait * 1000);
+            shouldTry = true;
+            retryWait *= 2;
+          } else {
+            shouldTry = false;
+            await handleError(error);
+          }
+        }
+      }
+      this.startInterval();
+    });
+    return this;
+  }
+
+  public update(text: string, streamType: StreamType = "streaming") {
+    !this.closed && this.queue.push({ text, streamType });
+  }
+
+  public end(text: string) {
+    !this.closed && this.queue.push({ text, streamType: "final" });
+    this.closed = true;
+  }
+
+  public async waitUntilFinish() {
+    return new Promise<void>((resolve) => {
+      setInterval(() => {
+        if (this.timer === undefined && this.queue.length === 0) {
+          resolve();
+        }
+      }, 100);
+    });
+  }
+
+  private async startInterval() {
+    this.timer = setInterval(async () => {
+      if (!this.isWorking) {
+        if (this.queue.length > 0) {
+          await this.consumeChunk();
+        } else if (this.closed) {
+          clearInterval(this.timer);
+          this.timer = undefined;
+        }
+      }
+    }, 100);
+  }
+
+  private async consumeChunk() {
+    this.isWorking = true;
+
+    let { text, streamType } = this.queue.shift();
+
+    while (true) {
+      const peek = this.queue[0];
+      if (peek && peek.streamType === streamType) {
+        const { text: next } = this.queue.shift();
+        text = next;
+      } else {
+        break;
+      }
+    }
+
+    console.log(`Chunk: ${streamType}  ${text} `);
+
+    const send = async () => {
+      console.log("SEND...");
+      await this.performContext(async (ctx) => {
+        await ctx.sendActivity({
+          type:
+            streamType === "final"
+              ? ActivityTypes.Message
+              : ActivityTypes.Typing,
+          text,
+          entities: [
+            {
+              type: "streaminfo",
+              streamId: this.streamId,
+              streamType,
+              ...(streamType !== "final" && {
+                streamSequence: this.streamSequence,
+              }),
+            },
+          ],
+        });
+      });
+      console.log("SEND...DONE");
+    };
+
+    const postSend = () => {
+      console.log("POST-SEND");
+      if (streamType === "final") {
+        this.queue = [];
+      } else {
+        ++this.streamSequence;
+      }
+    };
+
+    const handleError = async (error) => {
+      this.queue = [];
+      this.closed = true;
+      console.log(`ERROR: ${error.message}`);
+      await this.performContext(async (ctx) => {
+        this.streamId &&
+          (await ctx.sendActivity({
+            type: ActivityTypes.Message,
+            text,
+            entities: [
+              {
+                type: "streaminfo",
+                streamId: this.streamId,
+                streamType: "final",
+              },
+            ],
+          }));
+        await ctx.sendActivity({
+          type: ActivityTypes.Message,
+          text: `Error: ${error.message}`,
+        });
+      });
+    };
+
+    let shouldTry = true;
+    let retryWait = 2;
+    while (shouldTry) {
+      try {
+        await send();
+        postSend();
+        shouldTry = false;
+      } catch (error) {
+        console.log(`ERROR: ${error.message}`);
+        if (error.statusCode === 429) {
+          console.log(`RETRY AFTER ${retryWait} secs...`);
+          await sleep(retryWait * 1000);
+          shouldTry = true;
+          retryWait *= 2;
+        } else {
+          shouldTry = false;
+          await handleError(error);
+        }
+      }
+    }
+
+    this.isWorking = false;
+  }
+}
+export class EndlessTextStreaming {
+  private queue: Chunck[] = [];
+  private isWorking = false;
+  private txtStream: TextStreaming;
+
+  constructor(
+    private adaptor: BotAdapter,
+    private convRef: ConversationReference
+  ) {
+    setInterval(async () => {
+      if (!this.isWorking && this.queue.length > 0) {
+        await this.consumeChunk();
+      }
+    }, 100);
+  }
+
+  public update(text: string, isFinal = false) {
+    !isFinal
+      ? this.queue.push({ text, streamType: "streaming" })
+      : this.queue.push({ text, streamType: "final" });
+  }
+
+  private async consumeChunk() {
+    this.isWorking = true;
+    const { text, streamType } = this.queue.shift();
+    if (streamType !== "final") {
+      if (!this.txtStream) {
+        this.txtStream = await TextStreaming.create(
+          this.adaptor,
+          this.convRef,
+          text,
+          "streaming"
+        );
+      } else {
+        this.txtStream.update(text);
+      }
+    } else {
+      if (!this.txtStream) {
+        this.txtStream = await TextStreaming.create(
+          this.adaptor,
+          this.convRef,
+          text,
+          "streaming"
+        );
+      }
+      await this.txtStream.end(text);
+      this.txtStream = undefined;
+    }
+    this.isWorking = false;
   }
 }

@@ -11,7 +11,7 @@ import {
   FileConsentCard,
   FileInfoCard,
 } from "botbuilder";
-import { JsonFile } from "./utils";
+import { JsonFile, printableJson } from "./utils";
 import config from "./config";
 import * as _ from "lodash";
 import * as fs from "fs";
@@ -343,6 +343,38 @@ class AdaptiveCardGenerator extends JsonCardLoader<any> {
     });
   }
 
+  public cardWithJSONPayload(cardPayload: any, json: any) {
+    return CardFactory.adaptiveCard({
+      $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
+      version: "1.2",
+      type: "AdaptiveCard",
+      actions: [
+        {
+          type: "Action.ShowCard",
+          title: "Show Details",
+          card: {
+            type: "AdaptiveCard",
+            body: [
+              {
+                type: "RichTextBlock",
+                inlines: [
+                  {
+                    type: "TextRun",
+                    fontType: "Monospace",
+                    text: printableJson(json, {
+                      indentChar: "　",
+                      colorize: false,
+                    }),
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      ],
+      ...cardPayload,
+    });
+  }
   private scrumItem(
     userId: string,
     name: string,

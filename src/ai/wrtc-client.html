@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OpenAI WebRTC Client</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      #container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 300px;
+        text-align: center;
+      }
+      #video {
+        width: 100%;
+        border-radius: 8px;
+      }
+      button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <h2>WebRTC Client</h2>
+      <video id="video" autoplay playsinline></video>
+      <button id="startButton">Start Connection</button>
+      <audio id="audio" autoplay></audio>
+    </div>
+
+    <script>
+      const startButton = document.getElementById("startButton");
+      const video = document.getElementById("video");
+
+      const config = {
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+      };
+
+      startButton.addEventListener("click", async () => {
+        // Get an ephemeral key from your server - see server code below
+        const tokenResponse = await fetch("/ai/session");
+        const data = await tokenResponse.json();
+        const EPHEMERAL_KEY = data.client_secret.value;
+
+        // Create a peer connection
+        const pc = new RTCPeerConnection(config);
+
+        // Capture connection state changes
+        pc.onconnectionstatechange = () => {
+          console.log("Connection State:", pc.connectionState);
+        };
+
+        pc.onicecandidate = (event) => {
+          if (event.candidate) {
+            console.log("ICE Candidate from client:", event.candidate);
+          }
+        };
+
+        // Set up to play remote audio from the model
+        const audioEl = document.getElementById("audio");
+        audioEl.autoplay = true;
+
+        // Handle incoming audio from the server
+        pc.ontrack = (event) => {
+          console.log("Receiving echoed audio from server");
+          audioEl.srcObject = event.streams[0];
+          audioEl.play();
+        };
+
+        // Add local audio track for microphone input in the browser
+        const stream = await navigator.mediaDevices.getUserMedia({
+          // video: true,
+          audio: true,
+        });
+        // video.srcObject = stream;
+
+        stream.getTracks().forEach((track) => pc.addTrack(track, stream));
+
+        // Set up data channel for sending and receiving events
+        const dc = pc.createDataChannel("oai-events");
+        dc.addEventListener("message", (e) => {
+          // Realtime server events appear here!
+          const realtimeEvent = JSON.parse(e.data);
+          console.log(realtimeEvent);
+        });
+
+        // Start the session using the Session Description Protocol (SDP)
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+
+        const offerURL = "/ai/connect";
+        const sdpResponse = await fetch(offerURL, {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(offer),
+        });
+        const answer = await sdpResponse.json();
+        await pc.setRemoteDescription(new RTCSessionDescription(answer));
+      });
+    </script>
+  </body>
+</html>

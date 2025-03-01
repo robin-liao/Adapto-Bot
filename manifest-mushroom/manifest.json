@@ -2,7 +2,7 @@
   "$schema": "https://github.com/OfficeDev/microsoft-teams-app-schema/blob/preview/DevPreview/MicrosoftTeams.schema.json",
   "manifestVersion": "devPreview",
   "version": "1.0",
-  "id": "7cc7da65-66f9-4de3-bcdb-203c0b04be0f",
+  "id": "07f28974-c1de-437a-9a5d-b554e8bc7185",
   "packageName": "com.microsoft.teams.samples.mushroomBot",
   "developer": {
     "name": "Robin Liao",
@@ -69,6 +69,8 @@
       "botId": "7cc7da65-66f9-4de3-bcdb-203c0b04be0f",
       "scopes": ["groupchat", "personal", "team"],
       "supportsFiles": true,
+      "supportsCalling": true,
+      "supportsVideo": true,
       "commandLists": [
         {
           "scopes": ["team", "groupChat", "personal"],

@@ -6,6 +6,8 @@ import {
   teamsGetChannelId,
   TeamsInfo,
   ThumbnailCard,
+  TurnContext,
+  ConversationReference,
 } from "botbuilder";
 import {
   Activity,
@@ -20,7 +22,13 @@ import { Auth, teamsSdk } from "../auth";
 import { CardGenerator, IAnnouncementCard, JsonCardLoader } from "../card-gen";
 import { ConvSettingTable } from "../storage/setting-table";
 import { IScenarioBuilder, ITeamsScenario } from "../teams-bot";
-import { getConversationId, isEmail, OneOnOneHelper, sleep } from "../utils";
+import {
+  getConversationId,
+  isEmail,
+  OneOnOneHelper,
+  sleep,
+  TextStreaming,
+} from "../utils";
 import * as tm from "../task-modules";
 import * as teamsTab from "../tabs";
 import config from "../config";
@@ -510,46 +518,31 @@ export class DefaultBot implements ITeamsScenario {
 
       const [first, ...middle] = args;
       const last = middle.pop();
-      let streamSequence = 1;
       const thinkSec = 5;
       const useInformative = first.toLocaleLowerCase() === "informative";
       let text = useInformative ? "" : first;
 
-      const { id: streamId } = await ctx.sendActivity({
-        type: ActivityTypes.Typing,
-        text: useInformative
-          ? "thinking..."
-          : `thinking for ${thinkSec} seconds...`,
-        channelData: {
-          streamType: "informative",
-          streamSequence,
-        },
-      });
+      const convRef = TurnContext.getConversationReference(
+        ctx.activity
+      ) as ConversationReference;
+
+      const stream = await TextStreaming.create(
+        ctx.adapter,
+        convRef,
+        useInformative ? "thinking..." : `thinking for ${thinkSec} seconds...`,
+        "informative"
+      );
 
       !useInformative && (await sleep(thinkSec * 1000));
 
       for (const chunk of middle) {
         text += ` ${chunk}`;
-        await ctx.sendActivity({
-          type: ActivityTypes.Typing,
-          text,
-          channelData: {
-            streamId,
-            streamType: useInformative ? "informative" : "streaming",
-            streamSequence: ++streamSequence,
-          },
-        });
+        stream.update(text, useInformative ? "informative" : "streaming");
       }
 
       text += ` ${last}`;
-      await ctx.sendActivity({
-        type: ActivityTypes.Message,
-        text,
-        channelData: {
-          streamId,
-          streamType: "final",
-        },
-      });
+      stream.end(text);
+      await stream.waitUntilFinish();
     });
 
     teamsBot.registerTextCommand(

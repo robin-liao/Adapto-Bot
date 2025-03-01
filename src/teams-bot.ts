@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 import {
+  AdaptiveCardInvokeResponse,
+  AdaptiveCardInvokeValue,
   AppBasedLinkQuery,
   Attachment,
   BotHandler,
@@ -30,7 +32,7 @@ import { Router } from "express";
 import { Auth } from "./auth";
 import { DOWNLOAD_INFO_CONTENT_TYPE, IBotFileHandler } from "./bot-file-helper";
 import { CardGenerator } from "./card-gen";
-import { GPTBot } from "./gpt-bot";
+import { GPTBot } from "./ai/gpt-bot";
 import { outgoingWebhookRouter } from "./outgoing-webhook-router";
 import { AuthBot } from "./scenarios/auth-bot";
 import { CardUpdate } from "./scenarios/card-update";
@@ -58,6 +60,7 @@ import {
 } from "./utils";
 import { TaskModuleAdaptiveCardList } from "./task-modules/ac-sample-list";
 import { ActivityGenerator } from "./scenarios/activity-generator";
+import { WebRTCBot } from "./ai/rtc-bot";
 
 export interface ITeamsScenario {
   accept(teamsBot: IScenarioBuilder);
@@ -66,6 +69,7 @@ export interface ITeamsScenario {
 export interface IScenarioBuilder {
   registerTextCommand(pattern: RegExp, handler: TextCommandCallback);
   registerInvoke(intent: string, handler: InvokeCallback);
+  registerACv2Handler(intent: string, handler: ACv2Callback);
   registerUniversalSearch(dataset: string, handler: InvokeSearchCallback);
   registerTaskModule(commandId: string, task: ITaskModule);
   registerTab(tabEntityId: string, tab: IAdaptiveCardTab);
@@ -93,6 +97,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
   private readonly tmHandler = new TaskModuleHandler();
   private readonly tabHandler = new TabHandler();
   private readonly invokeHandler = new InvokeHandler();
+  private readonly acv2Handler = new AdaptiveCardV2Handler();
   private readonly fileHandlers: IBotFileHandler[] = [];
 
   constructor(conversationState: ConversationState) {
@@ -128,6 +133,10 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     this.invokeHandler.registerUniversalSearch(dataset, handler);
   }
 
+  public registerACv2Handler(intent: string, handler: ACv2Callback) {
+    this.acv2Handler.register(intent, handler);
+  }
+
   public registerTaskModule(cmdID: string, task: ITaskModule) {
     this.tmHandler.register(cmdID, task);
   }
@@ -161,6 +170,20 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     return result.status === StatusCodes.NOT_IMPLEMENTED
       ? this.handleInvoke(ctx)
       : result;
+  }
+
+  protected async onAdaptiveCardInvoke(
+    ctx: TurnContext,
+    { action: { data } }: AdaptiveCardInvokeValue
+  ): Promise<AdaptiveCardInvokeResponse> {
+    const res = await this.acv2Handler.dispatch(ctx, data);
+    return (
+      res ?? {
+        statusCode: StatusCodes.NOT_FOUND,
+        type: "application/vnd.microsoft.activity.message",
+        value: {},
+      }
+    );
   }
 
   protected async handleTeamsAppBasedLinkQuery(
@@ -412,10 +435,10 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
       return ctx.activity.value
         ? this.handleOnMessageBack(ctx, next)
         : ctx.activity.attachments?.some(
-          (x) => x.contentType === DOWNLOAD_INFO_CONTENT_TYPE
-        )
-          ? this.handleOnMessageWithFileDownload(ctx, next)
-          : this.handleOnMessage(ctx, next);
+            (x) => x.contentType === DOWNLOAD_INFO_CONTENT_TYPE
+          )
+        ? this.handleOnMessageWithFileDownload(ctx, next)
+        : this.handleOnMessage(ctx, next);
     });
     this.registerOnTeamsEvents();
   }
@@ -435,6 +458,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     new SMEMessageExtension().accept(this);
     new TaskModuleAdaptiveCardList().accept(this);
     new ActivityGenerator().accept(this);
+    new WebRTCBot().accept(this);
   }
 
   private async handleOnMessage(ctx: TurnContext, next: () => Promise<void>) {
@@ -699,11 +723,11 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
             },
             ...(ctx.activity.value
               ? [
-                {
-                  title: "value",
-                  value: JSON.stringify(ctx.activity.value),
-                },
-              ]
+                  {
+                    title: "value",
+                    value: JSON.stringify(ctx.activity.value),
+                  },
+                ]
               : []),
           ],
         },
@@ -758,9 +782,9 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
       mri: string;
       displayName: string;
     } = {
-        mri: "97b1ec61-45bf-453c-9059-6e8984e0cef4",
-        displayName: "Robin Liao",
-      }
+      mri: "97b1ec61-45bf-453c-9059-6e8984e0cef4",
+      displayName: "Robin Liao",
+    }
   ): Promise<string[]> {
     const send = () => {
       try {
@@ -1053,5 +1077,31 @@ class TabHandler {
   ): Promise<TabResponse> {
     const tab = this.lookup[tabEntityId];
     return tab ? tab.tabSubmit(ctx, request) : Promise.resolve({ tab: {} });
+  }
+}
+
+type ACv2Callback = (
+  ctx: TurnContext,
+  data: any
+) => Promise<AdaptiveCardInvokeResponse>;
+
+class AdaptiveCardV2Handler {
+  private lookup: { [intent: string]: ACv2Callback } = {};
+
+  public register(intent: string, handler: ACv2Callback) {
+    if (this.lookup[intent]) {
+      throw new Error(`Invoke handler for intent "${intent}" already exists`);
+    }
+    this.lookup[intent] = handler;
+  }
+
+  public async dispatch(
+    ctx: TurnContext,
+    data: any
+  ): Promise<AdaptiveCardInvokeResponse | undefined> {
+    const intentQry: string = data.intent;
+    if (this.lookup[intentQry]) {
+      return this.lookup[intentQry]?.(ctx, data);
+    }
   }
 }

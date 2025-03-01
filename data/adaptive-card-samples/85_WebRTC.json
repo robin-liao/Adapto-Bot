@@ -1,0 +1,105 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "WebRTC Demo",
+      "weight": "bolder",
+      "size": "large"
+    },
+    {
+      "type": "TextBlock",
+      "text": "Play Sine Wave Track",
+      "weight": "bolder",
+      "size": "medium",
+      "separator": true
+    },
+    {
+      "type": "ActionSet",
+      "actions": [
+        {
+          "type": "Action.Submit",
+          "title": "Talk",
+          "data": {
+            "msteams": {
+              "type": "talk"
+            },
+            "intent": "sineWave",
+            "lang": "en-US"
+          }
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Transcribe",
+      "weight": "bolder",
+      "size": "medium",
+      "separator": true
+    },
+    {
+      "type": "ActionSet",
+      "actions": [
+        {
+          "type": "Action.Submit",
+          "title": "Talk",
+          "data": {
+            "msteams": {
+              "type": "talk"
+            },
+            "intent": "transcribe",
+            "lang": "en-US"
+          }
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Echo my voice with random audio processing",
+      "weight": "bolder",
+      "size": "medium",
+      "separator": true
+    },
+    {
+      "type": "ActionSet",
+      "actions": [
+        {
+          "type": "Action.Submit",
+          "title": "Talk",
+          "data": {
+            "msteams": {
+              "type": "talk"
+            },
+            "intent": "echo",
+            "lang": "en-US"
+          }
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Relay Open AI Realtime Session",
+      "weight": "bolder",
+      "size": "medium",
+      "separator": true
+    },
+    {
+      "type": "ActionSet",
+      "actions": [
+        {
+          "type": "Action.Submit",
+          "title": "Talk",
+          "data": {
+            "msteams": {
+              "type": "talk"
+            },
+            "intent": "openai",
+            "lang": "en-US"
+          }
+        }
+      ]
+    }
+  ]
+}

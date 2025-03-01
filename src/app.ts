@@ -24,6 +24,7 @@ import config from "./config";
 import { printableJson } from "./utils";
 import azureDevOpsRouter from "./devops/read-git-file";
 import { smeRouter } from "./sme-router";
+import { aiRouter } from "./ai";
 
 // Read botFilePath and botFileSecret from .env file
 // Note: Ensure you have a .env file and include botFilePath and botFileSecret.
@@ -179,6 +180,7 @@ app.use("/devops", azureDevOpsRouter);
 app.use("/skillrequest", smeRouter);
 app.use(cors());
 app.use("/static", express.static(config.dataPrefix));
+app.use("/ai", aiRouter);
 
 app.listen(config.port, () => {
   console.log(`\n${app.name} listening on PORT ${config.port}`);

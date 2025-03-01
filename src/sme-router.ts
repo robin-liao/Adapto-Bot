@@ -7,7 +7,7 @@ import {
 } from "botbuilder";
 import { Router } from "express";
 import axios from "axios";
-import { OpenAI } from "./openai-api";
+import { OpenAI } from "./ai/openai-api";
 
 export type SMERequest = MessagingExtensionQuery;
 export type SMEResponse = MessagingExtensionResult;

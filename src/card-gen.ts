@@ -242,6 +242,71 @@ class AdaptiveCardGenerator extends JsonCardLoader<any> {
     });
   }
 
+  public youTubeCard(
+    url: string,
+    title: string,
+    channel: string,
+    description: string,
+    poster?: string
+  ): ITypedAttachment {
+    return CardFactory.adaptiveCard({
+      type: "AdaptiveCard",
+      body: [
+        {
+          type: "Media",
+          style: "RoundedCorners",
+          sources: [
+            {
+              mimeType: "video/mp4",
+              url,
+            },
+          ],
+          ...(poster && { poster }),
+        },
+        {
+          type: "TextBlock",
+          text: title,
+          wrap: true,
+          size: "Large",
+          weight: "Bolder",
+        },
+        {
+          type: "TextBlock",
+          text: channel,
+          wrap: true,
+          spacing: "Small",
+          weight: "Bolder",
+        },
+        {
+          type: "TextBlock",
+          text: description,
+          wrap: true,
+          spacing: "None",
+        },
+        {
+          actions: [
+            {
+              title: "Open",
+              type: "Action.OpenUrl",
+              url,
+            },
+          ],
+          spacing: "Medium",
+          type: "ActionSet",
+        },
+      ],
+      $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
+      version: "1.6",
+      fallbackText:
+        "This card requires CaptionSource to be viewed. Ask your platform to update to Adaptive Cards v1.6 for this and more!",
+      selectAction: {
+        title: "Open",
+        type: "Action.OpenUrl",
+        url,
+      },
+    });
+  }
+
   public settingCard(setting: Partial<ConvSetting> = {}) {
     return CardFactory.adaptiveCard({
       $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
@@ -343,7 +408,7 @@ class AdaptiveCardGenerator extends JsonCardLoader<any> {
     });
   }
 
-  public cardWithJSONPayload(cardPayload: any, json: any) {
+  public cardWithJSONPayload(json: any, additionalCardPayload?: any) {
     return CardFactory.adaptiveCard({
       $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
       version: "1.2",
@@ -372,7 +437,7 @@ class AdaptiveCardGenerator extends JsonCardLoader<any> {
           },
         },
       ],
-      ...cardPayload,
+      ...additionalCardPayload,
     });
   }
   private scrumItem(

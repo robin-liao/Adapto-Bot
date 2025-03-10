@@ -11,26 +11,53 @@ import {
   MediaStream,
 } from "wrtc";
 import { SpeechClient } from "@google-cloud/speech";
+import { customsearch_v1 } from "@googleapis/customsearch";
+import { youtube_v3 } from "@googleapis/youtube";
 import wav from "wav";
-import { OpenAI } from "./openai-api";
+import { OpenAI, Tool } from "./openai-api";
+import * as _ from "lodash";
+import {
+  ActivityTypes,
+  BotAdapter,
+  CardFactory,
+  ConversationReference,
+} from "botbuilder";
+import { CardGenerator } from "../card-gen";
+import { GoogleMapHelper, MapPlace, performContext, sleep } from "../utils";
 
 const rtcConfig: RTCConfiguration = {
   iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+  // iceTransportPolicy: "relay",
 };
 
 export const createPeerConnection = async (
   sdp: RTCSessionDescriptionInit,
-  ontrack?: (e: RTCTrackEvent, peer: RTCPeerConnection) => void,
-  beforeOffer?: (peer: RTCPeerConnection) => void
+  beforeOffer?: (
+    peer: RTCPeerConnection,
+    track?: MediaStreamTrack
+  ) => Promise<void>,
+  onclose?: (peer: RTCPeerConnection, track?: MediaStreamTrack) => void
 ) => {
+  let track: MediaStreamTrack;
   const peer = new RTCPeerConnection(rtcConfig);
   peer.onconnectionstatechange = () => {
     console.log("Connection State:", peer.connectionState);
+    console.log("ICE Connection State:", peer.iceConnectionState);
+    if (
+      peer.iceConnectionState === "disconnected" ||
+      peer.iceConnectionState === "failed"
+    ) {
+      console.warn("Client disconnected! Closing connection...");
+      onclose?.(peer, track);
+      peer.close();
+    }
   };
-  ontrack && (peer.ontrack = (event) => ontrack(event, peer));
+  peer.ontrack = (event) => {
+    track = event.track;
+  };
   const desc = new RTCSessionDescription(sdp);
   await peer.setRemoteDescription(desc);
-  beforeOffer && beforeOffer(peer);
+  beforeOffer && (await beforeOffer(peer, track));
   const answer = await peer.createAnswer();
   await peer.setLocalDescription(answer);
   return peer;
@@ -97,40 +124,98 @@ export class MP3Track extends AudioProcessdTrack {
     mp3File = config.dataPrefix + "/media/silent-scream.mp3",
     infinite = true
   ) {
-    const passThrough = new PassThrough();
+    const readToStream = async (file: string) => {
+      const fileBuffer = fs.readFileSync(file);
+      const int16Array = new Int16Array(
+        fileBuffer.buffer,
+        fileBuffer.byteOffset,
+        fileBuffer.length / 2
+      );
+      const bitsPerSample = 16;
+      const numberOfFrames = 480;
+      const channelCount = 1; // Set to 2 for stereo
+      const frameSize = numberOfFrames * channelCount;
+      const sampleRate = 48000;
+
+      let offset = 0;
+      const timer = setInterval(() => {
+        if (offset + frameSize <= int16Array.length) {
+          const samples = int16Array.slice(offset, offset + frameSize);
+          offset += frameSize;
+
+          this.source.onData({
+            samples,
+            sampleRate,
+            bitsPerSample,
+            channelCount,
+            numberOfFrames,
+          });
+        } else {
+          if (infinite) {
+            offset = 0;
+            console.log("Repeating audio...");
+          } else {
+            clearInterval(timer);
+            console.log("Audio playback finished.");
+          }
+        }
+      }, 10);
+    };
 
     const playFile = () => {
-      ffmpeg(fs.createReadStream(mp3File))
-        .toFormat("s16le")
+      const ffmpegProcess = ffmpeg(mp3File)
+        .inputFormat("mp3")
         .audioChannels(1)
         .audioFrequency(48000)
         .audioCodec("pcm_s16le")
-        .pipe(passThrough);
+        .outputFormat("s16le")
+        .on("start", (commandLine) => {
+          console.log("Spawned Ffmpeg with command: " + commandLine);
+        })
+        .on("error", (err) => {
+          console.error("An error occurred: " + err.message);
+        })
+        .on("end", () => {
+          console.log("Conversion finished successfully");
+          readToStream("output.pcm");
+        })
+        .save("output.pcm");
+
+      let pcmBuffer = Buffer.alloc(0);
+      const bytesPerSample = 2; // 16 bits = 2 bytes
+      const numberOfFrames = 480;
+      const channelCount = 1; // Set to 2 for stereo
+      const frameSize = numberOfFrames * channelCount * bytesPerSample;
+
+      // ffmpegProcess.on("data", (chunk) => {
+      //   pcmBuffer = Buffer.concat([pcmBuffer, chunk]);
+
+      //   console.log("chunk.byteLength: ", chunk.byteLength);
+      //   console.log("chunk.length: ", chunk.length);
+
+      //   while (pcmBuffer.length >= frameSize) {
+      //     const sampleChunk = pcmBuffer.slice(0, frameSize);
+      //     pcmBuffer = pcmBuffer.slice(frameSize);
+
+      //     const samples = new Int16Array(
+      //       sampleChunk.buffer,
+      //       sampleChunk.byteOffset,
+      //       sampleChunk.length / bytesPerSample
+      //     );
+
+      //     console.log("samples.byteLength: ", samples.byteLength);
+      //     console.log("samples.length: ", samples.length);
+
+      //     this.source.onData({
+      //       samples,
+      //       sampleRate: 48000,
+      //       bitsPerSample: 16,
+      //       channelCount,
+      //       numberOfFrames,
+      //     });
+      //   }
+      // });
     };
-
-    // Read PCM data and feed into WebRTC track
-    passThrough.on("data", (chunk) => {
-      const samples = new Int16Array(chunk.buffer);
-      console.log(
-        `[onData] len = ${samples.length} byteLen = ${chunk.byteLength}`
-      );
-      this.source.onData({
-        samples,
-        sampleRate: 48000,
-        bitsPerSample: 16,
-        channelCount: 1,
-        numberOfFrames: samples.byteLength,
-      });
-    });
-
-    // Restart when file ends
-    passThrough.on("end", () => {
-      console.log("MP3 playback finished.");
-      if (infinite) {
-        console.log("Restarting MP3 playback...");
-        setTimeout(playFile, 500); // Short delay before restarting
-      }
-    });
 
     playFile();
   }
@@ -144,7 +229,7 @@ export type TranscriberEvent = {
 
 export class Transcriber extends AudioProcessdTrack {
   private speechClient: SpeechClient = new SpeechClient({
-    apiKey: "AIzaSyA_NzJzFkDsVbmHektNnHh_F3MYwzuHeCg",
+    apiKey: config.googleAPIKey,
   });
 
   private listeners: Partial<TranscriberEvent> = {};
@@ -249,15 +334,27 @@ export class Transcriber extends AudioProcessdTrack {
   }
 }
 
+export type ToolFunc = {
+  tool: Tool;
+  func: (args: any) => Promise<any>;
+};
+
 export class OpenAITrack extends AudioProcessdTrack {
   private peer = new RTCPeerConnection(rtcConfig);
   private listeners: Partial<TranscriberEvent> = {};
   private thruSource = new ns.RTCAudioSource();
   private thruTrack = this.thruSource.createTrack();
   private thruStream = new MediaStream([this.thruTrack]);
+  private funcLookup: {
+    [name: string]: ToolFunc;
+  } = {};
 
   public constructor(incomingTrack: MediaStreamTrack) {
     super(incomingTrack);
+  }
+
+  public registerTool(toolFunc: ToolFunc) {
+    this.funcLookup[toolFunc.tool.name] = toolFunc;
   }
 
   public on<K extends keyof TranscriberEvent>(
@@ -276,7 +373,7 @@ export class OpenAITrack extends AudioProcessdTrack {
     // Set up data channel for sending and receiving events
     const dc = this.peer.createDataChannel("oai-events");
     let text = "";
-    dc.addEventListener("message", (e) => {
+    dc.addEventListener("message", async (e) => {
       const data = JSON.parse(e.data);
       // console.log("Realtime Event:", data);
       if (data.type === "response.audio_transcript.delta") {
@@ -285,7 +382,37 @@ export class OpenAITrack extends AudioProcessdTrack {
       } else if (data.type === "response.audio_transcript.done") {
         text = "";
         this.listeners.data?.(data.transcript, true);
+      } else if (data.type === "response.function_call_arguments.done") {
+        const fn = this.funcLookup[data.name]?.func;
+        if (fn) {
+          console.log(
+            `Calling local function ${data.name} with ${data.arguments}`
+          );
+          const args = JSON.parse(data.arguments);
+          const result = await fn(args);
+          console.log("result", JSON.stringify(result, null, 2));
+          // Let OpenAI know that the function has been called and share it's output
+          const event = {
+            type: "conversation.item.create",
+            item: {
+              type: "function_call_output",
+              call_id: data.call_id, // call_id from the function_call message
+              output: JSON.stringify(result), // result of the function
+            },
+          };
+          dc.send(JSON.stringify(event));
+          // Have assistant respond after getting the results
+          dc.send(JSON.stringify({ type: "response.create" }));
+        }
+      } else {
+        // console.log("Unhandled message:", JSON.stringify(data, null, 2));
       }
+    });
+
+    dc.addEventListener("open", (ev) => {
+      console.log("Opening Open AI data channel", ev);
+      const tools = _.values(this.funcLookup).map((val) => val.tool);
+      this.configureDataChannel(dc, tools);
     });
 
     // ontrack
@@ -313,6 +440,10 @@ export class OpenAITrack extends AudioProcessdTrack {
     await this.peer.setRemoteDescription(answer);
   }
 
+  public close() {
+    this.peer.close();
+  }
+
   private async getOpenAIAnswerSDP(offer: RTCSessionDescriptionInit) {
     const oaiSession = await OpenAI.getRealtimeSession();
     const emphKey = oaiSession.client_secret.value;
@@ -332,5 +463,263 @@ export class OpenAITrack extends AudioProcessdTrack {
       sdp: await sdpResponse.text(),
     };
     return answer;
+  }
+
+  private configureDataChannel(ds: RTCDataChannel, tools: Tool[]) {
+    console.log("Configuring data channel");
+    const event = {
+      type: "session.update",
+      session: {
+        instructions:
+          "You are a Microsoft Teams agent to assist users for any asks particularly focused on Teams specific functionalities. When user asks for 'send me back the results' or 'send me back the results as an adaptive card', you should trigger 'sendAdaptiveCard' tool function and send the search results of raw JSON input from previous tool function output as the input to this tool function. To trigger 'sendAdaptiveCard' you should read the spec of the tool function and send the input as per the spec. Within 'sendAdaptiveCard' tool function it will convert the raw JSON input to an adaptive card and send it back to the user. Note that this tool  can't handle web search results, so for search results you should process by yourself and skip rendering it by using this tool function",
+        modalities: ["text", "audio"],
+        tools,
+        tool_choice: "auto",
+      },
+    };
+    ds.send(JSON.stringify(event));
+  }
+}
+
+export const getGoogleSearchTool = (): ToolFunc => ({
+  tool: {
+    type: "function",
+    name: "webSearch",
+    description:
+      "Performs an internet search using a search engine with the given query.",
+    parameters: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "The search query",
+        },
+      },
+      required: ["query"],
+    },
+  },
+  func: async (args: any) => {
+    const { query } = args;
+    const data = await searchWeb(query);
+    return data.items ?? [];
+  },
+});
+
+export const getYouTubeSearchTool = (): ToolFunc => ({
+  tool: {
+    type: "function",
+    name: "youtubeSearch",
+    description:
+      "Performs video search for YouTube or any video topics with the given query.",
+    parameters: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "The search query",
+        },
+      },
+      required: ["query"],
+    },
+  },
+  func: async (args: any) => {
+    const { query } = args;
+    const data = await searchYouTube(query);
+    return data.items ?? [];
+  },
+});
+
+export const getSendAdaptiveCardTool = (
+  adapter: BotAdapter,
+  convRef: ConversationReference
+): ToolFunc => ({
+  tool: {
+    type: "function",
+    name: "sendAdaptiveCard",
+    description:
+      "Send any results as an adaptive card. There're 2 input arguments: (1) 'type':  must be 'web' or 'mapPlaces' to identify the result is from web search or from map place search. (2) 'results': raw JSON payload of previous search results.",
+    parameters: {
+      type: "object",
+      properties: {
+        type: { description: "type of the result", enum: ["web", "mapPlaces"] },
+        results: {
+          description: "raw JSON payload of previous search results",
+          type: "object",
+        },
+      },
+    },
+  },
+  func: async (args) => {
+    const { results = [], type } = args;
+    console.log("Sending adaptive card: ", args);
+    let card = CardGenerator.adaptive.cardWithJSONPayload(args);
+
+    if (type === "mapPlaces") {
+      const mapHelper = new GoogleMapHelper();
+      const maps = await Promise.all(
+        (results as MapPlace[]).map((r) => {
+          try {
+            return mapHelper.getStaticMapOfMarker(r.lat, r.lng);
+          } catch (error) {
+            return undefined;
+          }
+        })
+      );
+      const pages = (results as MapPlace[]).map((r, id) => ({
+        type: "CarouselPage",
+        style: "emphasis",
+        showBorder: true,
+        roundedCorners: true,
+        items: [
+          ...(!!maps[id] && [
+            {
+              type: "Image",
+              url: maps[id],
+              style: "RoundedCorners",
+              ...(r.url && {
+                selectAction: {
+                  type: "Action.OpenUrl",
+                  url: r.url,
+                },
+              }),
+            },
+          ]),
+          {
+            type: "ColumnSet",
+            columns: [
+              {
+                items: [
+                  {
+                    type: "Image",
+                    url: r.photo_url,
+                    style: "RoundedCorners",
+                    size: "Large",
+                  },
+                ],
+                type: "Column",
+                width: "auto",
+              },
+              {
+                type: "Column",
+                items: [
+                  {
+                    type: "TextBlock",
+                    text: r.name,
+                    wrap: true,
+                    size: "Large",
+                    weight: "Bolder",
+                  },
+                  ...(r.rating && [
+                    {
+                      type: "Rating",
+                      value: r.rating,
+                      color: "Marigold",
+                      count: r.total_reviews,
+                      spacing: "ExtraSmall",
+                    },
+                  ]),
+                  {
+                    type: "TextBlock",
+                    text: r.address,
+                    wrap: true,
+                    isSubtle: true,
+                    maxLines: 0,
+                    size: "Default",
+                    spacing: "ExtraSmall",
+                  },
+                  {
+                    type: "TextBlock",
+                    text: r.phone,
+                    wrap: true,
+                    isSubtle: true,
+                    spacing: "ExtraSmall",
+                  },
+                  {
+                    type: "ActionSet",
+                    actions: [
+                      {
+                        type: "Action.OpenUrl",
+                        url: r.website,
+                        title: "Website",
+                      },
+                    ],
+                  },
+                ],
+                width: "stretch",
+                verticalContentAlignment: "Top",
+                ...(r.url && {
+                  selectAction: {
+                    type: "Action.OpenUrl",
+                    url: r.url,
+                  },
+                }),
+              },
+            ],
+            style: "accent",
+            bleed: true,
+          },
+        ],
+      }));
+      card = CardFactory.adaptiveCard({
+        type: "AdaptiveCard",
+        version: "1.5",
+        body: [
+          {
+            type: "Carousel",
+            pages,
+          },
+        ],
+      });
+      console.log("Sending adaptive card: ", JSON.stringify(card, null, 2));
+    }
+    await performContext(adapter, convRef, async (ctx2) => {
+      await ctx2.sendActivity({
+        type: ActivityTypes.Message,
+        ...(results && {
+          attachments: [card],
+        }),
+      });
+    });
+    return { success: true, message: "Sent as adaptive card" };
+  },
+});
+
+async function searchWeb(query: string) {
+  const customsearch = new customsearch_v1.Customsearch({
+    auth: config.googleAPIKey,
+  });
+
+  try {
+    console.log("Google Search: ", query);
+    const res = await customsearch.cse.list({
+      q: query,
+      cx: "d5b981a49041a4bdd",
+    });
+    console.log("Google Search Items: ", res.data.items.length);
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching search results:", error);
+    throw error;
+  }
+}
+
+async function searchYouTube(query: string) {
+  const youtube = new youtube_v3.Youtube({
+    auth: config.googleAPIKey,
+  });
+
+  try {
+    console.log("YouTube Search: ", query);
+    const res = await youtube.search.list({
+      q: query,
+      part: ["snippet"],
+      type: ["video"],
+      maxResults: 5,
+    });
+    console.log("YouTube Search Items: ", res.data.items.length);
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching search results:", error);
+    throw error;
   }
 }

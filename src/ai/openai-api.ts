@@ -1,10 +1,7 @@
-import { Configuration, OpenAIApi } from "openai";
+import { OpenAI as OAI } from "openai";
+import { JSONSchema } from "openai/lib/jsonschema";
 
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-const openai = new OpenAIApi(configuration);
+const openai = new OAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export class OpenAI {
   public static async gpt(
@@ -17,17 +14,12 @@ export class OpenAI {
     console.log(
       `text=${text}\ntemperature=${temperature}\nmax_tokens=${max_tokens}\nfrequency_penalty=${frequency_penalty}\npresence_penalty=${presence_penalty}`
     );
-    const response = await openai.createCompletion({
-      model: "text-davinci-003",
-      prompt: text,
-      temperature,
-      max_tokens,
-      top_p: 1,
-      frequency_penalty,
-      presence_penalty,
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [{ role: "user", content: [{ type: "text", text }] }],
     });
 
-    return response.data.choices[0].text;
+    return response.choices[0].message.content;
   }
 
   public static async getRealtimeSession() {
@@ -45,4 +37,11 @@ export class OpenAI {
     const data = await r.json();
     return data;
   }
+}
+
+export interface Tool {
+  type: "function";
+  name: string;
+  description: string;
+  parameters: JSONSchema;
 }

@@ -21,4 +21,5 @@ export default {
   PAT: process.env.PAT,
   CERT_THUMBPRINT: process.env.CERT_THUMBPRINT,
   CERT_PRIVATE_KEY_PEM: process.env.CERT_PRIVATE_KEY_PEM,
+  googleAPIKey: process.env.GOOGLE_API_KEY,
 };

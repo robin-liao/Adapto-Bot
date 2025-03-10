@@ -60,7 +60,9 @@ import {
 } from "./utils";
 import { TaskModuleAdaptiveCardList } from "./task-modules/ac-sample-list";
 import { ActivityGenerator } from "./scenarios/activity-generator";
-import { WebRTCBot } from "./ai/rtc-bot";
+import { WebRTCBot } from "./ai/wrtc-bot";
+import WebSocket from "ws";
+import * as _ from "lodash";
 
 export interface ITeamsScenario {
   accept(teamsBot: IScenarioBuilder);
@@ -73,6 +75,7 @@ export interface IScenarioBuilder {
   registerUniversalSearch(dataset: string, handler: InvokeSearchCallback);
   registerTaskModule(commandId: string, task: ITaskModule);
   registerTab(tabEntityId: string, tab: IAdaptiveCardTab);
+  registerTabRouter(tabEntityId: string, router: Router);
   registerMessageExtensionQuery(
     commandId: string,
     handler: MessageExtensionQueryCallback
@@ -82,6 +85,10 @@ export interface IScenarioBuilder {
     handler: MessageExtensionSettingHandler
   );
   registerFileHandler(handler: IBotFileHandler);
+  registerWebSocketHandler<T>(
+    eventTarget: string,
+    handler: WebScoketCallback<T>
+  );
 
   sendCard(
     ctx: TurnContext,
@@ -99,11 +106,20 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
   private readonly invokeHandler = new InvokeHandler();
   private readonly acv2Handler = new AdaptiveCardV2Handler();
   private readonly fileHandlers: IBotFileHandler[] = [];
+  private readonly wsHandler = new WebSocketHandler();
 
   constructor(conversationState: ConversationState) {
     super();
     this.setupHandlers();
     this.setupScenarios();
+  }
+
+  public onWebSocketConnection(ws: WebSocket) {
+    this.wsHandler.onConnection(ws);
+  }
+
+  public getTabRouter() {
+    return this.tabHandler.tabRouter;
   }
 
   public getTaskModuleRouter() {
@@ -145,6 +161,10 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     this.tabHandler.register(tabEntityId, tab);
   }
 
+  public registerTabRouter(tabEntityId: string, router: Router) {
+    this.tabHandler.registerRouter(tabEntityId, router);
+  }
+
   public registerMessageExtensionQuery(
     commandId: string,
     handler: MessageExtensionQueryCallback
@@ -163,6 +183,13 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     if (!this.fileHandlers.includes(handler)) {
       this.fileHandlers.push(handler);
     }
+  }
+
+  public registerWebSocketHandler<T>(
+    eventTarget: string,
+    handler: WebScoketCallback<T>
+  ) {
+    this.wsHandler.register(eventTarget, handler);
   }
 
   protected async onInvokeActivity(ctx: TurnContext): Promise<InvokeResponse> {
@@ -1056,9 +1083,18 @@ class TaskModuleHandler {
 
 class TabHandler {
   private lookup: { [tabEntityId: string]: IAdaptiveCardTab } = {};
+  private router = Router();
+
+  public get tabRouter() {
+    return this.router;
+  }
 
   public register(tabEntityId: string, tab: IAdaptiveCardTab) {
     this.lookup[tabEntityId] = tab;
+  }
+
+  public registerRouter(tabEntityId: string, router: Router) {
+    this.router.use(`/${tabEntityId}`, router);
   }
 
   public handleTeamsTabFetch(
@@ -1103,5 +1139,105 @@ class AdaptiveCardV2Handler {
     if (this.lookup[intentQry]) {
       return this.lookup[intentQry]?.(ctx, data);
     }
+  }
+}
+
+type WSFunc = {
+  handshake: (ws: WebSocket, args: { convId: string }) => void;
+  subscribe: (ws: WebSocket, args: { eventTarget: string }) => void;
+  publish: (
+    ws: WebSocket,
+    args: { eventTarget: string; eventData: any }
+  ) => void;
+};
+
+type WSFuncArgs<F extends keyof WSFunc> = Parameters<WSFunc[F]>[1];
+
+type WSRequest = {
+  func: string;
+  args: any;
+};
+
+type WSConn = {
+  ws: WebSocket;
+  state: {
+    init: boolean;
+    convId: string;
+    subscribed: string[];
+  };
+};
+
+export type WebScoketCallback<T = any> = {
+  setSend: (fn: (convId: string, data: T) => void) => void;
+  onMessage: (convId: string, event: T) => void;
+};
+
+class WebSocketHandler {
+  private wsConns: WSConn[] = [];
+  private lookup: { [eventTarget: string]: WebScoketCallback } = {};
+  private wsFunc: WSFunc;
+
+  constructor() {
+    this.wsFunc = {
+      handshake: (ws, { convId }) => {
+        const conn = this.wsConns.find((v) => v.ws === ws);
+        console.log("[handshake] conn: ", !!conn);
+        conn.state = {
+          init: true,
+          convId,
+          subscribed: ["systemEvent"],
+        };
+      },
+      subscribe: (ws, { eventTarget }) => {
+        const conn = this.wsConns.find((v) => v.ws === ws);
+        console.log("[subscribe] conn: ", !!conn);
+        if (!conn.state.subscribed.includes(eventTarget)) {
+          conn.state.subscribed.push(eventTarget);
+        }
+      },
+      publish: (ws, { eventTarget, eventData }) => {
+        const conn = this.wsConns.find((v) => v.ws === ws);
+        console.log("[post] conn: ", !!conn);
+        this.lookup[eventTarget]?.onMessage(conn.state.convId, eventData);
+      },
+    };
+  }
+
+  public register<T>(eventTarget: string, handler: WebScoketCallback<T>) {
+    this.lookup[eventTarget] = handler;
+    handler.setSend((toConvId, data) => {
+      this.wsConns.forEach(({ ws, state: { init, convId, subscribed } }) => {
+        if (init && convId === toConvId && subscribed.includes(eventTarget)) {
+          ws.send(JSON.stringify({ eventTarget, eventData: data }));
+        }
+      });
+    });
+  }
+
+  public onConnection(ws: WebSocket) {
+    const existing = this.wsConns.find((v) => v.ws === ws);
+    if (existing) {
+      return;
+    }
+    this.wsConns.push({
+      ws,
+      state: { init: false, convId: "", subscribed: [] },
+    });
+
+    ws.on("message", (msg) => {
+      const { func, args } = JSON.parse(msg.toString()) as WSRequest;
+      switch (func as keyof WSFunc) {
+        case "handshake":
+          this.wsFunc.handshake(ws, args as WSFuncArgs<"handshake">);
+          break;
+        case "subscribe":
+          this.wsFunc.subscribe(ws, args as WSFuncArgs<"subscribe">);
+          break;
+        case "publish":
+          this.wsFunc.publish(ws, args as WSFuncArgs<"publish">);
+          break;
+      }
+      // this.lookup[channel]?.onMessage(event);
+    });
   }
 }

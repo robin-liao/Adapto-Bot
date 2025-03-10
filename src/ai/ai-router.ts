@@ -3,12 +3,17 @@ import * as fs from "fs";
 import format from "string-template";
 import { MediaStream } from "wrtc";
 import {
+  MP3Track,
   OpenAITrack,
   SineWaveTrack,
   Transcriber,
+  VolumnAdjust,
   createPeerConnection,
+  getGoogleSearchTool,
+  getYouTubeSearchTool,
 } from "./webrtc-utils";
 import { OpenAI } from "./openai-api";
+import config from "../config";
 
 class AIRouter {
   private router = Router();
@@ -43,51 +48,54 @@ class AIRouter {
     this.router.post("/connect", async (req, res) => {
       const { localDescription: sdp } = await createPeerConnection(
         req.body,
-        (event, _peer) => {
-          console.log("Save client sender stream");
-          this.senderStream = event.streams[0];
-        },
-        (peer) => {
-          this.senderStream.getTracks().forEach(async (track) => {
-            console.log(
-              `add track to peer connection: ${track.kind.toUpperCase()} ${
-                track.id
-              }`
-            );
+        async (peer, track) => {
+          console.log(
+            `add track to peer connection: ${track.kind.toUpperCase()} ${
+              track.id
+            }`
+          );
 
-            const process = new OpenAITrack(track);
-            peer.addTrack(process.audioOutputTrack, this.senderStream);
-            await process.init();
-          });
+          // const process = new VolumnAdjust(track);
+          const process = new MP3Track(track);
+          // const process = new OpenAITrack(track);
+          // process.registerTool(getGoogleSearchTool());
+          // process.registerTool(getYouTubeSearchTool());
+
+          peer.addTrack(process.audioOutputTrack, this.senderStream);
+          process.play(config.dataPrefix + "/media/silent-scream.mp3", true);
+          // await process.init();
+        },
+        (peer, track) => {
+          if (track) {
+            this.senderStream.removeTrack(track);
+            console.log("Remove track from peer connection");
+          }
         }
       );
       res.json(sdp);
     });
 
     this.router.post("/broadcast", async (req, res) => {
-      const { localDescription: sdp } = await createPeerConnection(
-        req.body,
-        (event, _peer) => {
-          console.log("Save client sender stream");
-          this.senderStream = event.streams[0];
-        }
-      );
+      const { localDescription: sdp } = await createPeerConnection(req.body);
       res.json(sdp);
     });
 
     this.router.post("/consume", async (req, res) => {
       const { localDescription: sdp } = await createPeerConnection(
         req.body,
-        undefined,
-        (peer) => {
-          this.senderStream.getTracks().forEach((track) => {
-            console.log(
-              `add track to peer connection: ${track.kind.toUpperCase()} ${
-                track.id
-              }`
-            );
-            peer.addTrack(track, this.senderStream);
-          });
+        async (peer, track) => {
+          console.log(
+            `add track to peer connection: ${track.kind.toUpperCase()} ${
+              track.id
+            }`
+          );
+          peer.addTrack(track, this.senderStream);
+        },
+        (peer, track) => {
+          if (track) {
+            this.senderStream.removeTrack(track);
+            console.log("Remove track from peer connection");
+          }
         }
       );
       res.json(sdp);

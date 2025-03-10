@@ -1,60 +1,30 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import express from "express";
 import * as bodyParser from "body-parser";
-import * as _ from "lodash";
 import cors from "cors";
+import express from "express";
+import { createServer } from "http";
+import * as _ from "lodash";
+import WebSocket from "ws";
 import { Auth } from "./auth";
 
 // Import required bot services. See https://aka.ms/bot-services to learn more about the different parts of a bot.
 import {
-  BotFrameworkAdapter,
+  CloudAdapter,
+  ConfigurationBotFrameworkAuthentication,
   ConversationState,
   MemoryStorage,
-  ConfigurationBotFrameworkAuthentication,
-  CloudAdapter,
 } from "botbuilder";
 
 // Import required bot configuration.
-import { BotConfiguration, IEndpointService } from "botframework-config";
 
-import { TeamsBot } from "./teams-bot";
+import { aiRouter } from "./ai";
 import config from "./config";
-import { printableJson } from "./utils";
 import azureDevOpsRouter from "./devops/read-git-file";
 import { smeRouter } from "./sme-router";
-import { aiRouter } from "./ai";
-
-// Read botFilePath and botFileSecret from .env file
-// Note: Ensure you have a .env file and include botFilePath and botFileSecret.
-// const ENV_FILE = path.join(__dirname, "..", ".env");
-// const loadFromEnv = config({ path: ENV_FILE });
-
-// // Get the .bot file path
-// // See https://aka.ms/about-bot-file to learn more about .bot file its use and bot configuration.
-// const BOT_FILE = path.join(__dirname, '..', (process.env.botFilePath || ''));
-// let botConfig;
-// try {
-//     // read bot configuration from .bot file.
-//     botConfig = BotConfiguration.loadSync(BOT_FILE, process.env.botFileSecret);
-// } catch (err) {
-//     console.error(`\nError reading bot file. Please ensure you have valid botFilePath and botFileSecret set for your environment.`);
-//     console.error(`\n - The botFileSecret is available under appsettings for your Azure Bot Service bot.`);
-//     console.error(`\n - If you are running this bot locally, consider adding a .env file with botFilePath and botFileSecret.`);
-//     console.error(`\n - See https://aka.ms/about-bot-file to learn more about .bot file its use and bot configuration.\n\n`);
-//     process.exit();
-// }
-
-// // For local development configuration as defined in .bot file.
-// const DEV_ENVIRONMENT = 'development';
-
-// // Define name of the endpoint configuration section from the .bot file.
-// const BOT_CONFIGURATION = (process.env.NODE_ENV || DEV_ENVIRONMENT);
-
-// // Get bot endpoint configuration by service name.
-// // Bot configuration as defined in .bot file.
-// const endpointConfig = <IEndpointService>botConfig.findServiceByNameOrId(BOT_CONFIGURATION);
+import { TeamsBot } from "./teams-bot";
+import { printableJson } from "./utils";
 
 // // Create adapter.
 // See https://aka.ms/about-bot-adapter to learn more about to learn more about bot adapter.
@@ -72,7 +42,7 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication({
   CertificatePrivateKey: config.CERT_PRIVATE_KEY_PEM,
 });
 
-const adapter = new CloudAdapter(botFrameworkAuthentication);
+export const adapter = new CloudAdapter(botFrameworkAuthentication);
 
 // Catch-all for any unhandled errors in your bot.
 adapter.onTurnError = async (turnContext, error) => {
@@ -145,6 +115,15 @@ app.use((req, res, next) => {
 // Create the TeamsBot.
 const bot = new TeamsBot(conversationState);
 
+// Create HTTP & WS server
+const server = createServer(app);
+const wss = new WebSocket.Server({ server });
+
+wss.on("connection", (ws, req) => {
+  console.log("WebSocket connection established: " + req.url);
+  bot.onWebSocketConnection(ws);
+});
+
 // Listen for incoming activities and route them to your bot for processing.
 
 app.post("/api/messages", (req, res) => {
@@ -174,6 +153,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/task", bot.getTaskModuleRouter());
+app.use("/tab", bot.getTabRouter());
 app.use("/messageExtension", bot.getMessageExtensionSettingRouter());
 app.use("/webhook", bot.getOutgoingWebhookRouter());
 app.use("/devops", azureDevOpsRouter);
@@ -182,7 +162,7 @@ app.use(cors());
 app.use("/static", express.static(config.dataPrefix));
 app.use("/ai", aiRouter);
 
-app.listen(config.port, () => {
+server.listen(config.port, () => {
   console.log(`\n${app.name} listening on PORT ${config.port}`);
   console.log(
     `\nGet Bot Framework Emulator: https://aka.ms/botframework-emulator.`

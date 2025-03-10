@@ -27,7 +27,8 @@
               "type": "talk"
             },
             "intent": "sineWave",
-            "lang": "en-US"
+            "lang": "en-US",
+            "sessionTitle": "Sine Wave"
           }
         }
       ]
@@ -50,7 +51,8 @@
               "type": "talk"
             },
             "intent": "transcribe",
-            "lang": "en-US"
+            "lang": "en-US",
+            "sessionTitle": "Transcribe"
           }
         }
       ]
@@ -73,7 +75,8 @@
               "type": "talk"
             },
             "intent": "echo",
-            "lang": "en-US"
+            "lang": "en-US",
+            "sessionTitle": "Echo"
           }
         }
       ]
@@ -96,7 +99,27 @@
               "type": "talk"
             },
             "intent": "openai",
-            "lang": "en-US"
+            "lang": "en-US",
+            "sessionTitle": "Open AI Realtime"
+          }
+        },
+        {
+          "type": "Action.Submit",
+          "title": "Collab Stage",
+          "data": {
+            "msteams": {
+              "type": "invoke",
+              "value": {
+                "type": "tab/tabInfoAction",
+                "tabInfo": {
+                  "contentUrl": "https://ypliao.ngrok.io/tab/wrtcCollabStage/client/wrtc-stage.html",
+                  "websiteUrl": "https://ypliao.ngrok.io/tab/wrtcCollabStage/client/wrtc-stage.html",
+                  "name": "Collaborative Stage",
+                  "entityId": "wrtcCollabStage",
+                  "openMode": "popoutWithChat"
+                }
+              }
+            }
           }
         }
       ]

@@ -16,6 +16,8 @@ import {
 } from "botbuilder";
 import { UserDataTable } from "./storage/user-table";
 import config from "./config";
+import { adapter } from "./app";
+import { Client as MapClient } from "@googlemaps/google-maps-services-js";
 
 export const sleep = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
@@ -93,6 +95,28 @@ export const teamsSendProactiveMessage = async (
     newConversation[0],
     async (ctx) => {
       onNewlyCreatedReplyChain && (await onNewlyCreatedReplyChain(ctx));
+    }
+  );
+};
+
+export const teamsSendProactiveOneOnOneMessage = async (
+  conversationId,
+  serviceUrl,
+  message: Partial<Activity>
+) => {
+  await adapter.continueConversationAsync(
+    config.microsoftAppID,
+    {
+      conversation: {
+        id: conversationId,
+        isGroup: false,
+        conversationType: "personal",
+        name: "",
+      },
+      serviceUrl,
+    },
+    async (context) => {
+      await context.sendActivity(message);
     }
   );
 };
@@ -205,36 +229,8 @@ export class TextStreaming {
     private convRef: ConversationReference
   ) {}
 
-  private async performContext(logic: (context: TurnContext) => Promise<void>) {
-    return new Promise<TurnContext>((resolve, reject) => {
-      this.adaptor.continueConversationAsync(
-        config.microsoftAppID,
-        this.convRef,
-        async (turnCtx) => {
-          turnCtx.onSendActivities(async (ctx, activities, next) => {
-            console.log();
-            console.log("[SEND-ACTIVITIES REQUEST]");
-            console.log(printableJson(activities));
-            console.log();
-
-            const result = await next();
-
-            console.log();
-            console.log("[SEND-ACTIVITIES RESPONSE]");
-            console.log(printableJson(result));
-            console.log();
-
-            return result;
-          });
-          try {
-            await logic(turnCtx);
-            resolve(turnCtx);
-          } catch (error) {
-            reject(error);
-          }
-        }
-      );
-    });
+  private performContext(logic: (context: TurnContext) => Promise<void>) {
+    return performContext(this.adaptor, this.convRef, logic);
   }
 
   private async start(text: string, streamType) {
@@ -480,5 +476,150 @@ export class EndlessTextStreaming {
       this.txtStream = undefined;
     }
     this.isWorking = false;
+  }
+}
+
+export const performContext = async (
+  adaptor: BotAdapter,
+  convRef: ConversationReference,
+  logic: (context: TurnContext) => Promise<void>
+) =>
+  new Promise<TurnContext>((resolve, reject) => {
+    adaptor.continueConversationAsync(
+      config.microsoftAppID,
+      convRef,
+      async (turnCtx) => {
+        turnCtx.onSendActivities(async (ctx, activities, next) => {
+          console.log();
+          console.log("[SEND-ACTIVITIES REQUEST]");
+          console.log(printableJson(activities));
+          console.log();
+
+          const result = await next();
+
+          console.log();
+          console.log("[SEND-ACTIVITIES RESPONSE]");
+          console.log(printableJson(result));
+          console.log();
+
+          return result;
+        });
+        try {
+          await logic(turnCtx);
+          resolve(turnCtx);
+        } catch (error) {
+          reject(error);
+        }
+      }
+    );
+  });
+
+export type MapPlace = {
+  name: string;
+  address: string;
+  lat: number;
+  lng: number;
+  phone: string;
+  website: string;
+  rating?: number;
+  total_reviews: number;
+  photo_url: string;
+  url?: string;
+};
+
+export class GoogleMapHelper {
+  private mapClient = new MapClient({});
+
+  public async getStaticMapOfMarker(lat: number, lng: number, zoom = 15) {
+    // Construct Google Static Map URL
+    const mapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=${zoom}&size=600x400&markers=color:red|${lat},${lng}&key=${config.googleAPIKey}`;
+
+    // Fetch the image using fetch instead of axios
+    const response = await fetch(mapUrl);
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch map image");
+    }
+
+    // Read the response as an ArrayBuffer
+    const arrayBuffer = await response.arrayBuffer();
+
+    // Convert image data to Base64
+    const base64Image = Buffer.from(arrayBuffer).toString("base64");
+    const imageUri = `data:image/png;base64,${base64Image}`;
+    return imageUri;
+  }
+
+  public async searchPlace(
+    query: string,
+    location = "47.6062,-122.3321",
+    radius = 10000
+  ) {
+    try {
+      const response = await this.mapClient.textSearch({
+        params: {
+          query: query as string,
+          location: location as string,
+          radius: Number(radius),
+          key: config.googleAPIKey as string,
+        },
+      });
+
+      if (response.data.status !== "OK") {
+        return [];
+      }
+
+      // Step 2: Fetch details for each place using place_id
+      const places = await Promise.all(
+        response.data.results.map(async (place) =>
+          this.getPlaceDetails(place.place_id)
+        )
+      );
+
+      return places;
+    } catch (error) {
+      console.error("Error fetching places:", error);
+      throw new Error("Error fetching places");
+    }
+  }
+
+  private async getPlaceDetails(placeId: string): Promise<MapPlace | null> {
+    try {
+      const response = await this.mapClient.placeDetails({
+        params: {
+          place_id: placeId,
+          key: config.googleAPIKey as string,
+          fields: [
+            "url,name,formatted_address,geometry,international_phone_number,website,photos,rating,user_ratings_total",
+          ],
+        },
+      });
+
+      if (response.data.status !== "OK") {
+        return null;
+      }
+
+      const place = response.data.result;
+      const photoReference = place.photos?.[0]?.photo_reference;
+      const photoUrl = photoReference
+        ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${config.googleAPIKey}`
+        : "https://via.placeholder.com/400"; // Default placeholder if no image
+
+      return {
+        name: place.name,
+        address: place.formatted_address,
+        lat: place.geometry.location.lat,
+        lng: place.geometry.location.lng,
+        phone: place.international_phone_number || "N/A",
+        website: place.website || "N/A",
+        total_reviews: place.user_ratings_total || 0,
+        photo_url: photoUrl,
+        ...(place.url && { url: place.url }),
+        ...(place.rating && { rating: place.rating }),
+      };
+    } catch (error) {
+      console.error("Error fetching place details:", error);
+      return null;
+    }
   }
 }

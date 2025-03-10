@@ -42,6 +42,7 @@ export class GPTBot implements ITeamsScenario {
         type: ActivityTypes.Typing,
       });
 
+      console.log(`Query OpenAI.gpt: ${text}`);
       const res = await OpenAI.gpt(text);
       const msg = MessageFactory.text(res);
       await ctx.sendActivities([msg]);

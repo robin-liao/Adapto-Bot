@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 import {
+  AdaptiveCardInvokeResponse,
+  AdaptiveCardInvokeValue,
   AppBasedLinkQuery,
   Attachment,
   BotHandler,
@@ -30,7 +32,7 @@ import { Router } from "express";
 import { Auth } from "./auth";
 import { DOWNLOAD_INFO_CONTENT_TYPE, IBotFileHandler } from "./bot-file-helper";
 import { CardGenerator } from "./card-gen";
-import { GPTBot } from "./gpt-bot";
+import { GPTBot } from "./ai/gpt-bot";
 import { outgoingWebhookRouter } from "./outgoing-webhook-router";
 import { AuthBot } from "./scenarios/auth-bot";
 import { CardUpdate } from "./scenarios/card-update";
@@ -58,6 +60,9 @@ import {
 } from "./utils";
 import { TaskModuleAdaptiveCardList } from "./task-modules/ac-sample-list";
 import { ActivityGenerator } from "./scenarios/activity-generator";
+import { WebRTCBot } from "./ai/wrtc-bot";
+import WebSocket from "ws";
+import * as _ from "lodash";
 
 export interface ITeamsScenario {
   accept(teamsBot: IScenarioBuilder);
@@ -66,9 +71,11 @@ export interface ITeamsScenario {
 export interface IScenarioBuilder {
   registerTextCommand(pattern: RegExp, handler: TextCommandCallback);
   registerInvoke(intent: string, handler: InvokeCallback);
+  registerACv2Handler(intent: string, handler: ACv2Callback);
   registerUniversalSearch(dataset: string, handler: InvokeSearchCallback);
   registerTaskModule(commandId: string, task: ITaskModule);
   registerTab(tabEntityId: string, tab: IAdaptiveCardTab);
+  registerTabRouter(tabEntityId: string, router: Router);
   registerMessageExtensionQuery(
     commandId: string,
     handler: MessageExtensionQueryCallback
@@ -78,6 +85,10 @@ export interface IScenarioBuilder {
     handler: MessageExtensionSettingHandler
   );
   registerFileHandler(handler: IBotFileHandler);
+  registerWebSocketHandler<T>(
+    eventTarget: string,
+    handler: WebScoketCallback<T>
+  );
 
   sendCard(
     ctx: TurnContext,
@@ -93,12 +104,22 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
   private readonly tmHandler = new TaskModuleHandler();
   private readonly tabHandler = new TabHandler();
   private readonly invokeHandler = new InvokeHandler();
+  private readonly acv2Handler = new AdaptiveCardV2Handler();
   private readonly fileHandlers: IBotFileHandler[] = [];
+  private readonly wsHandler = new WebSocketHandler();
 
   constructor(conversationState: ConversationState) {
     super();
     this.setupHandlers();
     this.setupScenarios();
+  }
+
+  public onWebSocketConnection(ws: WebSocket) {
+    this.wsHandler.onConnection(ws);
+  }
+
+  public getTabRouter() {
+    return this.tabHandler.tabRouter;
   }
 
   public getTaskModuleRouter() {
@@ -128,12 +149,20 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     this.invokeHandler.registerUniversalSearch(dataset, handler);
   }
 
+  public registerACv2Handler(intent: string, handler: ACv2Callback) {
+    this.acv2Handler.register(intent, handler);
+  }
+
   public registerTaskModule(cmdID: string, task: ITaskModule) {
     this.tmHandler.register(cmdID, task);
   }
 
   public registerTab(tabEntityId: string, tab: IAdaptiveCardTab) {
     this.tabHandler.register(tabEntityId, tab);
+  }
+
+  public registerTabRouter(tabEntityId: string, router: Router) {
+    this.tabHandler.registerRouter(tabEntityId, router);
   }
 
   public registerMessageExtensionQuery(
@@ -156,11 +185,32 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     }
   }
 
+  public registerWebSocketHandler<T>(
+    eventTarget: string,
+    handler: WebScoketCallback<T>
+  ) {
+    this.wsHandler.register(eventTarget, handler);
+  }
+
   protected async onInvokeActivity(ctx: TurnContext): Promise<InvokeResponse> {
     const result = await super.onInvokeActivity(ctx);
     return result.status === StatusCodes.NOT_IMPLEMENTED
       ? this.handleInvoke(ctx)
       : result;
+  }
+
+  protected async onAdaptiveCardInvoke(
+    ctx: TurnContext,
+    { action: { data } }: AdaptiveCardInvokeValue
+  ): Promise<AdaptiveCardInvokeResponse> {
+    const res = await this.acv2Handler.dispatch(ctx, data);
+    return (
+      res ?? {
+        statusCode: StatusCodes.NOT_FOUND,
+        type: "application/vnd.microsoft.activity.message",
+        value: {},
+      }
+    );
   }
 
   protected async handleTeamsAppBasedLinkQuery(
@@ -412,10 +462,10 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
       return ctx.activity.value
         ? this.handleOnMessageBack(ctx, next)
         : ctx.activity.attachments?.some(
-          (x) => x.contentType === DOWNLOAD_INFO_CONTENT_TYPE
-        )
-          ? this.handleOnMessageWithFileDownload(ctx, next)
-          : this.handleOnMessage(ctx, next);
+            (x) => x.contentType === DOWNLOAD_INFO_CONTENT_TYPE
+          )
+        ? this.handleOnMessageWithFileDownload(ctx, next)
+        : this.handleOnMessage(ctx, next);
     });
     this.registerOnTeamsEvents();
   }
@@ -435,6 +485,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     new SMEMessageExtension().accept(this);
     new TaskModuleAdaptiveCardList().accept(this);
     new ActivityGenerator().accept(this);
+    new WebRTCBot().accept(this);
   }
 
   private async handleOnMessage(ctx: TurnContext, next: () => Promise<void>) {
@@ -699,11 +750,11 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
             },
             ...(ctx.activity.value
               ? [
-                {
-                  title: "value",
-                  value: JSON.stringify(ctx.activity.value),
-                },
-              ]
+                  {
+                    title: "value",
+                    value: JSON.stringify(ctx.activity.value),
+                  },
+                ]
               : []),
           ],
         },
@@ -758,9 +809,9 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
       mri: string;
       displayName: string;
     } = {
-        mri: "97b1ec61-45bf-453c-9059-6e8984e0cef4",
-        displayName: "Robin Liao",
-      }
+      mri: "97b1ec61-45bf-453c-9059-6e8984e0cef4",
+      displayName: "Robin Liao",
+    }
   ): Promise<string[]> {
     const send = () => {
       try {
@@ -1032,9 +1083,18 @@ class TaskModuleHandler {
 
 class TabHandler {
   private lookup: { [tabEntityId: string]: IAdaptiveCardTab } = {};
+  private router = Router();
+
+  public get tabRouter() {
+    return this.router;
+  }
 
   public register(tabEntityId: string, tab: IAdaptiveCardTab) {
     this.lookup[tabEntityId] = tab;
+  }
+
+  public registerRouter(tabEntityId: string, router: Router) {
+    this.router.use(`/${tabEntityId}`, router);
   }
 
   public handleTeamsTabFetch(
@@ -1053,5 +1113,131 @@ class TabHandler {
   ): Promise<TabResponse> {
     const tab = this.lookup[tabEntityId];
     return tab ? tab.tabSubmit(ctx, request) : Promise.resolve({ tab: {} });
+  }
+}
+
+type ACv2Callback = (
+  ctx: TurnContext,
+  data: any
+) => Promise<AdaptiveCardInvokeResponse>;
+
+class AdaptiveCardV2Handler {
+  private lookup: { [intent: string]: ACv2Callback } = {};
+
+  public register(intent: string, handler: ACv2Callback) {
+    if (this.lookup[intent]) {
+      throw new Error(`Invoke handler for intent "${intent}" already exists`);
+    }
+    this.lookup[intent] = handler;
+  }
+
+  public async dispatch(
+    ctx: TurnContext,
+    data: any
+  ): Promise<AdaptiveCardInvokeResponse | undefined> {
+    const intentQry: string = data.intent;
+    if (this.lookup[intentQry]) {
+      return this.lookup[intentQry]?.(ctx, data);
+    }
+  }
+}
+
+type WSFunc = {
+  handshake: (ws: WebSocket, args: { convId: string }) => void;
+  subscribe: (ws: WebSocket, args: { eventTarget: string }) => void;
+  publish: (
+    ws: WebSocket,
+    args: { eventTarget: string; eventData: any }
+  ) => void;
+};
+
+type WSFuncArgs<F extends keyof WSFunc> = Parameters<WSFunc[F]>[1];
+
+type WSRequest = {
+  func: string;
+  args: any;
+};
+
+type WSConn = {
+  ws: WebSocket;
+  state: {
+    init: boolean;
+    convId: string;
+    subscribed: string[];
+  };
+};
+
+export type WebScoketCallback<T = any> = {
+  setSend: (fn: (convId: string, data: T) => void) => void;
+  onMessage: (convId: string, event: T) => void;
+};
+
+class WebSocketHandler {
+  private wsConns: WSConn[] = [];
+  private lookup: { [eventTarget: string]: WebScoketCallback } = {};
+  private wsFunc: WSFunc;
+
+  constructor() {
+    this.wsFunc = {
+      handshake: (ws, { convId }) => {
+        const conn = this.wsConns.find((v) => v.ws === ws);
+        console.log("[handshake] conn: ", !!conn);
+        conn.state = {
+          init: true,
+          convId,
+          subscribed: ["systemEvent"],
+        };
+      },
+      subscribe: (ws, { eventTarget }) => {
+        const conn = this.wsConns.find((v) => v.ws === ws);
+        console.log("[subscribe] conn: ", !!conn);
+        if (!conn.state.subscribed.includes(eventTarget)) {
+          conn.state.subscribed.push(eventTarget);
+        }
+      },
+      publish: (ws, { eventTarget, eventData }) => {
+        const conn = this.wsConns.find((v) => v.ws === ws);
+        console.log("[post] conn: ", !!conn);
+        this.lookup[eventTarget]?.onMessage(conn.state.convId, eventData);
+      },
+    };
+  }
+
+  public register<T>(eventTarget: string, handler: WebScoketCallback<T>) {
+    this.lookup[eventTarget] = handler;
+    handler.setSend((toConvId, data) => {
+      this.wsConns.forEach(({ ws, state: { init, convId, subscribed } }) => {
+        if (init && convId === toConvId && subscribed.includes(eventTarget)) {
+          ws.send(JSON.stringify({ eventTarget, eventData: data }));
+        }
+      });
+    });
+  }
+
+  public onConnection(ws: WebSocket) {
+    const existing = this.wsConns.find((v) => v.ws === ws);
+    if (existing) {
+      return;
+    }
+    this.wsConns.push({
+      ws,
+      state: { init: false, convId: "", subscribed: [] },
+    });
+
+    ws.on("message", (msg) => {
+      const { func, args } = JSON.parse(msg.toString()) as WSRequest;
+      switch (func as keyof WSFunc) {
+        case "handshake":
+          this.wsFunc.handshake(ws, args as WSFuncArgs<"handshake">);
+          break;
+        case "subscribe":
+          this.wsFunc.subscribe(ws, args as WSFuncArgs<"subscribe">);
+          break;
+        case "publish":
+          this.wsFunc.publish(ws, args as WSFuncArgs<"publish">);
+          break;
+      }
+      // this.lookup[channel]?.onMessage(event);
+    });
   }
 }

@@ -1,0 +1,405 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebSocket Connection</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      #container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+      #messages {
+        border: 1px solid #ccc;
+        padding: 10px;
+        height: 200px;
+        overflow-y: scroll;
+        margin-bottom: 10px;
+      }
+      #input {
+        width: calc(100% - 22px);
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      #send {
+        padding: 10px 20px;
+        border: none;
+        background-color: #007bff;
+        color: #fff;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      #send:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <h1>WebSocket Chat</h1>
+      <div id="messages"></div>
+      <input type="text" id="input" placeholder="Type a message..." />
+      <button id="send">Send</button>
+    </div>
+
+    <script>
+      const ws = new WebSocket("wss://ypliao.ngrok.io");
+      const messages = document.getElementById("messages");
+      const input = document.getElementById("input");
+      const sendButton = document.getElementById("send");
+      const tabEntityId = "wrtcCollabStage";
+      const convId =
+        "a:1H7SI9551GsMNrECkTGfeqkNf9T_SPpAvfZaK-XUYYBZAO74mUwqzpVLYwvonVLWKWFSvHRww1pzwaRdLOY9fO7BDN02nruIHMCtNSrPhYQxZpaRFYMREu14p8EY4_ofR";
+
+      ws.onopen = () => {
+        console.log("Connected to the WebSocket server");
+        ws.send(
+          JSON.stringify({
+            func: "handshake",
+            args: { convId },
+          })
+        );
+        ws.send(
+          JSON.stringify({
+            func: "subscribe",
+            args: { eventTarget: tabEntityId },
+          })
+        );
+      };
+
+      ws.onmessage = (event) => {
+        const message = document.createElement("div");
+        const { eventTarget, eventData } = JSON.parse(event.data);
+        if (eventTarget === tabEntityId) {
+          message.textContent = eventData.message;
+          messages.appendChild(message);
+          messages.scrollTop = messages.scrollHeight;
+        }
+      };
+
+      sendButton.onclick = () => {
+        const message = input.value;
+        const payload = {
+          func: "publish",
+          args: {
+            eventTarget: tabEntityId,
+            eventData: { message },
+          },
+        };
+        ws.send(JSON.stringify(payload));
+        input.value = "";
+      };
+
+      input.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+          sendButton.click();
+        }
+      });
+    </script>
+  </body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Google Maps Search & Screenshot</title>
+    <script
+      src="https://res.cdn.office.net/teams-js/2.34.0/js/MicrosoftTeams.min.js"
+      integrity="sha384-brW9AazbKR2dYw2DucGgWCCcmrm2oBFV4HQidyuyZRI/TnAkmOOnTARSTdps3Hwt"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      async
+      defer
+      src="https://maps.googleapis.com/maps/api/js?key={TXT_GOOGLE_API_KEY}&callback=initMap"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        height: 100vh;
+      }
+      #map {
+        height: 100%;
+        width: 100%;
+        margin-top: 10px;
+      }
+      #search-container {
+        margin-bottom: 10px;
+      }
+      input,
+      button {
+        padding: 8px;
+        font-size: 16px;
+      }
+
+      /* Styled InfoWindow */
+      .custom-info-window {
+        font-family: Arial, sans-serif;
+        max-width: 300px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        padding: 0;
+        background-color: white;
+        text-align: left;
+      }
+      .custom-info-window img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 10px;
+      }
+      .custom-info-window-content {
+        padding: 10px;
+      }
+      .custom-info-window h3 {
+        margin: 5px 0;
+        font-size: 16px;
+        color: #333;
+      }
+      .custom-info-window p {
+        font-size: 14px;
+        color: #555;
+        margin: 4px 0;
+        display: flex;
+        align-items: center;
+      }
+      .custom-info-window .icon {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        margin-left: 5px;
+        cursor: pointer;
+      }
+      .custom-info-window .icon img {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="search-container">
+      <div id="status"></div>
+      <input type="text" id="query" placeholder="Search places..." />
+      <button onclick="searchPlaces()">Search</button>
+      <button onclick="captureScreenshot()">Capture Map</button>
+    </div>
+    <div id="map"></div>
+    <div id="screenshot-preview"></div>
+
+    <script>
+      let ws;
+      const reconnectInterval = 1000;
+      const elQuery = document.getElementById("query");
+      const tabEntityId = "wrtcCollabStage";
+      let convId =
+        "a:1H7SI9551GsMNrECkTGfeqkNf9T_SPpAvfZaK-XUYYBZAO74mUwqzpVLYwvonVLWKWFSvHRww1pzwaRdLOY9fO7BDN02nruIHMCtNSrPhYQxZpaRFYMREu14p8EY4_ofR";
+
+      function connectWebSocket() {
+        ws = new WebSocket("wss://{TXT_HOST}");
+        ws.onopen = () => {
+          console.log("Connected to the WebSocket server");
+          document.getElementById("status").textContent = "";
+
+          try {
+            microsoftTeams.initialize();
+            microsoftTeams.app.getContext().then((context) => {
+              console.log("Context:", context);
+            });
+          } catch (error) {
+            console.error("Error initializing Microsoft Teams SDK:", error);
+          }
+
+          ws.send(
+            JSON.stringify({
+              func: "handshake",
+              args: { convId },
+            })
+          );
+          ws.send(
+            JSON.stringify({
+              func: "subscribe",
+              args: { eventTarget: tabEntityId },
+            })
+          );
+        };
+
+        ws.onmessage = (event) => {
+          const message = document.createElement("div");
+          const { eventTarget, eventData } = JSON.parse(event.data);
+          if (eventTarget === tabEntityId) {
+            if (eventData.placeQuery) {
+              elQuery.value = eventData.placeQuery;
+            }
+            if (eventData.places?.length) {
+              setMarkers(eventData.places);
+            }
+          }
+        };
+
+        ws.onclose = function (event) {
+          console.log("WebSocket closed, attempting to reconnect...", event);
+          document.getElementById("status").textContent =
+            "Disconnected. Reconnecting...";
+          retryConnection();
+        };
+      }
+
+      function retryConnection() {
+        setTimeout(() => {
+          console.log("Reconnecting...");
+          connectWebSocket();
+        }, reconnectInterval);
+
+        // Increase interval exponentially (max 30 seconds)
+        reconnectInterval = Math.min(reconnectInterval * 2, 30000);
+      }
+
+      // Start connection on page load
+      connectWebSocket();
+
+      let map;
+      let markers = [];
+
+      function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {
+          center: { lat: 47.6062, lng: -122.3321 }, // Default: Seattle
+          zoom: 12,
+          gestureHandling: "cooperative",
+        });
+        infoWindow = new google.maps.InfoWindow();
+      }
+
+      async function searchPlaces() {
+        const query = document.getElementById("query").value.trim();
+        if (!query) return alert("Please enter a search query");
+
+        try {
+          const response = await fetch(
+            `/tab/wrtcCollabStage/search-map?query=${encodeURIComponent(query)}`
+          );
+          const data = await response.json();
+
+          if (data.length === 0) {
+            alert("No results found");
+            return;
+          }
+          setMarkers(data);
+        } catch (error) {
+          console.error("Error fetching search results:", error);
+          alert("Failed to fetch results. Check console for details.");
+        }
+      }
+
+      function setMarkers(data) {
+        clearMarkers();
+        const bounds = new google.maps.LatLngBounds();
+
+        data.forEach((place) => {
+          const position = { lat: place.lat, lng: place.lng };
+          const marker = new google.maps.Marker({
+            position,
+            map,
+            title: place.name,
+          });
+
+          // Add click event to open info window
+          marker.addListener("click", () => {
+            const contentString = `
+                <div class="custom-info-window">
+                    <img src="${place.photo_url}" alt="${place.name}">
+                    <div class="custom-info-window-content">
+                        <h3>${place.name}</h3>
+                        <p><strong>⭐&nbsp;${place.rating}</strong>&nbsp;(${place.total_reviews} reviews)</p>
+                        <p><strong>📍</strong>&nbsp;${place.address}</p>
+                        <p><strong>📞</strong>&nbsp;${place.phone}</p>
+                        <p>
+                            <strong>🔗</strong> 
+                            &nbsp;
+                            <a href="${place.website}" target="_blank" class="icon">
+                                Website
+                            </a>
+                        </p>
+                    </div>
+                </div>
+              `;
+            infoWindow.setContent(contentString);
+            infoWindow.open(map, marker);
+          });
+
+          markers.push(marker);
+          bounds.extend(position);
+        });
+
+        map.fitBounds(bounds);
+      }
+
+      function clearMarkers() {
+        markers.forEach((marker) => marker.setMap(null));
+        markers = [];
+      }
+
+      async function captureScreenshot() {
+        const mapElement = document.getElementById("map");
+
+        try {
+          const canvas = await html2canvas(mapElement);
+          const imageData = canvas.toDataURL("image/png");
+
+          // Send image to backend
+          const response = await fetch(
+            "http://localhost:5000/upload-screenshot",
+            {
+              method: "POST",
+              body: dataURItoBlob(imageData),
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+
+          const result = await response.json();
+          if (result.fileUrl) {
+            displayScreenshot(result.fileUrl);
+          }
+        } catch (error) {
+          console.error("Error capturing screenshot:", error);
+          alert("Failed to capture map screenshot.");
+        }
+      }
+
+      function dataURItoBlob(dataURI) {
+        const byteString = atob(dataURI.split(",")[1]);
+        const mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([ab], { type: mimeString });
+      }
+
+      function displayScreenshot(imageUrl) {
+        const preview = document.getElementById("screenshot-preview");
+        preview.innerHTML = `<p>Screenshot saved:</p><a href="${imageUrl}" target="_blank"><img src="${imageUrl}" width="300"></a>`;
+      }
+    </script>
+  </body>
+</html>

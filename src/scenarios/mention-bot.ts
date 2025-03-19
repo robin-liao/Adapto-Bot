@@ -4,6 +4,7 @@ import {
   MessageFactory,
   MessagingExtensionAction,
   MessagingExtensionActionResponse,
+  StatusCodes,
   TaskModuleTaskInfo,
   TeamsChannelAccount,
   TeamsInfo,
@@ -20,6 +21,7 @@ import { IScenarioBuilder, ITeamsScenario } from "../teams-bot";
 export class MentionBot implements ITeamsScenario, IMessagingExtensionAction {
   public accept(teamsBot: IScenarioBuilder) {
     this.registerTextCommands(teamsBot);
+    this.registerIdCardScenario(teamsBot);
     teamsBot.registerTaskModule("cardMention", this);
   }
 
@@ -220,7 +222,7 @@ export class MentionBot implements ITeamsScenario, IMessagingExtensionAction {
 
   private registerTextCommands(teamsBot: IScenarioBuilder) {
     teamsBot.registerTextCommand(/^mention/i, async (ctx, cmd, args) => {
-      const mri = args[0];
+      const mri = this.parseMentionedUsers(ctx, args.join(" ")) ?? args[0];
       if (mri) {
         const mentioned = await TeamsInfo.getMember(ctx, mri);
         const mention: Mention = {
@@ -255,5 +257,107 @@ export class MentionBot implements ITeamsScenario, IMessagingExtensionAction {
         );
       }
     });
+  }
+
+  private registerIdCardScenario(teamsBot: IScenarioBuilder) {
+    teamsBot.registerTextCommand(/^idcard/i, async (ctx, cmd, args) => {
+      const card = {
+        type: "AdaptiveCard",
+        version: "1.0",
+        body: [
+          {
+            type: "TextBlock",
+            size: "Medium",
+            text: "Choose user(s) to share contact (global context):",
+          },
+          {
+            type: "Input.ChoiceSet",
+            id: "selectedUsersGlobal",
+            style: "people",
+            choices: [],
+            "choices.data": {
+              type: "Data.Query",
+              dataset: "graph.microsoft.com/users",
+            },
+            isMultiSelect: false,
+            placeholder: "Search global user(s)",
+            isRequired: true,
+          },
+          {
+            type: "Input.Text",
+            isRequired: true,
+            id: "displayName",
+            placeholder: "Enter display name (Rquired)",
+          },
+        ],
+        actions: [
+          {
+            type: "Action.Submit",
+            title: "Submit",
+            data: {
+              intent: "idcard",
+            },
+          },
+        ],
+      };
+      await ctx.sendActivity({
+        attachments: [CardFactory.adaptiveCard(card)],
+      });
+    });
+
+    teamsBot.registerInvoke("idcard", async (ctx) => {
+      const selectedMris =
+        (ctx.activity.value.selectedUsersGlobal as string)?.split(",") ?? [];
+
+      await ctx.sendActivity(
+        MessageFactory.text(
+          `You have selected the following users: ${JSON.stringify(
+            selectedMris
+          )}`
+        )
+      );
+
+      const displayName = ctx.activity.value.displayName ?? "Unknown";
+      const mention: Mention = {
+        type: "mention",
+        text: `<at>${displayName}</at>`,
+        mentioned: {
+          id: selectedMris[0],
+          name: displayName,
+        },
+      };
+
+      await ctx.sendActivity({
+        type: "message",
+        textFormat: "xml",
+        text: `
+        <p>
+          <span contenteditable="false" title="ID card" type="(idcard)" class="animated-emoticon-20-idcard" itemscope="Share_Contact_Card">
+            <img itemscope itemtype="http://schema.skype.com/Emoji" itemid="idcard" src="${this.idCardIcon}" title="ID card" alt="🪪" style="width:20px;height:20px;">
+          </span>
+          <at>${mention.text}</at>
+          &nbsp;
+        </p>`,
+        entities: [mention],
+      });
+      return { status: StatusCodes.OK };
+    });
+  }
+
+  private parseMentionedUsers(ctx: TurnContext, message: string): string {
+    message = message.trim();
+    const mentionedEntities = ctx.activity.entities?.filter(
+      (entity) => entity.type === "mention"
+    );
+    const mentionedUser = mentionedEntities?.filter(
+      (entity) => entity.text === message
+    );
+    if (mentionedUser && mentionedUser.length > 0) {
+      return mentionedUser[0].mentioned.id;
+    }
+  }
+
+  private get idCardIcon() {
+    return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAABNdJREFUeF7tml1sFFUUx/9ndmnwkxiCgaDGiomfGA3xAY1KgBhFd25n7JbEhER9MzE8ocSg4ieKBuNHYvTFNx9ku7N7Z7QmRCUaX/yI9KGIRqLYNAYIEKVokN2dYwa7Zbed7cxO72w77szj7jnn/s/vnnvnfgyhyx/q8vyRAkgroMsJpEOgywsgnQTTIZAOgS4nkA6BmQognx9a8k+ttoWYV4FwM4DFCSmY4wDvY2jfcgWvO07uWCvdLSugz7Q3MfhtgBYlJOlWMk+4jEecki79DHwBCMPeDMKbCU+8ST4R+stFvTg1p2kAcnm7V6vhZwCZ/xMAAKfcCvVOHQ7TAOim8w6BH21I/jCYtlay2p6hwn2HkwBlQ/7jpQuq7t0g3glgaV0zgZ8pW+KFxhymARCmPQrg8kknwsZyUd+dhMSnaux7wB5gxocNv38nLf3WIAA1AFrdqCdz+qJCYeBUEgEYhrXYpey5NwDjpCzpTZO6XwVwY7LS0hO9VhCmPWM+ygDcn3eWZ6rudhCtBbACwCjA33AVj9m2ODJXFdQRALop7yRQGcAlPokeJ7e2vlw2hucCQuwA8vndF56pLTwUsEo8xFW+ybbFeKchxA5AN50dBH4yRGI7pKVvC2Gn1CR2AMKQX4LojkDVjM9kSV8fZCdMpx/ML4JwTZBt0/+Mn0D0lLRyg42/xw/AtMcALA8Wy2PSEpPri1b2wrQPALg2OJ6vxX5p6Td2GsBXAG4PFBy2Agx7PwjXB8bzM2D8IEv6DR0FEHoOYLwiS3rgXHF2CIBfBnB1WxDmagiseWjvwkV/jg8HjNljlUxm5VzsJWKfA7xeMs3ishqygwDd5tNrozXA+MjSv2+rRxUZdwRAXaswnQcZvFYDehk8RqB9ZUt/Q1EukcJ0FEAkhTE7pQDi2AwZhnUpa9l1LtMKDW42TCcyk8sa/4IKPrdt8XsYHxU2yiugr99Zxy5/OhtxDBa2JezZxAjrqxyAMOy9IKwJK8DXjnhYFsUts4oR0lk9AFP+oeKovNVBy7zfCwjT/hvAeSE7oKVZT+Z0tlAY8I7fmh4x35fCwrRHADSttyPA+E1a+pV+frMCAIxIS18Z614g9Np/JirE78qiaDx6n7SOvBcADgC0TVq5UqwAvFdgjbIjBCyJ0PNnXVyi65xi7seo/u34KZ8EvcYnzgC/aEfIpC3za7IknojkG8EpFgCeDsNwVrvEuwCsDquLwM+VLfFsWHsVdrEBqIszDPsul3AvEV3FzL0TR+Le6vAgEX51mQ5q4JFahYqOk/PeIB19YgfQ0WwiNBYFgHcNdkG9rUoms2wuDjIi5DrN5b9zigWN+45xaekXNxr63Qw1vecJvLVsiVdVCOp0jD5TPs2g5yfb9VmC+12P7yRw8yzNeElD9a1SyTza6SSitGeaQ5fVuLIZRI83+TO2y5J+Dggw/UPJibLxbnp6ojQ+j33+6sn0XFEo3HNixiHg/SkM52EQvz+Pk2lXGhMhH+oTmXpkYTobAfc9FTu/dtUqtj9KGm0qD+b2+MWd8e7fW/a6yGwholUMePt3v9tfxXqVhDsC8DCYvj5zfnbXJx9sONkqaqI/flCBKgWggmKSY6QVkOTeU6E9rQAVFJMcI62AJPeeCu1pBaigmOQYXV8B/wITMWBflDVLfAAAAABJRU5ErkJggg==";
   }
 }

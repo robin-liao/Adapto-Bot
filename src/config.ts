@@ -3,6 +3,7 @@ env.config();
 
 export default {
   teamsAppId: process.env.TEAMS_APP_ID,
+  tenantId: process.env.TENANT_ID,
   microsoftAppID: process.env.MICROSOFT_APP_ID,
   microsoftAppPassword: process.env.MICROSOFT_APP_PASSWORD,
   port: process.env.port || process.env.PORT || 5487,
@@ -20,4 +21,5 @@ export default {
   PAT: process.env.PAT,
   CERT_THUMBPRINT: process.env.CERT_THUMBPRINT,
   CERT_PRIVATE_KEY_PEM: process.env.CERT_PRIVATE_KEY_PEM,
+  googleAPIKey: process.env.GOOGLE_API_KEY,
 };

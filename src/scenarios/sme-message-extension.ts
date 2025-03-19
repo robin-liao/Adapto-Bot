@@ -10,7 +10,7 @@ import { SMERequest, SMEResponse } from "../sme-router";
 import { IScenarioBuilder, ITeamsScenario } from "../teams-bot";
 import axios from "axios";
 import * as _ from "lodash";
-import { OpenAI } from "../openai-api";
+import { OpenAI } from "../ai/openai-api";
 import { XMLParser } from "fast-xml-parser";
 import { CURLParser } from "parse-curl-js";
 import { ParsedCURL } from "parse-curl-js/dist/interface";

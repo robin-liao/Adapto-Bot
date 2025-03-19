@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OpenAI WebRTC Client</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      #container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 300px;
+        text-align: center;
+      }
+      #video {
+        width: 100%;
+        border-radius: 8px;
+      }
+      button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      #muteButton {
+        background-color: #dc3545;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+      #muteButton:hover {
+        background-color: #c82333;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <h2>WebRTC Client</h2>
+      <video id="video" autoplay playsinline></video>
+      <button id="startButton">Start Connection</button>
+      <button id="closeButton">Disconnect</button>
+      <button id="muteButton">Mute</button>
+      <button id="btnPlay">Play</button>
+      <button id="btnPause">Pause</button>
+      <button id="btnStop">Stop</button>
+      <audio id="audio" autoplay></audio>
+    </div>
+
+    <script>
+      const startButton = document.getElementById("startButton");
+      const closeButton = document.getElementById("closeButton");
+      const video = document.getElementById("video");
+      const audioEl = document.getElementById("audio");
+      const muteButton = document.getElementById("muteButton");
+      let isMuted = false;
+
+      const config = {
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+      };
+
+      let pc = new RTCPeerConnection(config);
+      let stream;
+
+      startButton.addEventListener("click", async () => {
+        // Get an ephemeral key from your server - see server code below
+        const tokenResponse = await fetch("/ai/session");
+        const data = await tokenResponse.json();
+        const EPHEMERAL_KEY = data.client_secret.value;
+
+        // Create a peer connection
+        pc = new RTCPeerConnection(config);
+
+        // Capture connection state changes
+        pc.onconnectionstatechange = () => {
+          console.log("Connection State:", pc.connectionState);
+        };
+
+        pc.onicecandidate = (event) => {
+          console.log("ICE Candidate Event:", event);
+        };
+
+        // Set up to play remote audio from the model
+        audioEl.autoplay = true;
+
+        // Handle incoming audio from the server
+        pc.ontrack = (event) => {
+          console.log("Receiving echoed audio from server");
+          audioEl.srcObject = event.streams[0];
+          audioEl.play();
+        };
+
+        // Add local audio track for microphone input in the browser
+        stream = await navigator.mediaDevices.getUserMedia({
+          // video: true,
+          audio: true,
+        });
+        // video.srcObject = stream;
+
+        stream.getTracks().forEach((track) => pc.addTrack(track));
+
+        // Set up data channel for sending and receiving events
+        const dc = pc.createDataChannel("oai-events");
+        dc.addEventListener("message", (e) => {
+          // Realtime server events appear here!
+          const realtimeEvent = JSON.parse(e.data);
+          console.log(realtimeEvent);
+        });
+
+        // Start the session using the Session Description Protocol (SDP)
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+
+        const offerURL = "/ai/connect";
+        const sdpResponse = await fetch(offerURL, {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(offer),
+        });
+        const answer = await sdpResponse.json();
+        await pc.setRemoteDescription(new RTCSessionDescription(answer));
+      });
+
+      closeButton.addEventListener("click", async () => {
+        pc.close();
+        stream.getTracks().forEach((track) => track.stop());
+        stream = null;
+      });
+
+      muteButton.addEventListener("click", () => {
+        stream.getAudioTracks().forEach((track) => {
+          track.enabled = !track.enabled;
+        });
+        isMuted = !isMuted;
+        muteButton.textContent = isMuted ? "Unmute" : "Mute";
+      });
+
+      const btnPlay = document.getElementById("btnPlay");
+      btnPlay.addEventListener("click", async () => {
+        const playResponse = await fetch("/ai/playerAction", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ action: "play" }),
+        });
+        const data = await playResponse.json();
+        console.log(data);
+      });
+
+      const btnPause = document.getElementById("btnPause");
+      btnPause.addEventListener("click", async () => {
+        const pauseResponse = await fetch("/ai/playerAction", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ action: "pause" }),
+        });
+        const data = await pauseResponse.json();
+        console.log(data);
+      });
+
+      const btnStop = document.getElementById("btnStop");
+      btnStop.addEventListener("click", async () => {
+        const stopResponse = await fetch("/ai/playerAction", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ action: "stop" }),
+        });
+        const data = await stopResponse.json();
+        console.log(data);
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <title>OpenAI WebRTC Client</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      #container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 300px;
+        text-align: center;
+      }
+      #video {
+        width: 100%;
+        border-radius: 8px;
+      }
+      button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <h2>WebRTC Client - Broadcast</h2>
+      <video id="video" autoplay playsinline></video>
+      <button id="startButton">Start Connection</button>
+      <audio id="audio"></audio>
+    </div>
+
+    <script>
+      const config = {
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+      };
+
+      async function init() {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          // video: true,
+          audio: true,
+        });
+        // document.getElementById("video").srcObject = stream;
+        const audioEl = document.getElementById("audio");
+        audioEl.srcObject = stream;
+        const peer = createPeer();
+        stream.getTracks().forEach((track) => peer.addTrack(track, stream));
+      }
+
+      function createPeer() {
+        const peer = new RTCPeerConnection(config);
+        peer.onnegotiationneeded = () => handleNegotiationNeededEvent(peer);
+        return peer;
+      }
+
+      async function handleNegotiationNeededEvent(peer) {
+        const offer = await peer.createOffer();
+        await peer.setLocalDescription(offer);
+        const { data: answer } = await axios.post("/ai/broadcast", offer);
+        const desc = new RTCSessionDescription(answer);
+        await peer.setRemoteDescription(desc).catch((e) => console.log(e));
+      }
+
+      const startButton = document.getElementById("startButton");
+      const video = document.getElementById("video");
+      startButton.addEventListener("click", () => init());
+    </script>
+  </body>
+</html>

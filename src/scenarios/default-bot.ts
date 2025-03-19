@@ -6,6 +6,8 @@ import {
   teamsGetChannelId,
   TeamsInfo,
   ThumbnailCard,
+  TurnContext,
+  ConversationReference,
 } from "botbuilder";
 import {
   Activity,
@@ -20,7 +22,13 @@ import { Auth, teamsSdk } from "../auth";
 import { CardGenerator, IAnnouncementCard, JsonCardLoader } from "../card-gen";
 import { ConvSettingTable } from "../storage/setting-table";
 import { IScenarioBuilder, ITeamsScenario } from "../teams-bot";
-import { getConversationId, isEmail, OneOnOneHelper, sleep } from "../utils";
+import {
+  getConversationId,
+  isEmail,
+  OneOnOneHelper,
+  sleep,
+  TextStreaming,
+} from "../utils";
 import * as tm from "../task-modules";
 import * as teamsTab from "../tabs";
 import config from "../config";
@@ -510,46 +518,31 @@ export class DefaultBot implements ITeamsScenario {
 
       const [first, ...middle] = args;
       const last = middle.pop();
-      let streamSequence = 1;
       const thinkSec = 5;
       const useInformative = first.toLocaleLowerCase() === "informative";
       let text = useInformative ? "" : first;
 
-      const { id: streamId } = await ctx.sendActivity({
-        type: ActivityTypes.Typing,
-        text: useInformative
-          ? "thinking..."
-          : `thinking for ${thinkSec} seconds...`,
-        channelData: {
-          streamType: "informative",
-          streamSequence,
-        },
-      });
+      const convRef = TurnContext.getConversationReference(
+        ctx.activity
+      ) as ConversationReference;
+
+      const stream = await TextStreaming.create(
+        ctx.adapter,
+        convRef,
+        useInformative ? "thinking..." : `thinking for ${thinkSec} seconds...`,
+        "informative"
+      );
 
       !useInformative && (await sleep(thinkSec * 1000));
 
       for (const chunk of middle) {
         text += ` ${chunk}`;
-        await ctx.sendActivity({
-          type: ActivityTypes.Typing,
-          text,
-          channelData: {
-            streamId,
-            streamType: useInformative ? "informative" : "streaming",
-            streamSequence: ++streamSequence,
-          },
-        });
+        stream.update(text, useInformative ? "informative" : "streaming");
       }
 
       text += ` ${last}`;
-      await ctx.sendActivity({
-        type: ActivityTypes.Message,
-        text,
-        channelData: {
-          streamId,
-          streamType: "final",
-        },
-      });
+      stream.end(text);
+      await stream.waitUntilFinish();
     });
 
     teamsBot.registerTextCommand(
@@ -601,6 +594,15 @@ export class DefaultBot implements ITeamsScenario {
             displayName: m.name,
           })),
         } as TeamsChannelData,
+      });
+    });
+
+    teamsBot.registerTextCommand(/^loop/i, async (ctx) => {
+      const url = `https://microsoft.sharepoint-df.com/:fl:/g/contentstorage/x8FNO-xtskuCRX2_fMTHLTgfCFikVaFEnzveGjdeSzo/EZWNVSqtLAFIqjEH8IlUBXwBDJEZxxibDQ-yapgWxQDa_w?e=uIPIWW&nav=cz0lMkZjb250ZW50c3RvcmFnZSUyRng4Rk5PLXh0c2t1Q1JYMl9mTVRITFRnZkNGaWtWYUZFbnp2ZUdqZGVTem8mZD1iIVdZaGRIazVpeVVDNFdZdU5NSVhPR2V2cndMcTJGUk5DZ1BUX3FPVTN1U0RXV1lCMC01ZldTWTBYWkVaZnRWZUUmZj0wMUE0SjJVTk1WUlZLU1ZMSk1BRkVLVU1JSDZDRVZJQkw0JmM9JTJGJmZsdWlkPTEmYT1Mb29wQXBwJnA9JTQwZmx1aWR4JTJGbG9vcC1wYWdlLWNvbnRhaW5lciZ4PSU3QiUyMnclMjIlM0ElMjJUMFJUVUh4dGFXTnliM052Wm5RdWMyaGhjbVZ3YjJsdWRDMWtaaTVqYjIxOFlpRlhXV2hrU0dzMWFYbFZRelJYV1hWT1RVbFlUMGRsZG5KM1RIRXlSbEpPUTJkUVZGOXhUMVV6ZFZORVYxZFpRakF0TldaWFUxa3dXRnBGV21aMFZtVkZmREF4UVRSS01sVk9TekpQU2pSRlRrdFpNa3hDUmt4Q1YwSklWME16V1RaYVExQSUzRCUyMiUyQyUyMmklMjIlM0ElMjJmYmQxMDM0ZC05YTExLTRiYmYtYjdiZi00YTY3NzE1MzE0M2QlMjIlN0Q%3D`;
+      await ctx.sendActivity({
+        type: ActivityTypes.Message,
+        textFormat: "xml",
+        text: `<a itemtype="http://schema.skype.com/FluidEmbedCard" href="${url}">Open URL</a>`,
       });
     });
   }

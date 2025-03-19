@@ -114,110 +114,159 @@ export class VolumnAdjust extends AudioProcessdTrack {
 }
 
 export class MP3Track extends AudioProcessdTrack {
-  constructor(track: MediaStreamTrack) {
+  private readonly bitsPerSample = 16;
+  private readonly numberOfFrames = 480;
+  private readonly channelCount = 1; // Set to 2 for stereo
+  private readonly sampleRate = 48000;
+  private readonly intervale = (1000 * this.numberOfFrames) / this.sampleRate;
+
+  private chunks: Int16Array[] = [];
+  private ffmoegDone = false;
+  private ffmpegStarted = false;
+
+  private timer: NodeJS.Timeout;
+  private chunkId = 0;
+  private playerStatus: "playing" | "paused" | "stopped" = "stopped";
+
+  constructor(
+    track: MediaStreamTrack,
+    private mp3File = config.dataPrefix + "/media/silent-scream.mp3",
+    private infinite = true
+  ) {
     super(track);
     console.log("ffmpegPath: ", ffmpegPath);
     ffmpeg.setFfmpegPath(ffmpegPath!);
+    this.ffmpegProcess();
   }
 
-  public play(
-    mp3File = config.dataPrefix + "/media/silent-scream.mp3",
-    infinite = true
-  ) {
-    const readToStream = async (file: string) => {
-      const fileBuffer = fs.readFileSync(file);
-      const int16Array = new Int16Array(
-        fileBuffer.buffer,
-        fileBuffer.byteOffset,
-        fileBuffer.length / 2
-      );
-      const bitsPerSample = 16;
-      const numberOfFrames = 480;
-      const channelCount = 1; // Set to 2 for stereo
-      const frameSize = numberOfFrames * channelCount;
-      const sampleRate = 48000;
+  public play() {
+    switch (this.playerStatus) {
+      case "playing":
+        console.log("Audio already playing...");
+        return;
+      case "paused":
+        console.log("Resuming audio playback...");
+        this.playerStatus = "playing";
+        this.startTrack();
+        break;
+      case "stopped":
+        console.log("Starting audio playback...");
+        this.playerStatus = "playing";
+        this.startTrack();
+        break;
+    }
+  }
 
-      let offset = 0;
-      const timer = setInterval(() => {
-        if (offset + frameSize <= int16Array.length) {
-          const samples = int16Array.slice(offset, offset + frameSize);
-          offset += frameSize;
+  public pause() {
+    console.log("Pausing audio playback...");
+    this.playerStatus = "paused";
+    clearInterval(this.timer);
+  }
 
-          this.source.onData({
-            samples,
-            sampleRate,
-            bitsPerSample,
-            channelCount,
-            numberOfFrames,
-          });
-        } else {
-          if (infinite) {
-            offset = 0;
-            console.log("Repeating audio...");
-          } else {
-            clearInterval(timer);
-            console.log("Audio playback finished.");
-          }
+  public stop() {
+    console.log("Stopping audio playback...");
+    this.playerStatus = "stopped";
+    clearInterval(this.timer);
+    this.chunkId = 0;
+  }
+
+  private startTrack() {
+    this.timer = setInterval(() => {
+      if (this.chunkId < this.chunks.length) {
+        const samples = this.chunks[this.chunkId++];
+        this.source.onData({
+          samples,
+          sampleRate: this.sampleRate,
+          bitsPerSample: this.bitsPerSample,
+          channelCount: this.channelCount,
+          numberOfFrames: this.numberOfFrames,
+        });
+      } else if (this.ffmoegDone) {
+        if (this.infinite) {
+          console.log("Repeating audio...");
+          this.chunkId = 0;
+        } else if (this.ffmpegStarted) {
+          console.log("Audio playback finished.");
+          this.stop();
         }
-      }, 10);
-    };
+      }
+    }, this.intervale);
+  }
 
-    const playFile = () => {
-      const ffmpegProcess = ffmpeg(mp3File)
-        .inputFormat("mp3")
-        .audioChannels(1)
-        .audioFrequency(48000)
-        .audioCodec("pcm_s16le")
-        .outputFormat("s16le")
-        .on("start", (commandLine) => {
-          console.log("Spawned Ffmpeg with command: " + commandLine);
-        })
-        .on("error", (err) => {
-          console.error("An error occurred: " + err.message);
-        })
-        .on("end", () => {
-          console.log("Conversion finished successfully");
-          readToStream("output.pcm");
-        })
-        .save("output.pcm");
+  private async ffmpegProcess() {
+    const ffmpegProcess = ffmpeg(this.mp3File)
+      .inputFormat("mp3")
+      .audioChannels(1)
+      .audioFrequency(48000)
+      .audioCodec("pcm_s16le")
+      .outputFormat("s16le")
+      .on("start", (commandLine) => {
+        this.ffmpegStarted = true;
+        console.log("Spawned Ffmpeg with command: " + commandLine);
+      })
+      .on("error", (err) => {
+        console.error("An error occurred: " + err.message);
+      })
+      .on("end", () => {
+        this.ffmoegDone = true;
+        console.log("Conversion finished successfully");
+      })
+      .pipe();
 
-      let pcmBuffer = Buffer.alloc(0);
-      const bytesPerSample = 2; // 16 bits = 2 bytes
-      const numberOfFrames = 480;
-      const channelCount = 1; // Set to 2 for stereo
-      const frameSize = numberOfFrames * channelCount * bytesPerSample;
+    let pcmBuffer = Buffer.alloc(0);
+    const bytesPerSample = this.bitsPerSample / 8;
+    const frameSize = this.numberOfFrames * this.channelCount * bytesPerSample;
 
-      // ffmpegProcess.on("data", (chunk) => {
-      //   pcmBuffer = Buffer.concat([pcmBuffer, chunk]);
+    ffmpegProcess.on("data", (chunk) => {
+      pcmBuffer = Buffer.concat([pcmBuffer, chunk]);
 
-      //   console.log("chunk.byteLength: ", chunk.byteLength);
-      //   console.log("chunk.length: ", chunk.length);
+      while (pcmBuffer.length >= frameSize) {
+        const sampleChunk = pcmBuffer.slice(0, frameSize);
+        pcmBuffer = pcmBuffer.slice(frameSize);
 
-      //   while (pcmBuffer.length >= frameSize) {
-      //     const sampleChunk = pcmBuffer.slice(0, frameSize);
-      //     pcmBuffer = pcmBuffer.slice(frameSize);
+        const int16Count = Math.floor(sampleChunk.length / bytesPerSample);
+        const samples = new Int16Array(int16Count);
+        for (let i = 0; i < int16Count; i++) {
+          samples[i] = sampleChunk.readInt16LE(i * 2);
+        }
 
-      //     const samples = new Int16Array(
-      //       sampleChunk.buffer,
-      //       sampleChunk.byteOffset,
-      //       sampleChunk.length / bytesPerSample
-      //     );
+        this.chunks.push(samples);
+      }
+    });
+  }
 
-      //     console.log("samples.byteLength: ", samples.byteLength);
-      //     console.log("samples.length: ", samples.length);
+  private async readPCMToStream(pcmFile: string) {
+    const fileBuffer = fs.readFileSync(pcmFile);
+    const int16Array = new Int16Array(
+      fileBuffer.buffer,
+      fileBuffer.byteOffset,
+      fileBuffer.length / 2
+    );
+    const frameSize = this.numberOfFrames * this.channelCount;
 
-      //     this.source.onData({
-      //       samples,
-      //       sampleRate: 48000,
-      //       bitsPerSample: 16,
-      //       channelCount,
-      //       numberOfFrames,
-      //     });
-      //   }
-      // });
-    };
+    let offset = 0;
+    const timer = setInterval(() => {
+      if (offset + frameSize <= int16Array.length) {
+        const samples = int16Array.slice(offset, offset + frameSize);
+        offset += frameSize;
 
-    playFile();
+        this.source.onData({
+          samples,
+          sampleRate: this.sampleRate,
+          bitsPerSample: this.bitsPerSample,
+          channelCount: this.channelCount,
+          numberOfFrames: this.numberOfFrames,
+        });
+      } else {
+        if (this.infinite) {
+          offset = 0;
+          console.log("Repeating audio...");
+        } else {
+          clearInterval(timer);
+          console.log("Audio playback finished.");
+        }
+      }
+    }, this.intervale);
   }
 }
 
@@ -348,6 +397,7 @@ export class OpenAITrack extends AudioProcessdTrack {
   private funcLookup: {
     [name: string]: ToolFunc;
   } = {};
+  private dc: RTCDataChannel;
 
   public constructor(incomingTrack: MediaStreamTrack) {
     super(incomingTrack);
@@ -371,9 +421,9 @@ export class OpenAITrack extends AudioProcessdTrack {
 
   public async init() {
     // Set up data channel for sending and receiving events
-    const dc = this.peer.createDataChannel("oai-events");
+    this.dc = this.peer.createDataChannel("oai-events");
     let text = "";
-    dc.addEventListener("message", async (e) => {
+    this.dc.addEventListener("message", async (e) => {
       const data = JSON.parse(e.data);
       // console.log("Realtime Event:", data);
       if (data.type === "response.audio_transcript.delta") {
@@ -388,31 +438,35 @@ export class OpenAITrack extends AudioProcessdTrack {
           console.log(
             `Calling local function ${data.name} with ${data.arguments}`
           );
-          const args = JSON.parse(data.arguments);
-          const result = await fn(args);
-          console.log("result", JSON.stringify(result, null, 2));
-          // Let OpenAI know that the function has been called and share it's output
-          const event = {
-            type: "conversation.item.create",
-            item: {
-              type: "function_call_output",
-              call_id: data.call_id, // call_id from the function_call message
-              output: JSON.stringify(result), // result of the function
-            },
-          };
-          dc.send(JSON.stringify(event));
-          // Have assistant respond after getting the results
-          dc.send(JSON.stringify({ type: "response.create" }));
+          try {
+            const args = JSON.parse(data.arguments);
+            const result = await fn(args);
+            console.log("result", JSON.stringify(result, null, 2));
+            // Let OpenAI know that the function has been called and share it's output
+            const event = {
+              type: "conversation.item.create",
+              item: {
+                type: "function_call_output",
+                call_id: data.call_id, // call_id from the function_call message
+                output: JSON.stringify(result), // result of the function
+              },
+            };
+            this.dc.send(JSON.stringify(event));
+            // Have assistant respond after getting the results
+            this.dc.send(JSON.stringify({ type: "response.create" }));
+          } catch (error) {
+            console.error("Error calling function:", error);
+          }
         }
       } else {
         // console.log("Unhandled message:", JSON.stringify(data, null, 2));
       }
     });
 
-    dc.addEventListener("open", (ev) => {
+    this.dc.addEventListener("open", (ev) => {
       console.log("Opening Open AI data channel", ev);
       const tools = _.values(this.funcLookup).map((val) => val.tool);
-      this.configureDataChannel(dc, tools);
+      this.configureDataChannel(tools);
     });
 
     // ontrack
@@ -440,6 +494,23 @@ export class OpenAITrack extends AudioProcessdTrack {
     await this.peer.setRemoteDescription(answer);
   }
 
+  public sendMessage(text: string) {
+    const event = {
+      type: "conversation.item.create",
+      item: {
+        type: "message",
+        role: "user",
+        content: [
+          {
+            type: "input_text",
+            text,
+          },
+        ],
+      },
+    };
+    this.dc?.send(JSON.stringify(event));
+  }
+
   public close() {
     this.peer.close();
   }
@@ -465,19 +536,20 @@ export class OpenAITrack extends AudioProcessdTrack {
     return answer;
   }
 
-  private configureDataChannel(ds: RTCDataChannel, tools: Tool[]) {
+  private configureDataChannel(tools: Tool[]) {
     console.log("Configuring data channel");
     const event = {
       type: "session.update",
       session: {
-        instructions:
-          "You are a Microsoft Teams agent to assist users for any asks particularly focused on Teams specific functionalities. When user asks for 'send me back the results' or 'send me back the results as an adaptive card', you should trigger 'sendAdaptiveCard' tool function and send the search results of raw JSON input from previous tool function output as the input to this tool function. To trigger 'sendAdaptiveCard' you should read the spec of the tool function and send the input as per the spec. Within 'sendAdaptiveCard' tool function it will convert the raw JSON input to an adaptive card and send it back to the user. Note that this tool  can't handle web search results, so for search results you should process by yourself and skip rendering it by using this tool function",
+        instructions: `You are a Microsoft Teams agent to assist users for any asks particularly focused on Teams specific functionalities.
+          - When user asks for 'send me back the results' or 'send me back the results as an adaptive card', you should trigger 'sendAdaptiveCard' tool function and send the search results of raw JSON input from previous tool function output as the input to this tool function. To trigger 'sendAdaptiveCard' you should read the spec of the tool function and send the input as per the spec. Within 'sendAdaptiveCard' tool function it will convert the raw JSON input to an adaptive card and send it back to the user. Note that this tool can't handle web search results, so for search results you should process by yourself and skip rendering it by using this tool function.
+          - When perform "searchMap" function, read its spec and follow its function description for the query text`,
         modalities: ["text", "audio"],
         tools,
         tool_choice: "auto",
       },
     };
-    ds.send(JSON.stringify(event));
+    this.dc?.send(JSON.stringify(event));
   }
 }
 
@@ -609,15 +681,17 @@ export const getSendAdaptiveCardTool = (
                     size: "Large",
                     weight: "Bolder",
                   },
-                  ...(r.rating && [
-                    {
-                      type: "Rating",
-                      value: r.rating,
-                      color: "Marigold",
-                      count: r.total_reviews,
-                      spacing: "ExtraSmall",
-                    },
-                  ]),
+                  ...(!!r.rating
+                    ? [
+                        {
+                          type: "Rating",
+                          value: r.rating,
+                          color: "Marigold",
+                          count: r.total_reviews,
+                          spacing: "ExtraSmall",
+                        },
+                      ]
+                    : []),
                   {
                     type: "TextBlock",
                     text: r.address,

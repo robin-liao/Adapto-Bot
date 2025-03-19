@@ -16,6 +16,7 @@ import {
   getGoogleSearchTool,
   getSendAdaptiveCardTool,
   getYouTubeSearchTool,
+  MP3Track,
   OpenAITrack,
   SineWaveTrack,
   ToolFunc,
@@ -52,6 +53,7 @@ export class WebRTCBot implements ITeamsScenario {
   private endlessStream: EndlessTextStreaming;
   private wsSend: (convId: string, data: WRTCBotWSEvent) => void;
   private readonly tabEntityId = "wrtcCollabStage";
+  private oaiTrack: OpenAITrack;
 
   constructor() {
     this.setupRouter();
@@ -61,11 +63,14 @@ export class WebRTCBot implements ITeamsScenario {
     teamsBot.registerACv2Handler("sineWave", (ctx, data) =>
       this.handleSineWave(ctx, data)
     );
-    teamsBot.registerACv2Handler("transcribe", (ctx, data) =>
-      this.handleTranscribe(ctx, data)
-    );
     teamsBot.registerACv2Handler("echo", (ctx, data) =>
       this.handleEcho(ctx, data)
+    );
+    teamsBot.registerACv2Handler("radio", (ctx, data) =>
+      this.handleRadio(ctx, data)
+    );
+    teamsBot.registerACv2Handler("transcribe", (ctx, data) =>
+      this.handleTranscribe(ctx, data)
     );
     teamsBot.registerACv2Handler("openai", (ctx, data) =>
       this.handleOpenAI(ctx, data)
@@ -76,15 +81,19 @@ export class WebRTCBot implements ITeamsScenario {
       this.tabEntityId,
       this.setupWebSocket()
     );
-  }
 
-  private async handleTranscribe(ctx: TurnContext, data: any) {
+    teamsBot.registerTextCommand(/^oai/i, async (ctx) => {
+      if (this.oaiTrack) {
+        const text = ctx.activity.text.replace("oai", "").trim();
+        this.oaiTrack.sendMessage(text);
+      }
+    });
+  }
+  private async handleSineWave(ctx: TurnContext, data: any) {
     this.adaptor = ctx.adapter;
     this.convRef = TurnContext.getConversationReference(
       ctx.activity
     ) as ConversationReference;
-
-    this.endlessStream = new EndlessTextStreaming(this.adaptor, this.convRef);
 
     const { localDescription: sdp } = await createPeerConnection(
       data.sdp,
@@ -95,16 +104,7 @@ export class WebRTCBot implements ITeamsScenario {
           }`
         );
 
-        const output = new Transcriber(track);
-
-        output.on("data", async (text, sentenceBreak) => {
-          console.log("Transcriber Text:", text);
-          sentenceBreak && console.log("====================================");
-
-          this.endlessStream.update("<b>You Said: </b>" + text, sentenceBreak);
-          this.wsSend?.(this.convRef.conversation.id, { message: text });
-        });
-
+        const output = new SineWaveTrack(track);
         peer.addTrack(output.audioOutputTrack, this.senderStream);
       },
       (_peer, track) => {
@@ -140,6 +140,95 @@ export class WebRTCBot implements ITeamsScenario {
         );
 
         const output = new VolumnAdjust(track);
+        peer.addTrack(output.audioOutputTrack, this.senderStream);
+      },
+      (_peer, track) => {
+        if (track) {
+          this.senderStream.removeTrack(track);
+          console.log("Remove track from peer connection");
+        }
+      }
+    );
+
+    await this.sendCardForSessionsCreation(ctx, sdp);
+
+    return {
+      statusCode: StatusCodes.OK,
+      type: "application/vnd.microsoft.activity.message",
+      value: JSON.stringify(sdp) as any,
+    };
+  }
+
+  private async handleRadio(ctx: TurnContext, data: any) {
+    this.adaptor = ctx.adapter;
+    this.convRef = TurnContext.getConversationReference(
+      ctx.activity
+    ) as ConversationReference;
+
+    let mp3Track: MP3Track;
+
+    const { localDescription: sdp } = await createPeerConnection(
+      data.sdp,
+      async (peer, track) => {
+        console.log(
+          `add track to peer connection: ${track.kind.toUpperCase()} ${
+            track.id
+          }`
+        );
+
+        mp3Track = new MP3Track(
+          track,
+          config.dataPrefix + "/media/silent-scream.mp3",
+          true
+        );
+        peer.addTrack(mp3Track.audioOutputTrack, this.senderStream);
+        mp3Track.play();
+      },
+      (_peer, track) => {
+        if (track) {
+          this.senderStream.removeTrack(track);
+          console.log("Remove track from peer connection");
+        }
+        mp3Track?.stop();
+      }
+    );
+
+    await this.sendCardForSessionsCreation(ctx, sdp);
+
+    return {
+      statusCode: StatusCodes.OK,
+      type: "application/vnd.microsoft.activity.message",
+      value: JSON.stringify(sdp) as any,
+    };
+  }
+
+  private async handleTranscribe(ctx: TurnContext, data: any) {
+    this.adaptor = ctx.adapter;
+    this.convRef = TurnContext.getConversationReference(
+      ctx.activity
+    ) as ConversationReference;
+
+    this.endlessStream = new EndlessTextStreaming(this.adaptor, this.convRef);
+
+    const { localDescription: sdp } = await createPeerConnection(
+      data.sdp,
+      async (peer, track) => {
+        console.log(
+          `add track to peer connection: ${track.kind.toUpperCase()} ${
+            track.id
+          }`
+        );
+
+        const output = new Transcriber(track);
+
+        output.on("data", async (text, sentenceBreak) => {
+          console.log("Transcriber Text:", text);
+          sentenceBreak && console.log("====================================");
+
+          this.endlessStream.update("<b>You Said: </b>" + text, sentenceBreak);
+          this.wsSend?.(this.convRef.conversation.id, { message: text });
+        });
+
         peer.addTrack(output.audioOutputTrack, this.senderStream);
       },
       (_peer, track) => {
@@ -195,44 +284,10 @@ export class WebRTCBot implements ITeamsScenario {
 
         peer.addTrack(process.audioOutputTrack, this.senderStream);
         await process.init();
+        this.oaiTrack = process;
       },
       (_peer, track) => {
         process?.close();
-        if (track) {
-          this.senderStream.removeTrack(track);
-          console.log("Remove track from peer connection");
-        }
-      }
-    );
-
-    await this.sendCardForSessionsCreation(ctx, sdp);
-
-    return {
-      statusCode: StatusCodes.OK,
-      type: "application/vnd.microsoft.activity.message",
-      value: JSON.stringify(sdp) as any,
-    };
-  }
-
-  private async handleSineWave(ctx: TurnContext, data: any) {
-    this.adaptor = ctx.adapter;
-    this.convRef = TurnContext.getConversationReference(
-      ctx.activity
-    ) as ConversationReference;
-
-    const { localDescription: sdp } = await createPeerConnection(
-      data.sdp,
-      async (peer, track) => {
-        console.log(
-          `add track to peer connection: ${track.kind.toUpperCase()} ${
-            track.id
-          }`
-        );
-
-        const output = new SineWaveTrack(track);
-        peer.addTrack(output.audioOutputTrack, this.senderStream);
-      },
-      (_peer, track) => {
         if (track) {
           this.senderStream.removeTrack(track);
           console.log("Remove track from peer connection");
@@ -321,7 +376,8 @@ export class WebRTCBot implements ITeamsScenario {
       tool: {
         type: "function",
         name: "searchMap",
-        description: "Search for places on Google Map",
+        description:
+          "Search for places on Google Map. To search for multiple places, use comma separated values and don't need to append city at the end. Always use English to for query text",
         parameters: {
           type: "object",
           properties: {
@@ -332,7 +388,7 @@ export class WebRTCBot implements ITeamsScenario {
       func: async (args) => {
         const { query } = args;
         const googleMap = new GoogleMapHelper();
-        const results = (await googleMap.searchPlace(query)).slice(0, 5);
+        const results = await googleMap.searchPlace(query);
         this.wsSend?.(this.convRef.conversation.id, {
           message: `Found ${results.length} places`,
           places: results,

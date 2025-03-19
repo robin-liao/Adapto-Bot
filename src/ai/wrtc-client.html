@@ -60,6 +60,9 @@
       <button id="startButton">Start Connection</button>
       <button id="closeButton">Disconnect</button>
       <button id="muteButton">Mute</button>
+      <button id="btnPlay">Play</button>
+      <button id="btnPause">Pause</button>
+      <button id="btnStop">Stop</button>
       <audio id="audio" autoplay></audio>
     </div>
 
@@ -152,6 +155,48 @@
         });
         isMuted = !isMuted;
         muteButton.textContent = isMuted ? "Unmute" : "Mute";
+      });
+
+      const btnPlay = document.getElementById("btnPlay");
+      btnPlay.addEventListener("click", async () => {
+        const playResponse = await fetch("/ai/playerAction", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ action: "play" }),
+        });
+        const data = await playResponse.json();
+        console.log(data);
+      });
+
+      const btnPause = document.getElementById("btnPause");
+      btnPause.addEventListener("click", async () => {
+        const pauseResponse = await fetch("/ai/playerAction", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ action: "pause" }),
+        });
+        const data = await pauseResponse.json();
+        console.log(data);
+      });
+
+      const btnStop = document.getElementById("btnStop");
+      btnStop.addEventListener("click", async () => {
+        const stopResponse = await fetch("/ai/playerAction", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ action: "stop" }),
+        });
+        const data = await stopResponse.json();
+        console.log(data);
       });
     </script>
   </body>

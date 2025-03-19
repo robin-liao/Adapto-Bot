@@ -35,30 +35,6 @@
     },
     {
       "type": "TextBlock",
-      "text": "Transcribe",
-      "weight": "bolder",
-      "size": "medium",
-      "separator": true
-    },
-    {
-      "type": "ActionSet",
-      "actions": [
-        {
-          "type": "Action.Submit",
-          "title": "Talk",
-          "data": {
-            "msteams": {
-              "type": "talk"
-            },
-            "intent": "transcribe",
-            "lang": "en-US",
-            "sessionTitle": "Transcribe"
-          }
-        }
-      ]
-    },
-    {
-      "type": "TextBlock",
       "text": "Echo my voice with random audio processing",
       "weight": "bolder",
       "size": "medium",
@@ -77,6 +53,54 @@
             "intent": "echo",
             "lang": "en-US",
             "sessionTitle": "Echo"
+          }
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Playback audio stream (radio station)",
+      "weight": "bolder",
+      "size": "medium",
+      "separator": true
+    },
+    {
+      "type": "ActionSet",
+      "actions": [
+        {
+          "type": "Action.Submit",
+          "title": "Talk",
+          "data": {
+            "msteams": {
+              "type": "talk"
+            },
+            "intent": "radio",
+            "lang": "en-US",
+            "sessionTitle": "Radio"
+          }
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Transcribe",
+      "weight": "bolder",
+      "size": "medium",
+      "separator": true
+    },
+    {
+      "type": "ActionSet",
+      "actions": [
+        {
+          "type": "Action.Submit",
+          "title": "Talk",
+          "data": {
+            "msteams": {
+              "type": "talk"
+            },
+            "intent": "transcribe",
+            "lang": "en-US",
+            "sessionTitle": "Transcribe"
           }
         }
       ]

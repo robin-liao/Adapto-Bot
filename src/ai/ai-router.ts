@@ -18,6 +18,7 @@ import config from "../config";
 class AIRouter {
   private router = Router();
   private senderStream: MediaStream = new MediaStream();
+  private mp3Track: MP3Track;
 
   constructor() {
     this.bindRoutes();
@@ -56,13 +57,18 @@ class AIRouter {
           );
 
           // const process = new VolumnAdjust(track);
-          const process = new MP3Track(track);
+          const process = new MP3Track(
+            track,
+            config.dataPrefix + "/media/silent-scream.mp3",
+            true
+          );
           // const process = new OpenAITrack(track);
           // process.registerTool(getGoogleSearchTool());
           // process.registerTool(getYouTubeSearchTool());
 
           peer.addTrack(process.audioOutputTrack, this.senderStream);
-          process.play(config.dataPrefix + "/media/silent-scream.mp3", true);
+          process.play();
+          this.mp3Track = process;
           // await process.init();
         },
         (peer, track) => {
@@ -70,9 +76,26 @@ class AIRouter {
             this.senderStream.removeTrack(track);
             console.log("Remove track from peer connection");
           }
+          this.mp3Track?.stop();
         }
       );
       res.json(sdp);
+    });
+
+    this.router.post("/playerAction", async (req, res) => {
+      const { action } = req.body;
+      switch (action) {
+        case "play":
+          this.mp3Track?.play();
+          break;
+        case "pause":
+          this.mp3Track?.pause();
+          break;
+        case "stop":
+          this.mp3Track?.stop();
+          break;
+      }
+      res.json({ status: "ok" });
     });
 
     this.router.post("/broadcast", async (req, res) => {

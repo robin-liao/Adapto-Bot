@@ -282,6 +282,7 @@
         map = new google.maps.Map(document.getElementById("map"), {
           center: { lat: 47.6062, lng: -122.3321 }, // Default: Seattle
           zoom: 12,
+          gestureHandling: "cooperative",
         });
         infoWindow = new google.maps.InfoWindow();
       }

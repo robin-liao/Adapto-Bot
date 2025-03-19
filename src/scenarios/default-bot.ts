@@ -596,6 +596,15 @@ export class DefaultBot implements ITeamsScenario {
         } as TeamsChannelData,
       });
     });
+
+    teamsBot.registerTextCommand(/^loop/i, async (ctx) => {
+      const url = `https://microsoft.sharepoint-df.com/:fl:/g/contentstorage/x8FNO-xtskuCRX2_fMTHLTgfCFikVaFEnzveGjdeSzo/EZWNVSqtLAFIqjEH8IlUBXwBDJEZxxibDQ-yapgWxQDa_w?e=uIPIWW&nav=cz0lMkZjb250ZW50c3RvcmFnZSUyRng4Rk5PLXh0c2t1Q1JYMl9mTVRITFRnZkNGaWtWYUZFbnp2ZUdqZGVTem8mZD1iIVdZaGRIazVpeVVDNFdZdU5NSVhPR2V2cndMcTJGUk5DZ1BUX3FPVTN1U0RXV1lCMC01ZldTWTBYWkVaZnRWZUUmZj0wMUE0SjJVTk1WUlZLU1ZMSk1BRkVLVU1JSDZDRVZJQkw0JmM9JTJGJmZsdWlkPTEmYT1Mb29wQXBwJnA9JTQwZmx1aWR4JTJGbG9vcC1wYWdlLWNvbnRhaW5lciZ4PSU3QiUyMnclMjIlM0ElMjJUMFJUVUh4dGFXTnliM052Wm5RdWMyaGhjbVZ3YjJsdWRDMWtaaTVqYjIxOFlpRlhXV2hrU0dzMWFYbFZRelJYV1hWT1RVbFlUMGRsZG5KM1RIRXlSbEpPUTJkUVZGOXhUMVV6ZFZORVYxZFpRakF0TldaWFUxa3dXRnBGV21aMFZtVkZmREF4UVRSS01sVk9TekpQU2pSRlRrdFpNa3hDUmt4Q1YwSklWME16V1RaYVExQSUzRCUyMiUyQyUyMmklMjIlM0ElMjJmYmQxMDM0ZC05YTExLTRiYmYtYjdiZi00YTY3NzE1MzE0M2QlMjIlN0Q%3D`;
+      await ctx.sendActivity({
+        type: ActivityTypes.Message,
+        textFormat: "xml",
+        text: `<a itemtype="http://schema.skype.com/FluidEmbedCard" href="${url}">Open URL</a>`,
+      });
+    });
   }
 
   private registerInvokes(teamsBot: IScenarioBuilder) {

@@ -5,3 +5,4 @@ docker-push.sh
 .DS_Store
 ssl/fullchain.pem
 ssl/key.pem
+yarn-error.log

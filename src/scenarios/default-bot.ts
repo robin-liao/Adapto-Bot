@@ -134,10 +134,14 @@ export class DefaultBot implements ITeamsScenario {
       });
     });
 
-    teamsBot.registerTextCommand(/^ai-ux/i, async (ctx) => {
+    teamsBot.registerTextCommand(/^ai-ux/i, async (ctx, _cmd, args) => {
+      const attachment = CardGenerator.adaptive.getJsonCardIncludingName(
+        args[0] ?? "77"
+      );
+      const cardJson = JSON.stringify(attachment.content ?? {});
       await ctx.sendActivity({
         type: ActivityTypes.Message,
-        text: `Hey I'm a friendly AI bot and I don't mess up during demos :).[1] This is what you sent: ${ctx.activity.text}`,
+        text: `Hey I'm a friendly AI bot and I don't mess up during demos :).[1] This is what you sent: ${ctx.activity.text}. Card reference: [2]`,
         channelData: {
           feedbackLoopEnabled: true, // Feedback buttons
         },
@@ -191,6 +195,23 @@ export class DefaultBot implements ITeamsScenario {
                   name: "Claim Interpreter name",
                   slogan: "Claim Interpreter slogan",
                   url: "https://www.example.com/claim-interpreter",
+                },
+              },
+              {
+                "@type": "Claim",
+                position: 2, // Required. Must match the [1] in the text above
+                appearance: {
+                  "@type": "DigitalDocument",
+                  name: "AI bot", // Title
+                  url: "https://example.com/claim-1", // Hyperlink on the title
+                  abstract: "Excerpt description", // Appears in the citation pop-up window
+                  text: cardJson, // Appears as a stringified Adaptive Card
+                  keywords: ["keyword 1", "keyword 2", "keyword 3"], // Appears in the citation pop-up window
+                  encodingFormat: "application/vnd.microsoft.card.adaptive",
+                  image: {
+                    "@type": "ImageObject",
+                    name: "Microsoft Word",
+                  },
                 },
               },
             ],

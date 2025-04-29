@@ -51,8 +51,8 @@
     {
       "entityId": "tab-task-module",
       "name": "Tasks Module",
-      "contentUrl": "https://adapto-bot.azurewebsites.net/task/launchTaskModule/initTab",
-      "websiteUrl": "https://adapto-bot.azurewebsites.net/task/launchTaskModule/initTab",
+      "contentUrl": "https://adapto-bot-gxa7f8fdh4etdebg.westus2-01.azurewebsites.net/task/launchTaskModule/initTab",
+      "websiteUrl": "https://adapto-bot-gxa7f8fdh4etdebg.westus2-01.azurewebsites.net/task/launchTaskModule/initTab",
       "scopes": ["personal", "team"]
     }
   ],
@@ -162,7 +162,7 @@
             "width": "800",
             "height": "600",
             "title": "First page",
-            "url": "https://adapto-bot.azurewebsites.net/task/launchTaskModule/dialogContent?groupId={groupId}&teamId={teamId}&entityId={entityId}&channelId={channelId}&tid={tid}&userObjectId={userObjectId}&sessionId={sessionId}&theme={theme}&locale={locale}&ringId={ringId}&platform={hostClientType}&parentMessageId={parentMessageId}"
+            "url": "https://adapto-bot-gxa7f8fdh4etdebg.westus2-01.azurewebsites.net/task/launchTaskModule/dialogContent?groupId={groupId}&teamId={teamId}&entityId={entityId}&channelId={channelId}&tid={tid}&userObjectId={userObjectId}&sessionId={sessionId}&theme={theme}&locale={locale}&ringId={ringId}&platform={hostClientType}&parentMessageId={parentMessageId}"
           }
         },
         {

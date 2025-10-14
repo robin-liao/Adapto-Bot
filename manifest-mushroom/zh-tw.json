@@ -1,0 +1,7 @@
+{
+  "$schema": "https://github.com/OfficeDev/microsoft-teams-app-schema/blob/preview/DevPreview/MicrosoftTeams.schema.json",
+  "name.short": "香菇Bot",
+  "name.full": "香菇Bot測試範例",
+  "description.short": "短敘述：香菇Bot",
+  "description.full": "長敘述：這是一個香菇Bot，開發者是香菇"
+}

@@ -16,7 +16,21 @@
   },
   "description": {
     "short": "Sample bot using V4 SDK",
-    "full": "Sample bot using V4 Bot Builder V4 SDK"
+    "full": "Sample bot using V4 Bot Builder V4 SDK",
+    "features": [
+      {
+        "title": "Feature heading 1",
+        "description": "This is a two line description about the feature heading 1 for this app."
+      },
+      {
+        "title": "Feature heading 2",
+        "description": "This is a two line description about the feature heading 2 for this app."
+      },
+      {
+        "title": "Feature heading 3",
+        "description": "This is a two line description about the feature heading 3 for this app."
+      }
+    ]
   },
   "icons": {
     "outline": "icon-outline.png",
@@ -76,12 +90,12 @@
           "scopes": ["team", "groupChat", "personal"],
           "commands": [
             {
-              "title": "Command 1",
-              "description": "Description of Command 1"
+              "title": "Tell a joke",
+              "description": "Drop a dad joke of today!"
             },
             {
-              "title": "Command 2",
-              "description": "Description of Command 2"
+              "title": "Citation",
+              "description": "Show some citation examples for LLM bot."
             }
           ]
         }
@@ -223,5 +237,14 @@
       ]
     }
   ],
-  "validDomains": ["*.azurewebsites.net", "*.ngrok.io"]
+  "validDomains": ["*.azurewebsites.net", "*.ngrok.io"],
+  "localizationInfo": {
+    "defaultLanguageTag": "en",
+    "additionalLanguages": [
+      {
+        "languageTag": "zh-tw",
+        "file": "zh-tw.json"
+      }
+    ]
+  }
 }

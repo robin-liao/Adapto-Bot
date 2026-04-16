@@ -85,6 +85,7 @@
       "supportsFiles": true,
       "supportsCalling": true,
       "supportsVideo": true,
+      "supportsSessions": true,
       "commandLists": [
         {
           "scopes": ["team", "groupChat", "personal"],

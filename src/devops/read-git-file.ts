@@ -1,4 +1,4 @@
-import request from "request";
+import axios from "axios";
 import * as _ from "lodash";
 import { Router } from "express";
 import config from "../config";
@@ -39,24 +39,20 @@ export class GitRepo {
     return this.invokeApi<ListFileResponse>(uri);
   }
 
-  public downloadFile(file: string) {
-    return new Promise((resolve, reject) =>
-      request.get(
-        file,
-        { auth: { user: "", pass: this.PAT } },
-        (err, res, body) => (err ? reject(err) : resolve(body))
-      )
-    );
+  public async downloadFile(file: string) {
+    const res = await axios.get(file, {
+      auth: { username: "", password: this.PAT },
+      responseType: "text",
+      transformResponse: [(data) => data],
+    });
+    return res.data;
   }
 
-  private invokeApi<T = any>(uri: string): Promise<T> {
-    return new Promise<T>((resolve, reject) =>
-      request.get(
-        uri,
-        { baseUrl, auth: { user: "", pass: this.PAT }, json: true },
-        (err, res, body) => (err ? reject(err) : resolve(body))
-      )
-    );
+  private async invokeApi<T = any>(uri: string): Promise<T> {
+    const res = await axios.get<T>(`${baseUrl}${uri}`, {
+      auth: { username: "", password: this.PAT },
+    });
+    return res.data;
   }
 }
 

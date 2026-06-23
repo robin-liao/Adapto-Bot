@@ -2,7 +2,7 @@ import { TurnContext } from "botbuilder-core";
 import { FileDownloadInfo, FileConsentCardResponse } from "botframework-schema";
 import { IBotFileHandler } from "../bot-file-helper";
 import { IScenarioBuilder, ITeamsScenario } from "../teams-bot";
-import request from "request";
+import axios from "axios";
 import * as fs from "fs";
 import config from "../config";
 import { CardGenerator } from "../card-gen";
@@ -36,15 +36,20 @@ export class FileBot implements ITeamsScenario, IBotFileHandler {
         )}</pre>`,
       });
       let filename: string;
-      const err = await new Promise((resolve, reject) => {
-        const r = request(file.downloadUrl);
-        r.on("response", (res) => {
+      const err = await new Promise(async (resolve) => {
+        try {
+          const res = await axios.get(file.downloadUrl, {
+            responseType: "stream",
+          });
           const regexp = /filename=\"(.*)\"/gi;
           filename = regexp.exec(res.headers["content-disposition"])[1];
-          res.pipe(fs.createWriteStream(`${this.fileFolder}/${filename}`));
-        });
-        r.on("error", (e) => resolve(e));
-        r.on("complete", (res) => resolve(true));
+          const ws = fs.createWriteStream(`${this.fileFolder}/${filename}`);
+          ws.on("finish", () => resolve(true));
+          ws.on("error", (e) => resolve(e));
+          res.data.pipe(ws);
+        } catch (e) {
+          resolve(e);
+        }
       });
       if (!err && !!filename) {
         await ctx.sendActivity({
@@ -69,27 +74,14 @@ export class FileBot implements ITeamsScenario, IBotFileHandler {
       text: `Uploading <b>${context.filename}</b>`,
     });
 
-    const result = new Promise<any>((resolve, reject) => {
-      request.put(
-        {
-          uri: fileConsentCardResponse.uploadInfo.uploadUrl,
-          headers: {
-            "Content-Length": fileInfo.size,
-            "Content-Range": `bytes 0-${fileInfo.size - 1}/${fileInfo.size}`,
-          },
-          encoding: null,
-          body: file,
+    const result = axios
+      .put(fileConsentCardResponse.uploadInfo.uploadUrl, file, {
+        headers: {
+          "Content-Length": fileInfo.size,
+          "Content-Range": `bytes 0-${fileInfo.size - 1}/${fileInfo.size}`,
         },
-        async (err, res) => {
-          if (err) {
-            reject(err);
-          } else {
-            const data = Buffer.from(res.body, "binary").toString("utf8");
-            resolve(JSON.parse(data));
-          }
-        }
-      );
-    });
+      })
+      .then((res) => res.data);
 
     try {
       await this.fileUploadCompleted(ctx, fileConsentCardResponse, result);

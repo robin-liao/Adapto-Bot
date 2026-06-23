@@ -5,7 +5,6 @@ import {
   MessagingExtensionResponse,
   TurnContext,
 } from "botbuilder";
-import request from "request";
 import { SMERequest, SMEResponse } from "../sme-router";
 import { IScenarioBuilder, ITeamsScenario } from "../teams-bot";
 import axios from "axios";
@@ -148,11 +147,11 @@ export class SMEMessageExtension implements ITeamsScenario {
   }
 
   private async httpGet(url: string, parseJson = true) {
-    return await new Promise((resolve, reject) => {
-      request(url, (err, res, body) =>
-        err ? reject(err) : resolve(parseJson ? JSON.parse(body) : body)
-      );
+    const res = await axios.get(url, {
+      responseType: parseJson ? "json" : "text",
+      transformResponse: parseJson ? undefined : [(data) => data],
     });
+    return res.data;
   }
 
   private findEndpoint(manifest: any) {

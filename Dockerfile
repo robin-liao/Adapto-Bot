@@ -1,4 +1,4 @@
-FROM node:18
+FROM node:24
 
 # Create app directory
 RUN mkdir /opt/app
@@ -9,7 +9,6 @@ WORKDIR /opt/app
 # where available (npm@5+)
 COPY ./package*.json ./
 COPY ./tsconfig.json ./
-COPY ./tslint.json ./
 COPY ./yarn.lock ./
 
 RUN yarn install

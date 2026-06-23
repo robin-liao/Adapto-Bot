@@ -1,13 +1,6 @@
-import {
-  createTableService,
-  TableService,
-  TableUtilities,
-  TableQuery,
-} from "azure-storage";
+import { TableClient, TableEntity as SdkTableEntity } from "@azure/data-tables";
 import config from "../config";
 import * as _ from "lodash";
-
-const entGen = TableUtilities.entityGenerator;
 
 export type ValueType = string | number | boolean | Date;
 
@@ -16,10 +9,6 @@ export interface AzureTableEntity {
   RowKey: string;
   Timestamp?: Date;
 }
-
-export type AzureTableEntityRaw<E extends AzureTableEntity> = {
-  [K in keyof E]: TableUtilities.entityGenerator.EntityProperty<E[K]>;
-};
 
 export type Flatten<T extends Record<string, any>> = {
   [K in keyof T]: T[K] extends ValueType ? T[K] : string;
@@ -47,111 +36,93 @@ export const deflattenObj = <T extends Record<string, any>>(
     }
   });
 
-class AzureTableService {
-  private service = createTableService(config.azureStorageConnectionString);
+const isValueType = (v: any): v is ValueType =>
+  _.isString(v) || _.isNumber(v) || _.isBoolean(v) || _.isDate(v);
 
-  public getTable(tblName: string): Promise<TableService.TableResult> {
-    return new Promise((resolve, reject) => {
-      this.service.createTableIfNotExists(
-        tblName,
-        {},
-        (err, result, response) => {
-          if (!err) {
-            resolve(result);
-          } else {
-            reject(err);
-          }
-        }
-      );
-    });
+const odataLiteral = (v: ValueType): string => {
+  if (_.isString(v)) return `'${v.replace(/'/g, "''")}'`;
+  if (_.isDate(v)) return `datetime'${v.toISOString()}'`;
+  return `${v}`; // number | boolean
+};
+
+class AzureTableService {
+  private readonly connectionString = config.azureStorageConnectionString;
+  private readonly clients = new Map<string, TableClient>();
+
+  private client(tblName: string): TableClient {
+    let c = this.clients.get(tblName);
+    if (!c) {
+      c = TableClient.fromConnectionString(this.connectionString, tblName, {
+        allowInsecureConnection: true,
+      });
+      this.clients.set(tblName, c);
+    }
+    return c;
   }
 
-  public putEntity<E extends AzureTableEntity>(
+  public async getTable(tblName: string): Promise<void> {
+    try {
+      await this.client(tblName).createTable();
+    } catch (err: any) {
+      // 409 TableAlreadyExists is expected and safe to ignore.
+      if (err?.statusCode !== 409) {
+        throw err;
+      }
+    }
+  }
+
+  public async putEntity<E extends AzureTableEntity>(
     tblName: string,
     entity: Partial<E>
-  ): Promise<TableService.EntityMetadata> {
-    return new Promise((resolve, reject) => {
-      this.service.insertOrMergeEntity<AzureTableEntityRaw<E>>(
-        tblName,
-        this.toStorageEntity(entity),
-        (err, result, response) => {
-          if (!err) {
-            resolve(result);
-          } else {
-            reject(err);
-          }
-        }
-      );
+  ): Promise<void> {
+    const { PartitionKey, RowKey, Timestamp, ...rest } = entity as any;
+    const sdkEntity: SdkTableEntity = {
+      partitionKey: String(PartitionKey),
+      rowKey: String(RowKey),
+    };
+    _.forEach(rest, (v, k) => {
+      sdkEntity[k] = isValueType(v) ? v : JSON.stringify(v);
     });
+    await this.client(tblName).upsertEntity(sdkEntity, "Merge");
   }
 
-  public queryEntities<E extends AzureTableEntity>(
+  public async queryEntities<E extends AzureTableEntity>(
     tblName: string,
     entity: Partial<E>,
     proj?: (keyof E)[]
   ): Promise<E[]> {
-    const keys = _.keys(entity);
-    let query = new TableQuery();
-    keys.forEach((k, id) => {
-      if (id === 0) {
-        query = query.where(`${k} eq ?`, entity[k]);
-      } else {
-        query = query.and(`${k} eq ?`, entity[k]);
-      }
+    const filter = _.keys(entity)
+      .map((k) => `${k} eq ${odataLiteral((entity as any)[k])}`)
+      .join(" and ");
+
+    const iter = this.client(tblName).listEntities<SdkTableEntity>({
+      queryOptions: {
+        filter: filter || undefined,
+        select: _.isEmpty(proj) ? undefined : (proj as string[]),
+      },
     });
 
-    if (!_.isEmpty(proj)) {
-      query = query.select(proj as string[]);
+    const results: E[] = [];
+    for await (const e of iter) {
+      const { partitionKey, rowKey, timestamp, etag, ...restProps } = e as any;
+      results.push({
+        ...restProps,
+        PartitionKey: partitionKey,
+        RowKey: rowKey,
+        Timestamp: timestamp ? new Date(timestamp) : undefined,
+      } as unknown as E);
     }
-
-    return new Promise<E[]>((resolve, reject) => {
-      this.service.queryEntities<AzureTableEntityRaw<E>>(
-        tblName,
-        query,
-        null,
-        (err, result, response) => {
-          if (!err) {
-            const arr = _.map(result.entries, (entry) =>
-              _.mapValues(entry, (v) =>
-                v.$ === "Edm.DateTime"
-                  ? new Date(v._ as unknown as string)
-                  : v._
-              )
-            ) as E[];
-            resolve(arr);
-          } else {
-            reject(err);
-          }
-        }
-      );
-    });
+    return results;
   }
 
-  public deleteEntity(
+  public async deleteEntity(
     tblName: string,
     entity: AzureTableEntity
   ): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.service.deleteEntity(tblName, entity, (error, response) =>
-        error ? reject(error) : resolve()
-      );
-    });
-  }
-
-  private toStorageEntity<E extends AzureTableEntity>(
-    entity: Partial<E>
-  ): AzureTableEntityRaw<E> {
-    return _.mapValues(entity, (val) =>
-      _.isString(val)
-        ? entGen.String(val)
-        : _.isBoolean(val)
-        ? entGen.Boolean(val)
-        : _.isNumber(val)
-        ? entGen.Double(val)
-        : _.isDate(val)
-        ? entGen.DateTime(val)
-        : entGen.String(val.toString())
-    ) as any;
+    await this.client(tblName).deleteEntity(
+      entity.PartitionKey,
+      entity.RowKey
+    );
   }
 }
 

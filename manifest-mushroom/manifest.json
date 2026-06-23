@@ -41,25 +41,21 @@
     {
       "entityId": "tab-adaptivecard-settings",
       "name": "Bot Settings",
-      "contentBotId": "7cc7da65-66f9-4de3-bcdb-203c0b04be0f",
       "scopes": ["personal", "team"]
     },
     {
       "entityId": "tab-adaptivecard-sandbox",
       "name": "AC Tab Sandbox",
-      "contentBotId": "7cc7da65-66f9-4de3-bcdb-203c0b04be0f",
       "scopes": ["personal", "team"]
     },
     {
       "entityId": "tab-tag-work",
       "name": "My Tag Work",
-      "contentBotId": "7cc7da65-66f9-4de3-bcdb-203c0b04be0f",
       "scopes": ["personal", "team"]
     },
     {
       "entityId": "tab-message-ext",
       "name": "ME Config",
-      "contentBotId": "7cc7da65-66f9-4de3-bcdb-203c0b04be0f",
       "scopes": ["personal"]
     },
     {

@@ -1,0 +1,506 @@
+{
+  "type": "AdaptiveCard",
+  "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.6",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "⚠️ ESCALATED Stale App Alerts",
+      "size": "Large",
+      "weight": "Bolder",
+      "color": "Attention",
+      "isSubtle": false,
+      "maxLines": 0
+    },
+    {
+      "type": "TextBlock",
+      "spacing": "None",
+      "text": "2 alert(s) detected",
+      "isSubtle": true,
+      "maxLines": 0
+    },
+    {
+      "type": "Container",
+      "spacing": "Small",
+      "style": "emphasis",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "🔴 spp_daily",
+          "weight": "Bolder",
+          "color": "Attention",
+          "isSubtle": false,
+          "wrap": true,
+          "maxLines": 0
+        },
+        {
+          "type": "FactSet",
+          "spacing": "Small",
+          "facts": [
+            {
+              "title": "App:",
+              "value": "featureworks-forward-signals-prod"
+            },
+            {
+              "title": "Func:",
+              "value": "spp_daily"
+            },
+            {
+              "title": "Overdue by:",
+              "value": "12738 seconds"
+            },
+            {
+              "title": "Last Check-in:",
+              "value": "06/21/2026 11:18:10"
+            },
+            {
+              "title": "Expected max interval:",
+              "value": "90000 seconds"
+            },
+            {
+              "title": "Processed:",
+              "value": "06/22/2026 15:50:28"
+            }
+          ]
+        },
+        {
+          "type": "ColumnSet",
+          "spacing": "Small",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Overdue:",
+                  "size": "Small",
+                  "isSubtle": false,
+                  "maxLines": 0
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "3h 32m",
+                  "size": "Small",
+                  "color": "Attention",
+                  "isSubtle": false,
+                  "maxLines": 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "TextBlock",
+          "spacing": "Small",
+          "text": "📝 Prefect Flow Run: http://pr-datawrks-v01.tps.local:4200/runs/flow-run/14be6563-1a04-4a79-9ffc-b9dda0cef81b\nFlow: Forward Signals -- SPP Daily\nDeployment: featureworks-forward-signals-spp-daily-prod\nClick the link above to view this specific flow run and logs.\n\nDocs: https://github.com/Tenaska/FeatureWorks/tree/main/flows/embeddings/forward_signals\nForward congestion signals (FECC v2 + lag-anchored). Upstream of embeddings pipeline.",
+          "size": "Medium",
+          "weight": "Bolder",
+          "color": "Warning",
+          "isSubtle": false,
+          "wrap": true,
+          "maxLines": 0
+        },
+        {
+          "type": "Input.ChoiceSet",
+          "id": "sleep_hours_featureworks-forward-signals-prod__spp_daily",
+          "spacing": "Small",
+          "value": "1",
+          "choices": [
+            {
+              "title": "1 hour",
+              "value": "1"
+            },
+            {
+              "title": "2 hours",
+              "value": "2"
+            },
+            {
+              "title": "4 hours",
+              "value": "4"
+            },
+            {
+              "title": "8 hours",
+              "value": "8"
+            },
+            {
+              "title": "12 hours",
+              "value": "12"
+            },
+            {
+              "title": "24 hours",
+              "value": "24"
+            },
+            {
+              "title": "Custom...",
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "type": "Input.Text",
+          "id": "custom_hours_featureworks-forward-signals-prod__spp_daily",
+          "spacing": "Small",
+          "maxLength": 0,
+          "placeholder": "Enter custom hours (leave empty to use dropdown)"
+        },
+        {
+          "type": "ActionSet",
+          "spacing": "Small",
+          "actions": [
+            {
+              "type": "Action.Execute",
+              "title": "😴 Sleep",
+              "data": {
+                "action": "sleep",
+                "app": "featureworks-forward-signals-prod",
+                "function": "spp_daily",
+                "input_id": "sleep_hours_featureworks-forward-signals-prod__spp_daily",
+                "all_alert_keys": [
+                  {
+                    "app": "featureworks-forward-signals-prod",
+                    "function": "spp_daily"
+                  },
+                  {
+                    "app": "featureworks-ptdf-estimation-prod",
+                    "function": "spp_daily"
+                  }
+                ]
+              },
+              "verb": "sleep"
+            },
+            {
+              "type": "Action.Execute",
+              "title": "🗑️ Delete",
+              "style": "destructive",
+              "data": {
+                "action": "delete",
+                "app": "featureworks-forward-signals-prod",
+                "function": "spp_daily",
+                "all_alert_keys": [
+                  {
+                    "app": "featureworks-forward-signals-prod",
+                    "function": "spp_daily"
+                  },
+                  {
+                    "app": "featureworks-ptdf-estimation-prod",
+                    "function": "spp_daily"
+                  }
+                ]
+              },
+              "verb": "delete"
+            },
+            {
+              "type": "Action.OpenUrl",
+              "title": "📋 Logs",
+              "url": "https://us-east-2.console.aws.amazon.com/cloudwatch/home?region=us-east-2#logsV2:log-groups"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "spacing": "Medium",
+      "style": "emphasis",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "🔴 spp_daily",
+          "weight": "Bolder",
+          "color": "Attention",
+          "isSubtle": false,
+          "wrap": true,
+          "maxLines": 0
+        },
+        {
+          "type": "FactSet",
+          "spacing": "Small",
+          "facts": [
+            {
+              "title": "App:",
+              "value": "featureworks-ptdf-estimation-prod"
+            },
+            {
+              "title": "Func:",
+              "value": "spp_daily"
+            },
+            {
+              "title": "Overdue by:",
+              "value": "12931 seconds"
+            },
+            {
+              "title": "Last Check-in:",
+              "value": "06/21/2026 11:14:56"
+            },
+            {
+              "title": "Expected max interval:",
+              "value": "90000 seconds"
+            },
+            {
+              "title": "Processed:",
+              "value": "06/22/2026 15:50:28"
+            }
+          ]
+        },
+        {
+          "type": "ColumnSet",
+          "spacing": "Small",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Overdue:",
+                  "size": "Small",
+                  "isSubtle": false,
+                  "maxLines": 0
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "3h 35m",
+                  "size": "Small",
+                  "color": "Attention",
+                  "isSubtle": false,
+                  "maxLines": 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "TextBlock",
+          "spacing": "Small",
+          "text": "📝 Prefect Flow Run: http://pr-datawrks-v01.tps.local:4200/runs/flow-run/019edced-8122-749e-a651-6764a5f03252\nFlow: PTDF Estimation -- SPP Daily\nDeployment: featureworks-ptdf-estimation-spp-daily-prod\nClick the link above to view this specific flow run and logs.\n\nDocs: https://github.com/Tenaska/FeatureWorks/tree/main/flows/embeddings/shift_factors\n2-window staggered ensemble (180d + 120d). DA shadows from spp.da_binding_constraints + RT from spp.rtbm_binding_constraints.",
+          "size": "Medium",
+          "weight": "Bolder",
+          "color": "Warning",
+          "isSubtle": false,
+          "wrap": true,
+          "maxLines": 0
+        },
+        {
+          "type": "Input.ChoiceSet",
+          "id": "sleep_hours_featureworks-ptdf-estimation-prod__spp_daily",
+          "spacing": "Small",
+          "value": "1",
+          "choices": [
+            {
+              "title": "1 hour",
+              "value": "1"
+            },
+            {
+              "title": "2 hours",
+              "value": "2"
+            },
+            {
+              "title": "4 hours",
+              "value": "4"
+            },
+            {
+              "title": "8 hours",
+              "value": "8"
+            },
+            {
+              "title": "12 hours",
+              "value": "12"
+            },
+            {
+              "title": "24 hours",
+              "value": "24"
+            },
+            {
+              "title": "Custom...",
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "type": "Input.Text",
+          "id": "custom_hours_featureworks-ptdf-estimation-prod__spp_daily",
+          "spacing": "Small",
+          "maxLength": 0,
+          "placeholder": "Enter custom hours (leave empty to use dropdown)"
+        },
+        {
+          "type": "ActionSet",
+          "spacing": "Small",
+          "actions": [
+            {
+              "type": "Action.Execute",
+              "title": "😴 Sleep",
+              "data": {
+                "action": "sleep",
+                "app": "featureworks-ptdf-estimation-prod",
+                "function": "spp_daily",
+                "input_id": "sleep_hours_featureworks-ptdf-estimation-prod__spp_daily",
+                "all_alert_keys": [
+                  {
+                    "app": "featureworks-forward-signals-prod",
+                    "function": "spp_daily"
+                  },
+                  {
+                    "app": "featureworks-ptdf-estimation-prod",
+                    "function": "spp_daily"
+                  }
+                ]
+              },
+              "verb": "sleep"
+            },
+            {
+              "type": "Action.Execute",
+              "title": "🗑️ Delete",
+              "style": "destructive",
+              "data": {
+                "action": "delete",
+                "app": "featureworks-ptdf-estimation-prod",
+                "function": "spp_daily",
+                "all_alert_keys": [
+                  {
+                    "app": "featureworks-forward-signals-prod",
+                    "function": "spp_daily"
+                  },
+                  {
+                    "app": "featureworks-ptdf-estimation-prod",
+                    "function": "spp_daily"
+                  }
+                ]
+              },
+              "verb": "delete"
+            },
+            {
+              "type": "Action.OpenUrl",
+              "title": "📋 Logs",
+              "url": "https://us-east-2.console.aws.amazon.com/cloudwatch/home?region=us-east-2#logsV2:log-groups"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "spacing": "Medium",
+      "style": "default",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Bulk Actions",
+          "size": "Medium",
+          "weight": "Bolder",
+          "isSubtle": false,
+          "maxLines": 0
+        },
+        {
+          "type": "Input.ChoiceSet",
+          "id": "sleep_hours_bulk",
+          "label": "Sleep duration for bulk actions:",
+          "value": "1",
+          "choices": [
+            {
+              "title": "1 hour",
+              "value": "1"
+            },
+            {
+              "title": "2 hours",
+              "value": "2"
+            },
+            {
+              "title": "4 hours",
+              "value": "4"
+            },
+            {
+              "title": "8 hours",
+              "value": "8"
+            },
+            {
+              "title": "12 hours",
+              "value": "12"
+            },
+            {
+              "title": "24 hours",
+              "value": "24"
+            },
+            {
+              "title": "Custom...",
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "type": "Input.Text",
+          "id": "custom_hours_bulk",
+          "maxLength": 0,
+          "placeholder": "Enter custom hours (leave empty to use dropdown)"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.OpenUrl",
+      "title": "📋 View All Logs",
+      "url": "https://us-east-2.console.aws.amazon.com/cloudwatch/home?region=us-east-2#logsV2:log-groups"
+    },
+    {
+      "type": "Action.Execute",
+      "title": "🙉 Sleep All Overdue",
+      "data": {
+        "action": "sleep_all_overdue",
+        "input_id": "sleep_hours_bulk"
+      },
+      "verb": "sleep_all_overdue"
+    },
+    {
+      "type": "Action.Execute",
+      "title": "😴 Sleep All (2)",
+      "data": {
+        "action": "sleep_all",
+        "alerts": [
+          {
+            "app": "featureworks-forward-signals-prod",
+            "function": "spp_daily"
+          },
+          {
+            "app": "featureworks-ptdf-estimation-prod",
+            "function": "spp_daily"
+          }
+        ],
+        "input_id": "sleep_hours_bulk"
+      },
+      "verb": "sleep_all"
+    },
+    {
+      "type": "Action.Execute",
+      "title": "🗑️ Delete All (2)",
+      "style": "destructive",
+      "data": {
+        "action": "delete_all",
+        "alerts": [
+          {
+            "app": "featureworks-forward-signals-prod",
+            "function": "spp_daily"
+          },
+          {
+            "app": "featureworks-ptdf-estimation-prod",
+            "function": "spp_daily"
+          }
+        ]
+      },
+      "verb": "delete_all"
+    }
+  ]
+}

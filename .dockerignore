@@ -1,0 +1,9 @@
+node_modules
+.git
+.gitignore
+npm-debug.log
+yarn-error.log
+ssl
+.vscode
+.DS_Store
+*.md

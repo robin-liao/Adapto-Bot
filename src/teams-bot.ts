@@ -45,6 +45,7 @@ import { SMEMessageExtension } from "./scenarios/sme-message-extension";
 import { TaskModuleAppJIT } from "./scenarios/task-module-app-jit";
 import { TaskModuleFullTest } from "./scenarios/task-module-full-test";
 import { WorkBot } from "./scenarios/work-bot";
+import { WidgetBot } from "./scenarios/widget-bot";
 import {
   UniversalSearchRequest,
   UniversalSearchResponse,
@@ -71,6 +72,10 @@ export interface ITeamsScenario {
 export interface IScenarioBuilder {
   registerTextCommand(pattern: RegExp, handler: TextCommandCallback);
   registerInvoke(intent: string, handler: InvokeCallback);
+  registerHtmlWidgetCalltoolHandler(
+    toolName: string,
+    handler: HtmlWidgetCalltoolHandler,
+  );
   registerACv2Handler(intent: string, handler: ACv2Callback);
   registerUniversalSearch(dataset: string, handler: InvokeSearchCallback);
   registerTaskModule(commandId: string, task: ITaskModule);
@@ -78,23 +83,23 @@ export interface IScenarioBuilder {
   registerTabRouter(tabEntityId: string, router: Router);
   registerMessageExtensionQuery(
     commandId: string,
-    handler: MessageExtensionQueryCallback
+    handler: MessageExtensionQueryCallback,
   );
   registerMessageExtensionSetting(
     commandId: string,
-    handler: MessageExtensionSettingHandler
+    handler: MessageExtensionSettingHandler,
   );
   registerFileHandler(handler: IBotFileHandler);
   registerWebSocketHandler<T>(
     eventTarget: string,
-    handler: WebScoketCallback<T>
+    handler: WebScoketCallback<T>,
   );
 
   sendCard(
     ctx: TurnContext,
     card: Attachment,
     alert?: boolean,
-    repeat?: number
+    repeat?: number,
   ): Promise<string[]>;
 }
 
@@ -142,9 +147,16 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     this.invokeHandler.register(intent, handler);
   }
 
+  public registerHtmlWidgetCalltoolHandler(
+    toolName: string,
+    handler: HtmlWidgetCalltoolHandler,
+  ) {
+    this.invokeHandler.registerHtmlWidgetCalltoolHandler(toolName, handler);
+  }
+
   public registerUniversalSearch(
     dataset: string,
-    handler: InvokeSearchCallback
+    handler: InvokeSearchCallback,
   ) {
     this.invokeHandler.registerUniversalSearch(dataset, handler);
   }
@@ -167,14 +179,14 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
 
   public registerMessageExtensionQuery(
     commandId: string,
-    handler: MessageExtensionQueryCallback
+    handler: MessageExtensionQueryCallback,
   ) {
     this.msgExtHandler.register(commandId, handler);
   }
 
   public registerMessageExtensionSetting(
     commandId: string,
-    handler: MessageExtensionSettingHandler
+    handler: MessageExtensionSettingHandler,
   ) {
     this.msgExtHandler.registerSetting(commandId, handler);
   }
@@ -187,7 +199,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
 
   public registerWebSocketHandler<T>(
     eventTarget: string,
-    handler: WebScoketCallback<T>
+    handler: WebScoketCallback<T>,
   ) {
     this.wsHandler.register(eventTarget, handler);
   }
@@ -201,7 +213,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
 
   protected async onAdaptiveCardInvoke(
     ctx: TurnContext,
-    { action: { data } }: AdaptiveCardInvokeValue
+    { action: { data } }: AdaptiveCardInvokeValue,
   ): Promise<AdaptiveCardInvokeResponse> {
     const res = await this.acv2Handler.dispatch(ctx, data);
     return (
@@ -215,7 +227,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
 
   protected async handleTeamsAppBasedLinkQuery(
     ctx: TurnContext,
-    query: AppBasedLinkQuery
+    query: AppBasedLinkQuery,
   ): Promise<MessagingExtensionResponse> {
     await sleep(5000);
     return Promise.resolve<MessagingExtensionResponse>({
@@ -302,57 +314,57 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
 
   protected async handleTeamsMessagingExtensionQuery(
     ctx: TurnContext,
-    query: MessagingExtensionQuery
+    query: MessagingExtensionQuery,
   ): Promise<MessagingExtensionResponse> {
     const cmdId = query.commandId;
     return this.msgExtHandler.handleTeamsMessagingExtensionQuery(
       cmdId,
       ctx,
-      query
+      query,
     );
   }
 
   protected async handleTeamsMessagingExtensionConfigurationQuerySettingUrl(
     ctx: TurnContext,
-    query: MessagingExtensionQuery
+    query: MessagingExtensionQuery,
   ): Promise<MessagingExtensionResponse> {
     const cmdId = query.commandId;
     return this.msgExtHandler.handleTeamsMessagingExtensionConfigurationQuerySettingUrl(
       cmdId,
       ctx,
-      query
+      query,
     );
   }
 
   protected async handleTeamsMessagingExtensionConfigurationSetting(
     ctx: TurnContext,
-    settings: any
+    settings: any,
   ): Promise<void> {
     const cmdId = ctx.activity.value.commandId as string;
     await this.msgExtHandler.handleTeamsMessagingExtensionConfigurationSetting(
       cmdId,
       ctx,
-      settings
+      settings,
     );
   }
 
   protected async handleTeamsMessagingExtensionCardButtonClicked(
     ctx: TurnContext,
-    cardData: any
+    cardData: any,
   ): Promise<void> {
     await this.handleInvoke(ctx);
   }
 
   protected async handleTeamsSigninVerifyState(
     ctx: TurnContext,
-    query: SigninStateVerificationQuery
+    query: SigninStateVerificationQuery,
   ): Promise<void> {
     await Auth.verifySigninState(ctx, query.state);
   }
 
   protected handleTeamsTaskModuleFetch(
     ctx: TurnContext,
-    request: TaskModuleRequest
+    request: TaskModuleRequest,
   ): Promise<TaskModuleResponse> {
     const cmdId = request.data?.commandId;
     return this.tmHandler.handleTeamsTaskModuleFetch(cmdId, ctx, request);
@@ -360,7 +372,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
 
   protected handleTeamsTaskModuleSubmit(
     ctx: TurnContext,
-    request: TaskModuleRequest
+    request: TaskModuleRequest,
   ): Promise<TaskModuleResponse> {
     const cmdId = request.data?.commandId;
     return this.tmHandler.handleTeamsTaskModuleSubmit(cmdId, ctx, request);
@@ -368,57 +380,57 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
 
   protected handleTeamsMessagingExtensionFetchTask(
     ctx: TurnContext,
-    request: MessagingExtensionAction
+    request: MessagingExtensionAction,
   ): Promise<MessagingExtensionActionResponse> {
     const { commandId } = request;
     return this.tmHandler.handleTeamsMessagingExtensionFetchTask(
       commandId,
       ctx,
-      request
+      request,
     );
   }
 
   protected handleTeamsMessagingExtensionSubmitAction(
     ctx: TurnContext,
-    request: MessagingExtensionAction
+    request: MessagingExtensionAction,
   ): Promise<MessagingExtensionActionResponse> {
     const { commandId } = request;
     return this.tmHandler.handleTeamsMessagingExtensionSubmitAction(
       commandId,
       ctx,
-      request
+      request,
     );
   }
 
   protected async handleTeamsMessagingExtensionBotMessagePreviewEdit(
     ctx: TurnContext,
-    request: MessagingExtensionAction
+    request: MessagingExtensionAction,
   ): Promise<MessagingExtensionActionResponse> {
     const { commandId } = request;
     return this.tmHandler.handleTeamsMessagingExtensionSubmitAction(
       commandId,
       ctx,
       request,
-      "edit"
+      "edit",
     );
   }
 
   protected async handleTeamsMessagingExtensionBotMessagePreviewSend(
     ctx: TurnContext,
-    request: MessagingExtensionAction
+    request: MessagingExtensionAction,
   ): Promise<MessagingExtensionActionResponse> {
     const { commandId } = request;
     return this.tmHandler.handleTeamsMessagingExtensionSubmitAction(
       commandId,
       ctx,
       request,
-      "send"
+      "send",
     );
   }
 
   protected handleTeamsTabFetch(
     ctx: TurnContext,
-    request: TabRequest
+    request: TabRequest,
   ): Promise<TabResponse> {
     const {
       tabContext: { tabEntityId },
@@ -428,7 +440,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
 
   protected handleTeamsTabSubmit(
     ctx: TurnContext,
-    request: TabRequest
+    request: TabRequest,
   ): Promise<TabResponse> {
     const {
       tabContext: { tabEntityId },
@@ -438,20 +450,20 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
 
   protected async handleTeamsFileConsentAccept(
     ctx: TurnContext,
-    fileConsentCardResponse: FileConsentCardResponse
+    fileConsentCardResponse: FileConsentCardResponse,
   ): Promise<void> {
     const proms = this.fileHandlers.map((h) =>
-      h.handleTeamsFileConsentAccept?.(ctx, fileConsentCardResponse)
+      h.handleTeamsFileConsentAccept?.(ctx, fileConsentCardResponse),
     );
     await Promise.all(proms);
   }
 
   protected async handleTeamsFileConsentDecline(
     ctx: TurnContext,
-    fileConsentCardResponse: FileConsentCardResponse
+    fileConsentCardResponse: FileConsentCardResponse,
   ): Promise<void> {
     const proms = this.fileHandlers.map((h) =>
-      h.handleTeamsFileConsentDecline?.(ctx, fileConsentCardResponse)
+      h.handleTeamsFileConsentDecline?.(ctx, fileConsentCardResponse),
     );
     await Promise.all(proms);
   }
@@ -462,10 +474,10 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
       return ctx.activity.value
         ? this.handleOnMessageBack(ctx, next)
         : ctx.activity.attachments?.some(
-            (x) => x.contentType === DOWNLOAD_INFO_CONTENT_TYPE
-          )
-        ? this.handleOnMessageWithFileDownload(ctx, next)
-        : this.handleOnMessage(ctx, next);
+              (x) => x.contentType === DOWNLOAD_INFO_CONTENT_TYPE,
+            )
+          ? this.handleOnMessageWithFileDownload(ctx, next)
+          : this.handleOnMessage(ctx, next);
     });
     this.registerOnTeamsEvents();
   }
@@ -486,6 +498,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     new TaskModuleAdaptiveCardList().accept(this);
     new ActivityGenerator().accept(this);
     new WebRTCBot().accept(this);
+    new WidgetBot().accept(this);
   }
 
   private async handleOnMessage(ctx: TurnContext, next: () => Promise<void>) {
@@ -511,7 +524,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
 
   private async handleOnMessageBack(
     ctx: TurnContext,
-    next: () => Promise<void>
+    next: () => Promise<void>,
   ) {
     const res = await this.handleInvoke(ctx);
     if (res.status === StatusCodes.NOT_FOUND) {
@@ -523,14 +536,14 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
 
   private async handleOnMessageWithFileDownload(
     ctx: TurnContext,
-    next: () => Promise<void>
+    next: () => Promise<void>,
   ) {
     const attachments = ctx.activity.attachments?.filter(
-      (x) => x.contentType === DOWNLOAD_INFO_CONTENT_TYPE
+      (x) => x.contentType === DOWNLOAD_INFO_CONTENT_TYPE,
     ) as FileDownloadInfoAttachment[];
     const files = attachments.map((x) => x.content);
     const proms = this.fileHandlers.map((h) =>
-      h.onMessageWithFileDownloadInfo?.(ctx, files)
+      h.onMessageWithFileDownloadInfo?.(ctx, files),
     );
     await Promise.all(proms);
     next();
@@ -542,6 +555,8 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
         case "composeExtension/fetchCommands":
         case "message/submitAction":
           return { status: StatusCodes.OK };
+        case "htmlwidget/calltool":
+          return this.invokeHandler.dispatchHtmlWidgetCalltool(ctx);
       }
     }
 
@@ -550,7 +565,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
   }
 
   protected async dispatchConversationUpdateActivity(
-    ctx: TurnContext
+    ctx: TurnContext,
   ): Promise<void> {
     OneOnOneHelper.saveOneOnOneConvRef(ctx);
     return super.dispatchConversationUpdateActivity(ctx);
@@ -562,7 +577,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
       obj: any,
       ctx: TurnContext,
       next: () => Promise<void>,
-      settingKey?: keyof ConvSetting
+      settingKey?: keyof ConvSetting,
     ) => {
       let enable = true;
       const convId = getConversationId(ctx.activity);
@@ -577,7 +592,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
           text: `<strong>${eventName}</strong><br/><pre>${JSON.stringify(
             obj,
             null,
-            2
+            2,
           )}</pre>`,
         });
       }
@@ -590,8 +605,8 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
         { channelInfo, teamInfo },
         ctx,
         next,
-        "echoAllTeamsEvents"
-      )
+        "echoAllTeamsEvents",
+      ),
     );
 
     this.onTeamsChannelDeletedEvent((channelInfo, teamInfo, ctx, next) =>
@@ -600,8 +615,8 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
         { channelInfo, teamInfo },
         ctx,
         next,
-        "echoAllTeamsEvents"
-      )
+        "echoAllTeamsEvents",
+      ),
     );
 
     this.onTeamsChannelRenamedEvent((channelInfo, teamInfo, ctx, next) =>
@@ -610,8 +625,8 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
         { channelInfo, teamInfo },
         ctx,
         next,
-        "echoAllTeamsEvents"
-      )
+        "echoAllTeamsEvents",
+      ),
     );
 
     this.onTeamsChannelRestoredEvent((channelInfo, teamInfo, ctx, next) =>
@@ -620,8 +635,8 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
         { channelInfo, teamInfo },
         ctx,
         next,
-        "echoAllTeamsEvents"
-      )
+        "echoAllTeamsEvents",
+      ),
     );
 
     this.onTeamsMembersAddedEvent((membersAdded, teamInfo, ctx, next) =>
@@ -630,8 +645,8 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
         { membersAdded, teamInfo },
         ctx,
         next,
-        "echoAllTeamsEvents"
-      )
+        "echoAllTeamsEvents",
+      ),
     );
 
     this.onTeamsMembersRemovedEvent((membersRemoved, teamInfo, ctx, next) =>
@@ -640,8 +655,8 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
         { membersRemoved, teamInfo },
         ctx,
         next,
-        "echoAllTeamsEvents"
-      )
+        "echoAllTeamsEvents",
+      ),
     );
 
     this.onTeamsTeamArchivedEvent((teamInfo, ctx, next) =>
@@ -650,8 +665,8 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
         { teamInfo },
         ctx,
         next,
-        "echoAllTeamsEvents"
-      )
+        "echoAllTeamsEvents",
+      ),
     );
 
     this.onTeamsTeamDeletedEvent((teamInfo, ctx, next) =>
@@ -660,8 +675,8 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
         { teamInfo },
         ctx,
         next,
-        "echoAllTeamsEvents"
-      )
+        "echoAllTeamsEvents",
+      ),
     );
 
     this.onTeamsTeamHardDeletedEvent((teamInfo, ctx, next) =>
@@ -670,8 +685,8 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
         { teamInfo },
         ctx,
         next,
-        "echoAllTeamsEvents"
-      )
+        "echoAllTeamsEvents",
+      ),
     );
 
     this.onTeamsTeamRenamedEvent((teamInfo, ctx, next) =>
@@ -680,8 +695,8 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
         { teamInfo },
         ctx,
         next,
-        "echoAllTeamsEvents"
-      )
+        "echoAllTeamsEvents",
+      ),
     );
 
     this.onTeamsTeamRestoredEvent((teamInfo, ctx, next) =>
@@ -690,8 +705,8 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
         { teamInfo },
         ctx,
         next,
-        "echoAllTeamsEvents"
-      )
+        "echoAllTeamsEvents",
+      ),
     );
 
     this.onTeamsTeamUnarchivedEvent((teamInfo, ctx, next) =>
@@ -700,8 +715,8 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
         { teamInfo },
         ctx,
         next,
-        "echoAllTeamsEvents"
-      )
+        "echoAllTeamsEvents",
+      ),
     );
 
     this.onReactionsAdded((ctx, next) =>
@@ -710,8 +725,8 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
         { reactionsAdded: ctx.activity.reactionsAdded },
         ctx,
         next,
-        "echoMessageReaction"
-      )
+        "echoMessageReaction",
+      ),
     );
 
     this.onReactionsRemoved((ctx, next) =>
@@ -720,8 +735,8 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
         { reactionsRemoved: ctx.activity.reactionsRemoved },
         ctx,
         next,
-        "echoMessageReaction"
-      )
+        "echoMessageReaction",
+      ),
     );
   }
 
@@ -811,7 +826,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
     } = {
       mri: "97b1ec61-45bf-453c-9059-6e8984e0cef4",
       displayName: "Robin Liao",
-    }
+    },
   ): Promise<string[]> {
     const send = () => {
       try {
@@ -862,7 +877,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
 
 type MessageExtensionQueryCallback = (
   ctx: TurnContext,
-  query: MessagingExtensionQuery
+  query: MessagingExtensionQuery,
 ) => Promise<MessagingExtensionResponse>;
 
 type MessageExtensionSettingHandler = {
@@ -901,7 +916,7 @@ class MessageExtensionHandler {
 
   public registerSetting(
     cmdID: string,
-    handler: MessageExtensionSettingHandler
+    handler: MessageExtensionSettingHandler,
   ) {
     if (handler.getRouter) {
       this.router.use(`/${cmdID}`, handler.getRouter());
@@ -912,7 +927,7 @@ class MessageExtensionHandler {
   public handleTeamsMessagingExtensionQuery(
     commandId: string,
     ctx: TurnContext,
-    query: MessagingExtensionQuery
+    query: MessagingExtensionQuery,
   ): Promise<MessagingExtensionResponse> {
     const x = this.lookup[commandId];
     return x ? x(ctx, query) : Promise.resolve({});
@@ -921,7 +936,7 @@ class MessageExtensionHandler {
   public handleTeamsMessagingExtensionConfigurationQuerySettingUrl(
     commandId: string,
     ctx: TurnContext,
-    query: MessagingExtensionQuery
+    query: MessagingExtensionQuery,
   ): Promise<MessagingExtensionResponse> {
     const x = this.lookupSettings[commandId];
     return x?.querySettingUrl
@@ -932,7 +947,7 @@ class MessageExtensionHandler {
   public handleTeamsMessagingExtensionConfigurationSetting(
     commandId: string,
     ctx: TurnContext,
-    settings: any
+    settings: any,
   ): Promise<void> {
     const x = this.lookupSettings[commandId];
     return x?.updateSettings
@@ -944,7 +959,7 @@ class MessageExtensionHandler {
 type TextCommandCallback = (
   ctx: TurnContext,
   command: string,
-  args: string[]
+  args: string[],
 ) => Promise<void>;
 
 class TextCommandHandler {
@@ -969,13 +984,21 @@ class TextCommandHandler {
 }
 
 type InvokeCallback = (ctx: TurnContext) => Promise<InvokeResponse>;
+type HtmlWidgetCalltoolHandler = (
+  ctx: TurnContext,
+  args: any,
+) => Promise<any> | any;
 type InvokeSearchCallback = (
   request: UniversalSearchRequest,
-  ctx: TurnContext
+  ctx: TurnContext,
 ) => Promise<InvokeResponse<UniversalSearchResponse>>;
 
 class InvokeHandler {
   private lookup: { [intent: string]: InvokeCallback } = {};
+  private htmlWidgetCalltoolHandlers = new Map<
+    string,
+    HtmlWidgetCalltoolHandler
+  >();
   private lookupSearch: { [dataset: string]: InvokeSearchCallback } = {};
 
   public register(intent: string, handler: InvokeCallback) {
@@ -985,13 +1008,61 @@ class InvokeHandler {
     this.lookup[intent] = handler;
   }
 
+  public registerHtmlWidgetCalltoolHandler(
+    toolName: string,
+    handler: HtmlWidgetCalltoolHandler,
+  ) {
+    if (this.htmlWidgetCalltoolHandlers.has(toolName)) {
+      throw new Error(
+        `HTML widget tool handler for "${toolName}" already exists`,
+      );
+    }
+    this.htmlWidgetCalltoolHandlers.set(toolName, handler);
+  }
+
+  public async dispatchHtmlWidgetCalltool(
+    ctx: TurnContext,
+  ): Promise<InvokeResponse> {
+    const value = ctx.activity.value ?? {};
+    const params = value.params ?? value;
+    const toolName: string | undefined = params.name ?? params.toolName;
+    const handler = toolName
+      ? this.htmlWidgetCalltoolHandlers.get(toolName)
+      : undefined;
+
+    if (!handler) {
+      return {
+        status: StatusCodes.OK,
+        body: {
+          content: [{ type: "text", text: `Unknown tool: ${toolName}` }],
+          isError: true,
+        },
+      };
+    }
+
+    try {
+      const body = await handler(ctx, params.arguments ?? params.args ?? {});
+      return { status: StatusCodes.OK, body };
+    } catch (err) {
+      return {
+        status: StatusCodes.OK,
+        body: {
+          content: [
+            { type: "text", text: (err as Error)?.message ?? String(err) },
+          ],
+          isError: true,
+        },
+      };
+    }
+  }
+
   public registerUniversalSearch(
     dataset: string,
-    handler: InvokeSearchCallback
+    handler: InvokeSearchCallback,
   ) {
     if (this.lookupSearch[dataset]) {
       throw new Error(
-        `Invoke search handler for intent "${dataset}" already exists`
+        `Invoke search handler for intent "${dataset}" already exists`,
       );
     }
     this.lookupSearch[dataset] = handler;
@@ -1042,7 +1113,7 @@ class TaskModuleHandler {
   public handleTeamsTaskModuleFetch(
     commandId: string,
     ctx: TurnContext,
-    request: TaskModuleRequest
+    request: TaskModuleRequest,
   ): Promise<TaskModuleResponse> {
     const tm = this.lookup[commandId];
     return tm ? tm.fetch(ctx, request) : Promise.resolve({});
@@ -1051,7 +1122,7 @@ class TaskModuleHandler {
   public handleTeamsTaskModuleSubmit(
     commandId: string,
     ctx: TurnContext,
-    request: TaskModuleRequest
+    request: TaskModuleRequest,
   ): Promise<TaskModuleResponse> {
     const tm = this.lookup[commandId];
     return tm ? tm.submit(ctx, request) : Promise.resolve({});
@@ -1060,7 +1131,7 @@ class TaskModuleHandler {
   public handleTeamsMessagingExtensionFetchTask(
     commandId: string,
     ctx: TurnContext,
-    request: MessagingExtensionAction
+    request: MessagingExtensionAction,
   ): Promise<MessagingExtensionActionResponse> {
     const tm = this.lookup[commandId];
     return tm ? tm.fetch(ctx, request) : Promise.resolve({});
@@ -1070,7 +1141,7 @@ class TaskModuleHandler {
     commandId: string,
     ctx: TurnContext,
     request: MessagingExtensionAction,
-    userPreviewResponse?: "edit" | "send"
+    userPreviewResponse?: "edit" | "send",
   ): Promise<MessagingExtensionActionResponse> {
     const tm = this.lookup[commandId] as IMessagingExtensionAction;
     return tm
@@ -1100,7 +1171,7 @@ class TabHandler {
   public handleTeamsTabFetch(
     tabEntityId: string,
     ctx: TurnContext,
-    request: TabRequest
+    request: TabRequest,
   ): Promise<TabResponse> {
     const tab = this.lookup[tabEntityId];
     return tab ? tab.tabFetch(ctx, request) : Promise.resolve({ tab: {} });
@@ -1109,7 +1180,7 @@ class TabHandler {
   public handleTeamsTabSubmit(
     tabEntityId: string,
     ctx: TurnContext,
-    request: TabRequest
+    request: TabRequest,
   ): Promise<TabResponse> {
     const tab = this.lookup[tabEntityId];
     return tab ? tab.tabSubmit(ctx, request) : Promise.resolve({ tab: {} });
@@ -1118,7 +1189,7 @@ class TabHandler {
 
 type ACv2Callback = (
   ctx: TurnContext,
-  data: any
+  data: any,
 ) => Promise<AdaptiveCardInvokeResponse>;
 
 class AdaptiveCardV2Handler {
@@ -1133,7 +1204,7 @@ class AdaptiveCardV2Handler {
 
   public async dispatch(
     ctx: TurnContext,
-    data: any
+    data: any,
   ): Promise<AdaptiveCardInvokeResponse | undefined> {
     const intentQry: string = data.intent;
     if (this.lookup[intentQry]) {
@@ -1147,7 +1218,7 @@ type WSFunc = {
   subscribe: (ws: WebSocket, args: { eventTarget: string }) => void;
   publish: (
     ws: WebSocket,
-    args: { eventTarget: string; eventData: any }
+    args: { eventTarget: string; eventData: any },
   ) => void;
 };
 

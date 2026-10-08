@@ -23,11 +23,11 @@ class AuthHandler {
     this.router.use(bodyParser.json());
     this.router.use(cookieParser());
     this.router.get(`${this.startPath}/:userId`, (req, res) =>
-      this.onAuthStart(req, res)
+      this.onAuthStart(req, res),
     );
     this.router.get(this.loginPath, (req, res) => this.onLogin(req, res));
     this.router.get(this.loginCallbackPath, (req, res) =>
-      this.onLoginCallback(req, res)
+      this.onLoginCallback(req, res),
     );
   }
 
@@ -38,7 +38,33 @@ class AuthHandler {
 
   public getSigninCard(userId: string) {
     const url = this.getAuthUrl(userId);
-    return CardFactory.signinCard("Login", url, "Please Login");
+    // return CardFactory.signinCard("Login", url, "Please Login");
+    return CardFactory.adaptiveCard({
+      type: "AdaptiveCard",
+      body: [
+        {
+          type: "TextBlock",
+          size: "Large",
+          weight: "Bolder",
+          text: "Sign In",
+        },
+        {
+          type: "ActionSet",
+          actions: [
+            {
+              type: "Action.Submit",
+              title: "Sign in",
+              data: {
+                msteams: {
+                  type: "signin",
+                  value: url,
+                },
+              },
+            },
+          ],
+        },
+      ],
+    });
   }
 
   private onAuthStart(req: express.Request, res: express.Response) {
@@ -75,7 +101,7 @@ class AuthHandler {
   public async verifySigninState(
     ctx: TurnContext,
     state?: string,
-    returnCardPayloadOnly?: boolean
+    returnCardPayloadOnly?: boolean,
   ) {
     const {
       from: { aadObjectId: userId },
@@ -185,7 +211,7 @@ class AuthHandler {
               document.write('<br/>');
               document.write('context: <br/><pre>' + JSON.stringify(context, null, 2) + '</pre>');
               document.write('<button onClick="redirect()">Redirect</button>');
-              // window.location = '${config.host}' + '${this.rootPath}' + '${this.loginPath}';
+              window.location = '${config.host}' + '${this.rootPath}' + '${this.loginPath}';
             });
           });
         </script>

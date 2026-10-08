@@ -5,7 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
     "prettier": "prettier \"./src/**/*.ts\" \"./src/**/*.tsx\" --write",
-    "start": "npm run server",
+    "start": "yarn server",
     "script": "nodemon --exec node --inspect=2266 -r ts-node/register",
     "dev": "npm run build:dev",
     "build": "npm run clean & webpack --config ./build-scripts/webpack.prod.js",

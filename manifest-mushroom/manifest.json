@@ -1,9 +1,8 @@
 {
-  "$schema": "https://github.com/OfficeDev/microsoft-teams-app-schema/blob/preview/DevPreview/MicrosoftTeams.schema.json",
-  "manifestVersion": "devPreview",
+  "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.29/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.29",
   "version": "1.0",
   "id": "07f28974-c1de-437a-9a5d-b554e8bc7185",
-  "packageName": "com.microsoft.teams.samples.mushroomBot",
   "developer": {
     "name": "Robin Liao",
     "websiteUrl": "https://example.azurewebsites.net",
@@ -16,21 +15,7 @@
   },
   "description": {
     "short": "Sample bot using V4 SDK",
-    "full": "Sample bot using V4 Bot Builder V4 SDK",
-    "features": [
-      {
-        "title": "Feature heading 1",
-        "description": "This is a two line description about the feature heading 1 for this app."
-      },
-      {
-        "title": "Feature heading 2",
-        "description": "This is a two line description about the feature heading 2 for this app."
-      },
-      {
-        "title": "Feature heading 3",
-        "description": "This is a two line description about the feature heading 3 for this app."
-      }
-    ]
+    "full": "Sample bot using V4 Bot Builder V4 SDK"
   },
   "icons": {
     "outline": "icon-outline.png",
@@ -66,8 +51,8 @@
       "scopes": ["personal", "team"]
     }
   ],
-  "copilotExtensions": {
-    "customEngineCopilots": [
+  "copilotAgents": {
+    "customEngineAgents": [
       {
         "type": "bot",
         "id": "7cc7da65-66f9-4de3-bcdb-203c0b04be0f"
@@ -77,11 +62,10 @@
   "bots": [
     {
       "botId": "7cc7da65-66f9-4de3-bcdb-203c0b04be0f",
-      "scopes": ["groupchat", "personal", "team"],
+      "scopes": ["groupChat", "personal", "team"],
       "supportsFiles": true,
       "supportsCalling": true,
       "supportsVideo": true,
-      "supportsSessions": true,
       "commandLists": [
         {
           "scopes": ["team", "groupChat", "personal"],
@@ -235,13 +219,5 @@
     }
   ],
   "validDomains": ["*.azurewebsites.net", "*.ngrok.io"],
-  "localizationInfo": {
-    "defaultLanguageTag": "en",
-    "additionalLanguages": [
-      {
-        "languageTag": "zh-tw",
-        "file": "zh-tw.json"
-      }
-    ]
-  }
+  "supportsChannelFeatures": "tier1"
 }

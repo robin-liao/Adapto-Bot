@@ -50,7 +50,7 @@ import {
   UniversalSearchRequest,
   UniversalSearchResponse,
 } from "./search.interface";
-import { ConvSetting, ConvSettingTable } from "./storage/setting-table";
+import { ConvSetting, ConvSettingStore } from "./storage/setting-table";
 import { IAdaptiveCardTab } from "./tabs";
 import { IMessagingExtensionAction, ITaskModule } from "./task-modules";
 import {
@@ -582,7 +582,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
       let enable = true;
       const convId = getConversationId(ctx.activity);
       if (settingKey && convId) {
-        const setting = await new ConvSettingTable(convId).get();
+        const setting = await ConvSettingStore.get(convId);
         enable = !!setting?.[settingKey];
       }
 
@@ -743,7 +743,7 @@ export class TeamsBot extends TeamsActivityHandler implements IScenarioBuilder {
   private async echo(ctx: TurnContext) {
     const convId = getConversationId(ctx.activity);
     if (convId) {
-      const setting = await new ConvSettingTable(convId).get();
+      const setting = await ConvSettingStore.get(convId);
       if (!setting?.echoMessage) {
         return;
       }

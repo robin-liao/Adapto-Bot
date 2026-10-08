@@ -6,7 +6,6 @@ import {
   TabResponseCard,
 } from "botframework-schema";
 import { CardGenerator } from "../card-gen";
-import { ConvSettingTable } from "../storage/setting-table";
 import { TeamsBot } from "../teams-bot";
 import { getConversationId, printableJson } from "../utils";
 import { IAdaptiveCardTab } from "./tab.interface";

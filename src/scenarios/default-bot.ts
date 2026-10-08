@@ -20,7 +20,7 @@ import {
 import _ from "lodash";
 import { Auth, teamsSdk } from "../auth";
 import { CardGenerator, IAnnouncementCard, JsonCardLoader } from "../card-gen";
-import { ConvSettingTable } from "../storage/setting-table";
+import { ConvSettingStore } from "../storage/setting-table";
 import { IScenarioBuilder, ITeamsScenario } from "../teams-bot";
 import {
   getConversationId,
@@ -90,7 +90,7 @@ export class DefaultBot implements ITeamsScenario {
 
     teamsBot.registerTextCommand(/^setting/i, async (ctx) => {
       const convId = getConversationId(ctx.activity);
-      const setting = await new ConvSettingTable(convId).get();
+      const setting = await ConvSettingStore.get(convId);
       const card = CardGenerator.adaptive.settingCard(setting);
       await ctx.sendActivity({
         attachments: [card],
@@ -652,9 +652,8 @@ export class DefaultBot implements ITeamsScenario {
     teamsBot.registerInvoke("setting", async (ctx) => {
       const value = ctx.activity.value;
       const convId = getConversationId(ctx.activity);
-      const tbl = new ConvSettingTable(convId);
       const { echoAllTeamsEvents, echoMessage, echoMessageReaction } = value;
-      await tbl.update({
+      await ConvSettingStore.update(convId, {
         ...(echoAllTeamsEvents && {
           echoAllTeamsEvents: echoAllTeamsEvents === "true" ? true : false,
         }),
@@ -665,7 +664,7 @@ export class DefaultBot implements ITeamsScenario {
           echoMessageReaction: echoMessageReaction === "true" ? true : false,
         }),
       });
-      const newSetting = await tbl.get();
+      const newSetting = await ConvSettingStore.get(convId);
       const newSettingCard = CardGenerator.adaptive.settingCard(newSetting);
       await ctx.updateActivity({
         type: ActivityTypes.Message,

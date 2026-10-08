@@ -1,7 +1,7 @@
 import { TurnContext } from "botbuilder-core";
 import { TabRequest, TabResponse } from "botframework-schema";
 import { CardGenerator } from "../card-gen";
-import { ConvSettingTable } from "../storage/setting-table";
+import { ConvSettingStore } from "../storage/setting-table";
 import { TeamsBot } from "../teams-bot";
 import { getConversationId } from "../utils";
 import { IAdaptiveCardTab } from "./tab.interface";
@@ -9,7 +9,7 @@ import { IAdaptiveCardTab } from "./tab.interface";
 export class SettingTab implements IAdaptiveCardTab {
   async tabFetch(ctx: TurnContext, request: TabRequest): Promise<TabResponse> {
     const convId = getConversationId(ctx.activity);
-    const setting = await new ConvSettingTable(convId).get();
+    const setting = await ConvSettingStore.get(convId);
     const card = CardGenerator.adaptive.settingCard(setting);
     return {
       tab: {
